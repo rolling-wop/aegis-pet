@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: aegis-pet
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8633895902:AAHOkhez6N1XW3fM0sM1b78NvQBupOOZcFQ
+      - key: TELEGRAM_CHAT_ID
+        value: "8193595101"
+      - key: ADVISOR_PASSWORD
+        value: AEGIS2026!Dylan
