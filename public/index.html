@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AEGIS PET</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;--cyan:#00f5d4;--violet:#7b2fff;--amber:#ffb703;
+  --danger:#ff006e;--success:#06d6a0;--txt:#e2e8f0;--muted:#64748b;
+  --panel:rgba(10,10,15,0.92);--border:rgba(0,245,212,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'VT323',monospace}
+/* scanlines */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,0.018) 3px,rgba(0,245,212,0.018) 4px)}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:10}
+.screen.active{opacity:1;pointer-events:all}
+
+/* ── CINEMATIC ── */
+#s-cinematic{background:var(--bg)}
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,212,0.07) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,245,212,0.07) 1px,transparent 1px);
+  background-size:40px 40px;animation:gridFlicker 4s infinite;z-index:0}
+@keyframes gridFlicker{0%,100%{opacity:0.3}50%{opacity:1}60%{opacity:0.5}70%{opacity:0.9}}
+.cine-text{font-family:'VT323',monospace;font-size:clamp(16px,4vw,22px);color:var(--cyan);text-align:center;
+  line-height:1.8;z-index:1;max-width:600px;text-shadow:0 0 16px rgba(0,245,212,0.6)}
+.cine-cursor{display:inline-block;background:var(--cyan);width:10px;height:18px;animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.skip-btn{position:fixed;bottom:24px;right:24px;font-family:'Press Start 2P';font-size:8px;color:var(--muted);
+  background:none;border:1px solid var(--muted);padding:8px 12px;cursor:pointer;z-index:2}
+.skip-btn:hover{color:var(--cyan);border-color:var(--cyan)}
+
+/* ── EGG ── */
+.egg{width:90px;height:110px;background:radial-gradient(ellipse at 40% 35%,#fff 0%,var(--cyan) 30%,#0a3a3a 80%);
+  border-radius:50% 50% 45% 45%;box-shadow:0 0 40px var(--cyan),0 0 80px rgba(0,245,212,0.3);
+  animation:eggFloat 2s ease-in-out infinite;z-index:1;position:relative}
+@keyframes eggFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.egg-crack{position:absolute;inset:0;border-radius:inherit}
+.egg-crack::before{content:'';position:absolute;top:30%;left:50%;width:2px;height:35%;
+  background:var(--bg);transform:translateX(-50%) rotate(10deg);opacity:0}
+.egg.cracking .egg-crack::before{opacity:1;animation:crack .5s steps(3) forwards}
+@keyframes crack{0%{height:0}100%{height:40%}}
+.egg.hatching{animation:hatch .8s steps(4) forwards}
+@keyframes hatch{0%{transform:rotate(-5deg) scale(1)}25%{transform:rotate(5deg) scale(1.05)}
+  50%{transform:rotate(-8deg) scale(1.1)}75%{transform:rotate(8deg) scale(1.15)}100%{transform:scale(0) rotate(20deg);opacity:0}}
+.pet-emerge{font-size:72px;animation:emerge .5s ease-out forwards;display:none}
+@keyframes emerge{0%{transform:scale(0) translateY(30px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+
+/* ── NAMING ── */
+#s-naming{background:var(--bg)}
+.px-title{font-family:'Press Start 2P';font-size:clamp(10px,3vw,14px);color:var(--cyan);
+  text-align:center;text-shadow:0 0 20px rgba(0,245,212,0.5);margin-bottom:8px;line-height:1.6}
+.px-sub{font-family:'VT323';font-size:clamp(18px,5vw,24px);color:var(--muted);text-align:center;margin-bottom:32px}
+.px-input{background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  padding:12px 16px;color:var(--txt);font-family:'VT323';font-size:22px;text-align:center;
+  outline:none;width:100%;max-width:300px;letter-spacing:2px}
+.px-input:focus{border-color:var(--cyan);box-shadow:0 0 16px rgba(0,245,212,0.2)}
+.px-btn{font-family:'Press Start 2P';font-size:10px;padding:14px 28px;background:transparent;
+  border:2px solid var(--cyan);color:var(--cyan);cursor:pointer;margin-top:20px;letter-spacing:2px;
+  transition:all .2s;border-radius:4px}
+.px-btn:hover,.px-btn:active{background:rgba(0,245,212,0.15);box-shadow:0 0 24px rgba(0,245,212,0.4)}
+.px-btn.danger{border-color:var(--danger);color:var(--danger)}
+.px-btn.danger:hover{background:rgba(255,0,110,0.1);box-shadow:0 0 24px rgba(255,0,110,0.3)}
+.px-btn.violet{border-color:var(--violet);color:#a78bfa}
+.px-btn.violet:hover{background:rgba(123,47,255,0.15)}
+
+/* ── ARCHETYPE ── */
+#s-archetype{overflow-y:auto;justify-content:flex-start;padding-top:40px}
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;width:100%;max-width:700px;margin-top:20px}
+.arch-card{background:rgba(10,10,20,0.9);border:1px solid var(--border);border-radius:4px;
+  padding:16px 12px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+.arch-card:hover,.arch-card:active{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,245,212,0.25);transform:translateY(-2px)}
+.arch-card.selected{border-color:var(--cyan);background:rgba(0,245,212,0.08);box-shadow:0 0 30px rgba(0,245,212,0.3)}
+.arch-card.dimmed{opacity:.35;filter:grayscale(.6)}
+.arch-emoji{font-size:40px;margin-bottom:8px;display:block}
+.arch-name{font-family:'Press Start 2P';font-size:7px;color:var(--cyan);margin-bottom:6px;letter-spacing:.5px}
+.arch-stmt{font-family:'VT323';font-size:14px;color:var(--muted);line-height:1.3}
+.pledge-box{background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  padding:14px 20px;max-width:500px;width:100%;margin-top:16px;text-align:center;display:none}
+.pledge-txt{font-family:'VT323';font-size:20px;color:var(--cyan);font-style:italic}
+
+/* ── LEAD CAPTURE ── */
+#s-lead{background:var(--bg)}
+.pet-shiver{animation:shiver .15s infinite}
+@keyframes shiver{0%,100%{transform:translateX(0)}33%{transform:translateX(-3px)}66%{transform:translateX(3px)}}
+.lc-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.lc-label{font-family:'Press Start 2P';font-size:7px;color:var(--muted);margin-bottom:4px;letter-spacing:.5px}
+.lc-group{display:flex;flex-direction:column}
+.lc-inp{background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  padding:10px 14px;color:var(--txt);font-family:'VT323';font-size:18px;outline:none}
+.lc-inp:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,245,212,0.15)}
+.lc-phone-row{display:flex;gap:0}
+.lc-phone-prefix{background:rgba(0,245,212,0.1);border:1px solid var(--border);border-right:none;
+  border-radius:4px 0 0 4px;padding:10px 12px;font-family:'VT323';font-size:18px;color:var(--cyan);white-space:nowrap}
+.lc-phone-row .lc-inp{border-radius:0 4px 4px 0;flex:1}
+select.lc-inp{cursor:pointer}
+.lc-check-row{display:flex;align-items:flex-start;gap:10px}
+.lc-check-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:3px;accent-color:var(--cyan)}
+.lc-check-row label{font-family:'VT323';font-size:14px;color:var(--muted);line-height:1.4}
+.lc-privacy{font-family:'VT323';font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+
+/* ── TUTORIAL ── */
+#s-tutorial{background:var(--bg)}
+.tut-shields{display:flex;flex-direction:column;gap:12px;width:100%;max-width:400px;margin-top:24px}
+.shield-opt{background:rgba(10,10,20,0.9);border:1px solid var(--border);border-radius:4px;
+  padding:14px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.shield-opt:hover,.shield-opt:active{border-color:var(--cyan);background:rgba(0,245,212,0.08)}
+.shield-opt.correct{border-color:var(--success);background:rgba(6,214,160,0.12);animation:correctPulse .4s ease}
+.shield-opt.wrong{border-color:var(--danger);background:rgba(255,0,110,0.08)}
+@keyframes correctPulse{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.shield-emoji{font-size:28px}
+.shield-info{flex:1}
+.shield-name{font-family:'Press Start 2P';font-size:8px;color:var(--txt);margin-bottom:3px}
+.shield-desc{font-family:'VT323';font-size:14px;color:var(--muted)}
+
+/* ── MAIN GAME ── */
+#s-game{justify-content:flex-start;padding:0;overflow-y:auto}
+.game-wrap{width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
+
+/* top bar */
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:rgba(10,10,15,0.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.tb-pet-name{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);text-shadow:0 0 8px rgba(0,245,212,0.4)}
+.tb-level{font-family:'Press Start 2P';font-size:7px;color:var(--muted);margin-left:auto}
+.xp-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;max-width:120px}
+.xp-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:3px;
+  animation:xpPulse 3s ease-in-out infinite;width:85%}
+@keyframes xpPulse{0%,100%{box-shadow:0 0 4px var(--cyan)}50%{box-shadow:0 0 10px var(--cyan)}}
+
+/* pet stage */
+.pet-stage{display:flex;align-items:center;justify-content:center;padding:20px;position:relative;min-height:200px}
+.pet-sprite{font-size:88px;line-height:1;position:relative;z-index:2;transition:filter .5s}
+.pet-sprite.state-great{animation:petDance .6s infinite alternate}
+.pet-sprite.state-good{animation:petBob 1.5s ease-in-out infinite}
+.pet-sprite.state-mid{animation:petSlow 3s ease-in-out infinite}
+.pet-sprite.state-low{animation:petSlow 5s ease-in-out infinite;filter:saturate(0.4) brightness(0.8)}
+.pet-sprite.state-crit{filter:grayscale(1) brightness(0.6);animation:petSlow 8s ease-in-out infinite}
+@keyframes petDance{0%{transform:translateY(0) rotate(-5deg)}100%{transform:translateY(-8px) rotate(5deg)}}
+@keyframes petBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes petSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+/* sparkles */
+.sparkle-container{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparkle{position:absolute;font-size:14px;animation:sparkleFloat 2s ease-out forwards}
+@keyframes sparkleFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(0)}}
+.dependants{display:flex;gap:6px;justify-content:center;font-size:28px;margin-top:-10px;
+  animation:dependBob 2s ease-in-out infinite}
+@keyframes dependBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.dep-figure{transition:opacity .8s,filter .8s}
+.dep-figure.fading{opacity:.3;filter:grayscale(1)}
+
+/* health bars */
+.health-panel{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.hb-row{display:flex;align-items:center;gap:8px}
+.hb-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.hb-label{font-family:'VT323';font-size:15px;color:var(--muted);width:90px;flex-shrink:0}
+.hb-wrap{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
+.hb-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.hb-fill.good{background:linear-gradient(90deg,var(--cyan),#00e0c0)}
+.hb-fill.mid{background:linear-gradient(90deg,var(--amber),#e6a000)}
+.hb-fill.bad{background:linear-gradient(90deg,var(--danger),#cc0055);animation:barFlicker .5s infinite}
+@keyframes barFlicker{0%,100%{opacity:1}50%{opacity:.6}}
+.hb-val{font-family:'VT323';font-size:14px;color:var(--muted);width:32px;text-align:right;flex-shrink:0}
+
+/* beast bar */
+.beast-bar{padding:8px 14px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.beast-slot{font-size:24px;width:38px;height:38px;border:1px solid var(--border);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;background:rgba(0,245,212,0.04);
+  cursor:pointer;transition:all .2s;position:relative}
+.beast-slot:hover{border-color:var(--cyan);background:rgba(0,245,212,0.12)}
+.beast-slot.locked{filter:grayscale(1) brightness(.4);cursor:default}
+.beast-slot-label{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
+  font-family:'Press Start 2P';font-size:5px;color:var(--muted);white-space:nowrap}
+
+/* greeting */
+.daily-greeting{font-family:'VT323';font-size:18px;color:var(--muted);text-align:center;
+  padding:8px 14px;background:rgba(0,245,212,0.04);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border)}
+
+/* bottom nav */
+.bottomnav{display:flex;border-top:1px solid var(--border);background:rgba(10,10,15,0.97);
+  position:sticky;bottom:0;z-index:20}
+.bnav-btn{flex:1;padding:12px 4px;background:none;border:none;cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;gap:4px;transition:all .2s}
+.bnav-btn:active{background:rgba(0,245,212,0.08)}
+.bnav-icon{font-size:22px}
+.bnav-label{font-family:'Press Start 2P';font-size:6px;color:var(--muted)}
+.bnav-btn.active .bnav-label{color:var(--cyan)}
+.bnav-btn.trial-btn{border:1px solid var(--cyan);margin:8px 4px;border-radius:4px;
+  background:rgba(0,245,212,0.06)}
+.bnav-btn.trial-btn .bnav-label{color:var(--cyan)}
+.bnav-btn.trial-btn:hover{background:rgba(0,245,212,0.15);box-shadow:0 0 16px rgba(0,245,212,0.2)}
+
+/* ── TRIAL ── */
+#s-trial{background:var(--bg);z-index:15}
+.trial-phase{width:100%;max-width:480px;text-align:center}
+/* announce */
+.threat-icon{font-size:80px;animation:threatPulse 1s ease-in-out infinite}
+@keyframes threatPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 10px var(--danger))}
+  50%{transform:scale(1.1);filter:drop-shadow(0 0 25px var(--danger))}}
+.threat-name{font-family:'Press Start 2P';font-size:clamp(11px,3.5vw,16px);color:var(--danger);
+  margin:12px 0 8px;text-shadow:0 0 16px rgba(255,0,110,0.5)}
+.threat-desc{font-family:'VT323';font-size:20px;color:var(--txt);max-width:380px;margin:0 auto}
+/* timer */
+.timer-bar-wrap{width:100%;max-width:380px;height:6px;background:rgba(255,255,255,0.1);
+  border-radius:3px;overflow:hidden;margin:16px 0}
+.timer-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));
+  border-radius:3px;transition:width .5s linear}
+.timer-bar.urgent{background:linear-gradient(90deg,var(--amber),var(--danger))}
+/* select */
+.beast-choices{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:16px}
+.bc-option{background:rgba(10,10,20,0.92);border:1px solid var(--border);border-radius:4px;
+  padding:12px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;text-align:left}
+.bc-option:hover,.bc-option:active{border-color:var(--cyan);background:rgba(0,245,212,0.08)}
+.bc-option.selected{border-color:var(--cyan);background:rgba(0,245,212,0.12)}
+.bc-option.correct{border-color:var(--success);background:rgba(6,214,160,0.12)}
+.bc-option.wrong{border-color:var(--danger);background:rgba(255,0,110,0.08)}
+.bc-emoji{font-size:32px;flex-shrink:0}
+.bc-info{}
+.bc-name{font-family:'Press Start 2P';font-size:8px;color:var(--txt);margin-bottom:3px}
+.bc-desc{font-family:'VT323';font-size:14px;color:var(--muted)}
+.bc-dim{font-family:'VT323';font-size:13px;color:var(--cyan)}
+/* resolve */
+.battle-anim{font-size:60px;display:flex;gap:16px;align-items:center;justify-content:center;margin:24px 0}
+.battle-vs{font-family:'Press Start 2P';font-size:14px;color:var(--muted)}
+/* outcome */
+.outcome-title{font-family:'Press Start 2P';font-size:clamp(14px,5vw,22px);margin-bottom:12px}
+.outcome-title.win{color:var(--success);text-shadow:0 0 20px rgba(6,214,160,0.5)}
+.outcome-title.lose{color:var(--danger);text-shadow:0 0 20px rgba(255,0,110,0.5)}
+.outcome-fact{font-family:'VT323';font-size:20px;color:var(--amber);max-width:380px;margin:0 auto 12px;line-height:1.4}
+.outcome-debrief{font-family:'VT323';font-size:18px;color:var(--muted);max-width:380px;margin:0 auto}
+/* reward */
+.reward-box{background:rgba(0,245,212,0.08);border:1px solid var(--cyan);border-radius:4px;
+  padding:16px 24px;margin:16px 0;text-align:center;animation:rewardGlow 1.5s ease-in-out infinite}
+@keyframes rewardGlow{0%,100%{box-shadow:0 0 12px rgba(0,245,212,0.2)}50%{box-shadow:0 0 30px rgba(0,245,212,0.5)}}
+.reward-label{font-family:'Press Start 2P';font-size:8px;color:var(--muted);margin-bottom:6px}
+.reward-val{font-family:'Press Start 2P';font-size:14px;color:var(--cyan)}
+
+/* ── COLLECTION ── */
+#s-collection{justify-content:flex-start;padding:0;overflow-y:auto}
+.coll-wrap{width:100%;max-width:480px;margin:0 auto;padding-bottom:20px}
+.coll-header{padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(10,10,15,0.95);
+  position:sticky;top:0;z-index:10}
+.coll-title{font-family:'Press Start 2P';font-size:10px;color:var(--cyan)}
+.coll-sub{font-family:'VT323';font-size:16px;color:var(--muted);margin-top:4px}
+.coll-section-label{font-family:'Press Start 2P';font-size:7px;color:var(--muted);
+  padding:10px 14px 6px;letter-spacing:1px;text-transform:uppercase}
+.beast-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px 10px}
+.beast-card{background:rgba(10,10,20,0.9);border:1px solid var(--border);border-radius:4px;
+  padding:14px 8px;text-align:center;transition:all .2s;position:relative;cursor:pointer}
+.beast-card.unlocked{border-color:rgba(0,245,212,0.3)}
+.beast-card.unlocked:hover{border-color:var(--cyan);background:rgba(0,245,212,0.06);transform:translateY(-2px)}
+.beast-card.locked{opacity:.4;filter:grayscale(.8)}
+.bc-card-emoji{font-size:38px;display:block;margin-bottom:6px}
+.bc-card-name{font-family:'Press Start 2P';font-size:6px;color:var(--txt);margin-bottom:3px}
+.bc-card-type{font-family:'VT323';font-size:13px;color:var(--muted);line-height:1.3}
+.bc-rarity{display:inline-block;font-family:'Press Start 2P';font-size:5px;padding:2px 5px;
+  border-radius:2px;margin-top:4px}
+.rarity-common{background:rgba(100,116,139,0.2);color:var(--muted)}
+.rarity-uncommon{background:rgba(0,245,212,0.15);color:var(--cyan)}
+.rarity-rare{background:rgba(123,47,255,0.2);color:#a78bfa}
+.rarity-epic{background:rgba(255,183,3,0.2);color:var(--amber)}
+.synergy-badge{position:absolute;top:4px;right:4px;font-size:10px;title:'Synergy active!'}
+.back-btn{font-family:'Press Start 2P';font-size:8px;color:var(--muted);background:none;
+  border:1px solid var(--muted);padding:8px 12px;cursor:pointer;margin-top:0}
+.back-btn:hover{color:var(--cyan);border-color:var(--cyan)}
+
+/* ── PROFILE ── */
+#s-profile{justify-content:flex-start;padding:0;overflow-y:auto}
+.prof-wrap{width:100%;max-width:480px;margin:0 auto;padding-bottom:20px}
+.prof-header{padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(10,10,15,0.95);
+  position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px}
+.evo-stage-badge{background:rgba(123,47,255,0.15);border:1px solid rgba(123,47,255,0.4);
+  border-radius:3px;padding:4px 10px;font-family:'Press Start 2P';font-size:7px;color:#a78bfa}
+.prof-section{margin:0 14px 16px;background:rgba(10,10,20,0.8);border:1px solid var(--border);border-radius:4px;padding:14px}
+.prof-sec-title{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);margin-bottom:12px;letter-spacing:.5px}
+.prof-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px solid rgba(0,245,212,0.06);font-family:'VT323';font-size:16px}
+.prof-row:last-child{border:none}
+.prof-key{color:var(--muted)}
+.prof-val{color:var(--txt);font-weight:600}
+.share-card{background:linear-gradient(135deg,rgba(0,245,212,0.08),rgba(123,47,255,0.08));
+  border:1px solid var(--cyan);border-radius:4px;padding:20px;text-align:center;margin-top:12px}
+.share-card-pet{font-size:52px;margin-bottom:8px}
+.share-card-name{font-family:'Press Start 2P';font-size:11px;color:var(--cyan);margin-bottom:4px}
+.share-card-arch{font-family:'VT323';font-size:18px;color:var(--muted);margin-bottom:12px}
+.share-card-cta{font-family:'VT323';font-size:16px;color:var(--txt)}
+.ref-link{font-family:'VT323';font-size:14px;color:var(--violet);word-break:break-all;margin-top:6px}
+.copy-ref-btn{font-family:'Press Start 2P';font-size:7px;padding:8px 14px;background:rgba(123,47,255,0.15);
+  border:1px solid rgba(123,47,255,0.4);color:#a78bfa;border-radius:4px;cursor:pointer;margin-top:10px}
+.copy-ref-btn:hover{background:rgba(123,47,255,0.3)}
+
+/* ── TOAST / UTIL ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F172A;
+  color:var(--txt);padding:10px 20px;border-radius:4px;font-family:'VT323';font-size:18px;
+  z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid var(--border);
+  white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ── MISC ── */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:4px}
+.spacer{flex:1}
+.hidden{display:none!important}
+.neon-txt{text-shadow:0 0 12px currentColor}
+</style>
+</head>
+<body>
+
+<!-- ═══ SCREEN: CINEMATIC ═══ -->
+<div class="screen active" id="s-cinematic">
+  <div class="grid-bg"></div>
+  <div class="cine-text" id="cine-text"></div>
+  <button class="skip-btn" onclick="skipCinematic()">[ SKIP ]</button>
+</div>
+
+<!-- ═══ SCREEN: NAMING ═══ -->
+<div class="screen" id="s-naming">
+  <div class="egg" id="egg-naming"></div>
+  <div style="height:28px"></div>
+  <div class="px-title">Something is trying<br>to reach you.</div>
+  <div class="px-sub">Give it a name.</div>
+  <input class="px-input" id="pet-name-inp" maxlength="12" placeholder="Enter name..." autocomplete="off">
+  <button class="px-btn" onclick="doNaming()">[ SUMMON ]</button>
+</div>
+
+<!-- ═══ SCREEN: HATCHING ═══ -->
+<div class="screen" id="s-hatching">
+  <div class="egg" id="egg-hatch"></div>
+  <div class="pet-emerge" id="pet-emerge"></div>
+  <div style="height:24px"></div>
+  <div id="hatch-msg" style="font-family:'VT323';font-size:26px;color:var(--cyan);opacity:0;transition:opacity 1s;text-align:center"></div>
+</div>
+
+<!-- ═══ SCREEN: ARCHETYPE ═══ -->
+<div class="screen" id="s-archetype">
+  <div class="px-title" style="margin-bottom:4px">Who are you in this world?</div>
+  <div class="px-sub">Choose your path. It shapes everything.</div>
+  <div class="arch-grid" id="arch-grid">
+    <div class="arch-card" onclick="selectArchetype('PROTECTOR',this)">
+      <span class="arch-emoji">🐺</span>
+      <div class="arch-name">THE PROTECTOR</div>
+      <div class="arch-stmt">"The people I love depend on me."</div>
+    </div>
+    <div class="arch-card" onclick="selectArchetype('BUILDER',this)">
+      <span class="arch-emoji">🐂</span>
+      <div class="arch-name">THE BUILDER</div>
+      <div class="arch-stmt">"I am building something that lasts."</div>
+    </div>
+    <div class="arch-card" onclick="selectArchetype('WANDERER',this)">
+      <span class="arch-emoji">🦊</span>
+      <div class="arch-name">THE WANDERER</div>
+      <div class="arch-stmt">"I live fully, I move freely."</div>
+    </div>
+    <div class="arch-card" onclick="selectArchetype('VISIONARY',this)">
+      <span class="arch-emoji">🐉</span>
+      <div class="arch-name">THE VISIONARY</div>
+      <div class="arch-stmt">"I think in decades, not days."</div>
+    </div>
+    <div class="arch-card" onclick="selectArchetype('SURVIVOR',this)">
+      <span class="arch-emoji">🦌</span>
+      <div class="arch-name">THE SURVIVOR</div>
+      <div class="arch-stmt">"I have faced hard things. I will face more."</div>
+    </div>
+  </div>
+  <div class="pledge-box" id="pledge-box">
+    <div class="pledge-txt" id="pledge-txt"></div>
+  </div>
+  <div style="height:16px"></div>
+  <button class="px-btn" id="pledge-btn" onclick="doPledge()" style="display:none">[ PLEDGE ]</button>
+</div>
+
+<!-- ═══ SCREEN: LEAD CAPTURE ═══ -->
+<div class="screen" id="s-lead">
+  <div id="lead-pet" style="font-size:72px;text-align:center" class="pet-shiver"></div>
+  <div class="px-title" style="margin-top:12px" id="lead-title"></div>
+  <div class="px-sub" style="margin-bottom:0">Save their world.</div>
+  <form class="lc-form" onsubmit="event.preventDefault();doLeadCapture()">
+    <div class="lc-group">
+      <div class="lc-label">YOUR NAME *</div>
+      <input class="lc-inp" id="lc-name" placeholder="Full name" required autocomplete="name">
+    </div>
+    <div class="lc-group">
+      <div class="lc-label">WHATSAPP *</div>
+      <div class="lc-phone-row">
+        <div class="lc-phone-prefix">+65</div>
+        <input class="lc-inp" id="lc-phone" placeholder="8X XXX XXX" required inputmode="tel" maxlength="8" pattern="[0-9]{8}">
+      </div>
+    </div>
+    <div class="lc-group">
+      <div class="lc-label">WHAT MATTERS MOST?</div>
+      <select class="lc-inp" id="lc-matters">
+        <option value="Family">Family</option>
+        <option value="Career">Career</option>
+        <option value="Health">Health</option>
+        <option value="Future">Future / Wealth</option>
+        <option value="Not sure">Not sure yet</option>
+      </select>
+    </div>
+    <div class="lc-check-row">
+      <input type="checkbox" id="lc-pdpa" required>
+      <label for="lc-pdpa">I agree to receive educational content and be contacted by a licensed financial advisor. (PDPA)</label>
+    </div>
+    <div class="lc-privacy">Your profile is private. Only shared with your advisor.</div>
+    <input type="hidden" id="lc-ref">
+    <button class="px-btn danger" type="submit" id="lead-submit-btn"></button>
+  </form>
+</div>
+
+<!-- ═══ SCREEN: TUTORIAL ═══ -->
+<div class="screen" id="s-tutorial">
+  <div id="tut-pet" style="font-size:64px;text-align:center"></div>
+  <div style="height:16px"></div>
+  <div class="px-title" style="font-size:10px">TUTORIAL TRIAL</div>
+  <div style="height:12px"></div>
+  <div style="font-family:'VT323';font-size:22px;color:var(--txt);text-align:center;max-width:380px;line-height:1.4;margin-bottom:24px">
+    A minor disruption approaches.<br>Choose a shield to defend <span id="tut-petname"></span>.
+  </div>
+  <div class="tut-shields">
+    <div class="shield-opt" onclick="tutorialChoice('vitality',this)">
+      <span class="shield-emoji">🐢</span>
+      <div class="shield-info">
+        <div class="shield-name">VITALITY SHIELD</div>
+        <div class="shield-desc">Terrax · Hospitalisation protection</div>
+      </div>
+    </div>
+    <div class="shield-opt" onclick="tutorialChoice('resilience',this)">
+      <span class="shield-emoji">🦏</span>
+      <div class="shield-info">
+        <div class="shield-name">RESILIENCE SHIELD</div>
+        <div class="shield-desc">Ironhide · Accident protection</div>
+      </div>
+    </div>
+    <div class="shield-opt" onclick="tutorialChoice('bond',this)">
+      <span class="shield-emoji">🐺</span>
+      <div class="shield-info">
+        <div class="shield-name">BOND SHIELD</div>
+        <div class="shield-desc">Lunara · Dependant continuity</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: MAIN GAME ═══ -->
+<div class="screen" id="s-game">
+  <div class="game-wrap">
+    <!-- top bar -->
+    <div class="topbar">
+      <span class="tb-pet-name" id="g-pet-name">PET</span>
+      <div class="xp-bar-wrap"><div class="xp-bar" id="g-xp-bar"></div></div>
+      <span class="tb-level" id="g-level">Lv1</span>
+    </div>
+    <!-- greeting -->
+    <div class="daily-greeting" id="g-greeting">Welcome back.</div>
+    <!-- pet stage -->
+    <div class="pet-stage">
+      <div class="sparkle-container" id="sparkle-ctr"></div>
+      <div class="pet-sprite state-good" id="g-pet-sprite"></div>
+    </div>
+    <!-- dependants (shown at level 3+) -->
+    <div class="dependants hidden" id="g-dependants">
+      <span class="dep-figure" id="dep-partner">👫</span>
+      <span class="dep-figure" id="dep-child">👶</span>
+    </div>
+    <!-- health bars -->
+    <div class="health-panel" id="health-panel">
+      <div class="hb-row">
+        <span class="hb-icon">💊</span>
+        <span class="hb-label">VITALITY</span>
+        <div class="hb-wrap"><div class="hb-fill good" id="hb-vitality" style="width:40%"></div></div>
+        <span class="hb-val" id="hv-vitality">40%</span>
+      </div>
+      <div class="hb-row">
+        <span class="hb-icon">⚡</span>
+        <span class="hb-label">STABILITY</span>
+        <div class="hb-wrap"><div class="hb-fill good" id="hb-stability" style="width:40%"></div></div>
+        <span class="hb-val" id="hv-stability">40%</span>
+      </div>
+      <div class="hb-row">
+        <span class="hb-icon">🛡️</span>
+        <span class="hb-label">RESILIENCE</span>
+        <div class="hb-wrap"><div class="hb-fill good" id="hb-resilience" style="width:40%"></div></div>
+        <span class="hb-val" id="hv-resilience">40%</span>
+      </div>
+      <div class="hb-row">
+        <span class="hb-icon">💞</span>
+        <span class="hb-label">BOND</span>
+        <div class="hb-wrap"><div class="hb-fill good" id="hb-bond" style="width:40%"></div></div>
+        <span class="hb-val" id="hv-bond">40%</span>
+      </div>
+      <div class="hb-row">
+        <span class="hb-icon">🌟</span>
+        <span class="hb-label">LEGACY</span>
+        <div class="hb-wrap"><div class="hb-fill good" id="hb-legacy" style="width:40%"></div></div>
+        <span class="hb-val" id="hv-legacy">40%</span>
+      </div>
+    </div>
+    <!-- beast bar -->
+    <div class="beast-bar" id="g-beast-bar">
+      <div style="font-family:'Press Start 2P';font-size:7px;color:var(--muted);width:100%;margin-bottom:4px">SHIELDS</div>
+    </div>
+    <div class="spacer"></div>
+    <!-- bottom nav -->
+    <div class="bottomnav">
+      <button class="bnav-btn trial-btn" onclick="startTrial()">
+        <span class="bnav-icon">⚔️</span>
+        <span class="bnav-label">TRIAL</span>
+      </button>
+      <button class="bnav-btn" onclick="showCollection()">
+        <span class="bnav-icon">📦</span>
+        <span class="bnav-label">BEASTS</span>
+      </button>
+      <button class="bnav-btn" onclick="showProfile()">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">PROFILE</span>
+      </button>
+      <button class="bnav-btn" id="mute-btn" onclick="toggleMute()">
+        <span class="bnav-icon" id="mute-icon">🔊</span>
+        <span class="bnav-label">SOUND</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: TRIAL ═══ -->
+<div class="screen" id="s-trial">
+  <div class="trial-phase" id="trial-phase"></div>
+</div>
+
+<!-- ═══ SCREEN: COLLECTION ═══ -->
+<div class="screen" id="s-collection">
+  <div class="coll-wrap">
+    <div class="coll-header">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="coll-title">⚔ BEAST COLLECTION</div>
+          <div class="coll-sub" id="coll-sub">Unlocked: 0 / 14</div>
+        </div>
+        <button class="back-btn" onclick="showScreen('s-game')">← BACK</button>
+      </div>
+    </div>
+    <div class="coll-section-label">🛡 SHIELD BEASTS</div>
+    <div class="beast-grid" id="shield-grid"></div>
+    <div class="coll-section-label">⚗ FORGE BEASTS</div>
+    <div class="beast-grid" id="forge-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PROFILE ═══ -->
+<div class="screen" id="s-profile">
+  <div class="prof-wrap">
+    <div class="prof-header">
+      <span id="prof-pet-emoji" style="font-size:36px"></span>
+      <div>
+        <div style="font-family:'Press Start 2P';font-size:9px;color:var(--cyan)" id="prof-petname"></div>
+        <div style="font-family:'VT323';font-size:16px;color:var(--muted)" id="prof-archetype"></div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <span class="evo-stage-badge" id="prof-evo"></span>
+        <button class="back-btn" onclick="showScreen('s-game')">← BACK</button>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="prof-section">
+      <div class="prof-sec-title">▸ GUARDIAN STATS</div>
+      <div class="prof-row"><span class="prof-key">Guardian Level</span><span class="prof-val" id="prof-level"></span></div>
+      <div class="prof-row"><span class="prof-key">Trials Complete</span><span class="prof-val" id="prof-trials"></span></div>
+      <div class="prof-row"><span class="prof-key">Login Streak</span><span class="prof-val" id="prof-streak"></span></div>
+      <div class="prof-row"><span class="prof-key">Days Active</span><span class="prof-val" id="prof-days"></span></div>
+      <div class="prof-row"><span class="prof-key">Beasts Unlocked</span><span class="prof-val" id="prof-beasts"></span></div>
+    </div>
+    <div class="prof-section">
+      <div class="prof-sec-title">▸ CHALLENGE A FRIEND</div>
+      <div class="share-card">
+        <div class="share-card-pet" id="share-pet-emoji"></div>
+        <div class="share-card-name" id="share-pet-name"></div>
+        <div class="share-card-arch" id="share-arch"></div>
+        <div class="share-card-cta">Can your guardian do better?</div>
+        <div class="ref-link" id="ref-link-display"></div>
+      </div>
+      <button class="copy-ref-btn" onclick="copyRefLink()">📋 COPY REFERRAL LINK</button>
+    </div>
+    <div style="padding:0 14px">
+      <div style="font-family:'VT323';font-size:13px;color:var(--muted);text-align:center;line-height:1.5">
+        AEGIS Pet is an educational experience. Results do not constitute financial advice.<br>
+        Consult a licensed financial advisor for personalised recommendations.
+        <br><br><a href="/advisor" style="color:var(--violet);font-size:11px">Advisor dashboard →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     GAME LOGIC
+═══════════════════════════════════════════════════════════ -->
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const ARCHETYPE_EMOJI = { PROTECTOR:'🐺', BUILDER:'🐂', WANDERER:'🦊', VISIONARY:'🐉', SURVIVOR:'🦌' };
+const ARCHETYPE_PLEDGES = {
+  PROTECTOR:'I will defend what matters most.',
+  BUILDER:'I will build strength before the storm.',
+  WANDERER:'I will face what comes with courage.',
+  VISIONARY:'I will think beyond today.',
+  SURVIVOR:'I will not face this alone.'
+};
+const ARCHETYPE_WEIGHTS = {
+  PROTECTOR:[4,5,1,7,6,2,3,8], BUILDER:[8,5,1,3,6,2,7,4],
+  WANDERER:[6,1,2,3,5,4,7,8],  VISIONARY:[8,4,5,3,7,1,2,6],
+  SURVIVOR:[2,3,7,1,5,6,4,8]
+};
+const SCENARIOS = {
+  1:{name:'THE SIGNAL',icon:'🏥',desc:'A sudden signal disrupts the core.',dimension:'vitality',
+     failFact:'"3 years of savings erased in 11 days."',debrief:'Without a med bay, disruptions drain everything else.',
+     correctBeast:'S01',threat:'magenta'},
+  2:{name:'THE EARLY WHISPER',icon:'👁️',desc:'Something stirs in the distance. Barely visible.',dimension:'vitality',
+     failFact:'"By the time it was visible, options had narrowed."',debrief:'Early signals are only useful if you\'re listening.',
+     correctBeast:'S05',threat:'violet'},
+  3:{name:'THE STORM',icon:'🌊',desc:'A critical force approaches.',dimension:'resilience',
+     failFact:'"Income stopped. Treatment costs mounted."',debrief:'Critical threats require critical preparation.',
+     correctBeast:'S06',threat:'danger'},
+  4:{name:'THE SILENCE',icon:'🌫️',desc:'What happens to those left behind?',dimension:'bond',
+     failFact:'"Some gaps aren\'t felt by you. They\'re felt by the ones you leave."',debrief:'Protect the people who can\'t protect themselves.',
+     correctBeast:'S02',threat:'muted'},
+  5:{name:'THE FREEZE',icon:'🧊',desc:'The core cannot move forward.',dimension:'stability',
+     failFact:'"Income stopped. Life continued without it."',debrief:'Stability isn\'t about what happens. It\'s about what keeps happening.',
+     correctBeast:'S04',threat:'cyan'},
+  6:{name:'THE IMPACT',icon:'💥',desc:'Unexpected. Sudden. Unavoidable.',dimension:'resilience',
+     failFact:'"Fast events have slow recoveries when unprepared."',debrief:'Impact isn\'t the problem. Unpreparedness is.',
+     correctBeast:'S03',threat:'amber'},
+  7:{name:'THE ECHO',icon:'🔄',desc:'It has returned. Different form. Same disruption.',dimension:'resilience',
+     failFact:'"Some threats don\'t just come once."',debrief:'Recovery is only complete when the second wave is also covered.',
+     correctBeast:'S07',threat:'danger'},
+  8:{name:'THE HORIZON',icon:'🌅',desc:'Time is the longest trial of all.',dimension:'legacy',
+     failFact:'"The future arrived. But nothing had been built for it."',debrief:'Surviving isn\'t enough. Thriving takes a different kind of shield.',
+     correctBeast:'F01',threat:'violet'}
+};
+const BEASTS = {
+  S01:{n:'Terrax',e:'🐢',dim:'Vitality',desc:'Hospitalisation',rarity:'common',type:'shield'},
+  S02:{n:'Lunara',e:'🐺',dim:'Bond',desc:'Death / Dependants',rarity:'common',type:'shield'},
+  S03:{n:'Ironhide',e:'🦏',dim:'Resilience',desc:'Accident coverage',rarity:'common',type:'shield'},
+  S04:{n:'Steadfast',e:'🐂',dim:'Stability',desc:'TPD / Income protection',rarity:'uncommon',type:'shield'},
+  S05:{n:'Veil',e:'🦌',dim:'Vitality',desc:'Early Critical Illness',rarity:'uncommon',type:'shield'},
+  S06:{n:'Sever',e:'🐆',dim:'Resilience',desc:'Critical Illness',rarity:'rare',type:'shield'},
+  S07:{n:'Pyre',e:'🦅',dim:'Resilience',desc:'Multipay CI',rarity:'rare',type:'shield'},
+  S08:{n:'Eternal',e:'🐍',dim:'Legacy',desc:'Whole Life bond',rarity:'epic',type:'shield'},
+  F01:{n:'Ascendant',e:'🐉',dim:'Legacy',desc:'ILP / Wealth accumulation',rarity:'rare',type:'forge'},
+  F02:{n:'Sovereign',e:'🦁',dim:'Legacy',desc:'Whole Life cash value',rarity:'uncommon',type:'forge'},
+  F03:{n:'Wavecrest',e:'🐬',dim:'Legacy',desc:'Savings / Endowment',rarity:'common',type:'forge'},
+  F04:{n:'Chrysalis',e:'🦋',dim:'Legacy',desc:'Long-term compounding',rarity:'uncommon',type:'forge'},
+  F05:{n:'Arcane',e:'🦊',dim:'Legacy',desc:'Active investment',rarity:'rare',type:'forge'},
+  F06:{n:'Anchor',e:'🐘',dim:'Legacy',desc:'Retirement / Legacy',rarity:'epic',type:'forge'}
+};
+const SYNERGIES = [
+  {beasts:['S05','S06'],name:'Full Illness Chain',bonus:'+25% CI shield'},
+  {beasts:['S01','S03'],name:'Dual Resilience',bonus:'Reduced combo damage'},
+  {beasts:['S07','S06'],name:'Endless Recovery',bonus:'Multipay fully active'},
+  {beasts:['F01','S08'],name:'Legacy Growth',bonus:'Investment + whole life'},
+  {beasts:['S02','S04'],name:'Family Fortress',bonus:'Max BOND + STABILITY'},
+  {beasts:['F03','F04'],name:'Compound Stream',bonus:'Savings accelerated'}
+];
+const EVO_STAGES = ['','Hatchling','Seedling','Guardian','Champion','Eternal'];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let G = {
+  playerId: localStorage.getItem('aegis_player_id'),
+  petName: localStorage.getItem('aegis_pet_name') || '',
+  archetype: localStorage.getItem('aegis_archetype') || '',
+  refCode: localStorage.getItem('aegis_ref_code') || '',
+  muted: false,
+  // game state (synced from server)
+  vitality:40, stability:40, resilience:40, bond:40, legacy:40,
+  guardianLevel:1, xp:0, trialsComplete:0, evolutionStage:1,
+  loginStreak:1, beastsUnlocked:[], scenariosDone:[], profileType:'UNENGAGED'
+};
+let selectedArchetype = null;
+let trialState = null; // current trial data
+
+// ── SCREEN MANAGER ───────────────────────────────────────────────────────────
+function showScreen(id, fromBack=false) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.onload = async () => {
+  // Check referral code in URL
+  const urlRef = new URLSearchParams(window.location.search).get('ref');
+  if (urlRef) document.getElementById('lc-ref').value = urlRef;
+
+  if (G.playerId) {
+    // Returning player — load state
+    try {
+      const r = await fetch(`/api/player/${G.playerId}`);
+      if (r.ok) {
+        const { player, gameState } = await r.json();
+        G.petName   = player.pet_name;
+        G.archetype = player.archetype;
+        applyGameState(gameState);
+        // Daily login
+        await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ playerId: G.playerId }) });
+        loadGameScreen();
+        showScreen('s-game');
+        return;
+      }
+    } catch(e) { console.error(e); }
+  }
+  // New player — start cinematic
+  startCinematic();
+};
+
+// ── CINEMATIC ─────────────────────────────────────────────────────────────────
+function startCinematic() {
+  showScreen('s-cinematic');
+  const lines = [
+    'Every life has a core worth protecting.',
+    'Most people only discover what theirs is...',
+    "...after it's gone."
+  ];
+  let lineIdx=0, charIdx=0;
+  const el = document.getElementById('cine-text');
+  el.innerHTML = '';
+  let currentLineEl = document.createElement('div');
+  el.appendChild(currentLineEl);
+
+  const cursor = document.createElement('span');
+  cursor.className = 'cine-cursor';
+
+  function typeChar() {
+    if (lineIdx >= lines.length) {
+      // Show egg after text
+      setTimeout(() => {
+        el.innerHTML = '<div style="font-size:52px;animation:eggFloat 2s ease-in-out infinite">🥚</div>';
+        setTimeout(skipCinematic, 3000);
+      }, 800);
+      return;
+    }
+    const line = lines[lineIdx];
+    if (charIdx < line.length) {
+      currentLineEl.textContent = line.substring(0, charIdx+1);
+      currentLineEl.appendChild(cursor);
+      charIdx++;
+      setTimeout(typeChar, 42);
+    } else {
+      charIdx = 0; lineIdx++;
+      setTimeout(() => {
+        currentLineEl = document.createElement('div');
+        el.appendChild(currentLineEl);
+        setTimeout(typeChar, 400);
+      }, 600);
+    }
+  }
+  setTimeout(typeChar, 600);
+}
+
+function skipCinematic() { showScreen('s-naming'); }
+
+// ── NAMING ────────────────────────────────────────────────────────────────────
+function doNaming() {
+  const name = document.getElementById('pet-name-inp').value.trim();
+  if (!name) { showToast('Give your pet a name first!'); return; }
+  G.petName = name;
+  showScreen('s-hatching');
+  startHatching();
+}
+document.getElementById('pet-name-inp').addEventListener('keydown', e => { if(e.key==='Enter') doNaming(); });
+
+// ── HATCHING ──────────────────────────────────────────────────────────────────
+function startHatching() {
+  const egg = document.getElementById('egg-hatch');
+  const emerge = document.getElementById('pet-emerge');
+  const msg = document.getElementById('hatch-msg');
+  egg.style.display = 'block';
+  emerge.style.display = 'none';
+  emerge.textContent = '🥚';
+  msg.style.opacity = '0';
+
+  // Crack sequence
+  setTimeout(() => egg.classList.add('cracking'), 800);
+  setTimeout(() => egg.classList.add('hatching'), 1800);
+  setTimeout(() => {
+    egg.style.display = 'none';
+    emerge.style.display = 'block';
+    emerge.textContent = G.archetype ? (ARCHETYPE_EMOJI[G.archetype]||'🐾') : '🐾';
+  }, 2400);
+  setTimeout(() => {
+    msg.style.opacity = '1';
+    msg.textContent = `${G.petName} is here.`;
+  }, 3200);
+  setTimeout(() => showScreen('s-archetype'), 5000);
+}
+
+// ── ARCHETYPE ─────────────────────────────────────────────────────────────────
+function selectArchetype(arch, card) {
+  selectedArchetype = arch;
+  G.archetype = arch;
+  document.querySelectorAll('.arch-card').forEach(c => { c.classList.remove('selected','dimmed'); c.classList.add('dimmed'); });
+  card.classList.remove('dimmed'); card.classList.add('selected');
+  const pledgeBox = document.getElementById('pledge-box');
+  document.getElementById('pledge-txt').textContent = '"' + ARCHETYPE_PLEDGES[arch] + '"';
+  pledgeBox.style.display = 'block';
+  document.getElementById('pledge-btn').style.display = 'inline-block';
+}
+
+function doPledge() {
+  if (!selectedArchetype) { showToast('Choose your archetype first'); return; }
+  showScreen('s-lead');
+  document.getElementById('lead-pet').textContent = ARCHETYPE_EMOJI[selectedArchetype];
+  document.getElementById('lead-title').textContent = `${G.petName} needs a safe place to live.`;
+  document.getElementById('lead-submit-btn').textContent = `[ PROTECT ${G.petName} ]`;
+}
+
+// ── LEAD CAPTURE ──────────────────────────────────────────────────────────────
+async function doLeadCapture() {
+  const name    = document.getElementById('lc-name').value.trim();
+  const phone   = document.getElementById('lc-phone').value.trim();
+  const matters = document.getElementById('lc-matters').value;
+  const ref     = document.getElementById('lc-ref').value.trim();
+  const pdpa    = document.getElementById('lc-pdpa').checked;
+
+  if (!name || !phone) { showToast('Name and WhatsApp required'); return; }
+  if (!pdpa) { showToast('Please accept the PDPA consent'); return; }
+  if (!/^\d{8}$/.test(phone)) { showToast('Enter 8-digit Singapore number'); return; }
+
+  const btn = document.getElementById('lead-submit-btn');
+  btn.textContent = '[ SUMMONING... ]';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/api/start', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, phone:'+65'+phone, petName:G.petName, archetype:G.archetype,
+        whatMatters:matters, referredBy:ref||null })
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    G.playerId = d.playerId;
+    G.refCode = d.refCode;
+    localStorage.setItem('aegis_player_id', d.playerId);
+    localStorage.setItem('aegis_pet_name', G.petName);
+    localStorage.setItem('aegis_archetype', G.archetype);
+    localStorage.setItem('aegis_ref_code', d.refCode);
+    showScreen('s-tutorial');
+    document.getElementById('tut-petname').textContent = G.petName;
+    document.getElementById('tut-pet').textContent = ARCHETYPE_EMOJI[G.archetype];
+  } catch(e) {
+    showToast('Error: ' + e.message);
+    btn.textContent = `[ PROTECT ${G.petName} ]`;
+    btn.disabled = false;
+  }
+}
+
+// ── TUTORIAL ──────────────────────────────────────────────────────────────────
+function tutorialChoice(type, el) {
+  if (type === 'vitality') {
+    el.classList.add('correct');
+    document.getElementById('tut-pet').style.animation = 'petDance .4s infinite alternate';
+    showToast('✔ Correct! Terrax defends the core!');
+    setTimeout(() => { loadGameScreen(); showScreen('s-game'); }, 1800);
+  } else {
+    el.classList.add('wrong');
+    showToast('Not quite — try the Vitality Shield!');
+    setTimeout(() => el.classList.remove('wrong'), 1000);
+  }
+}
+
+// ── GAME SCREEN ───────────────────────────────────────────────────────────────
+function applyGameState(gs) {
+  if (!gs) return;
+  G.vitality     = gs.vitality || 40;
+  G.stability    = gs.stability || 40;
+  G.resilience   = gs.resilience || 40;
+  G.bond         = gs.bond || 40;
+  G.legacy       = gs.legacy || 40;
+  G.guardianLevel = gs.guardian_level || 1;
+  G.xp           = gs.xp || 0;
+  G.trialsComplete = gs.trials_complete || 0;
+  G.evolutionStage = gs.evolution_stage || 1;
+  G.loginStreak  = gs.login_streak || 1;
+  G.beastsUnlocked = JSON.parse(gs.beasts_unlocked || '[]');
+  G.scenariosDone  = JSON.parse(gs.scenarios_done || '[]');
+  G.profileType   = gs.profile_type || 'UNENGAGED';
+}
+
+function loadGameScreen() {
+  const petEmoji = ARCHETYPE_EMOJI[G.archetype] || '🐾';
+  document.getElementById('g-pet-name').textContent = G.petName;
+  document.getElementById('g-level').textContent = 'Lv' + G.guardianLevel;
+  document.getElementById('g-pet-sprite').textContent = petEmoji;
+
+  // Greeting
+  const avg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
+  const greetings = avg > 70
+    ? [`Good morning! ${G.petName} slept well last night. ⭐`,
+       `${G.petName} is feeling strong today! 💪`,
+       `${G.petName} is ready for challenges! ⚔️`]
+    : avg > 40
+    ? [`${G.petName} slept restlessly. Needs more protection.`,
+       `A new day. New trials await ${G.petName}.`,
+       `${G.petName} is watching the horizon.`]
+    : [`${G.petName} looks worried. Threats are closing in.`,
+       `${G.petName} needs your help. Gaps remain.`,
+       `Warning: ${G.petName}'s shields are weak.`];
+  document.getElementById('g-greeting').textContent = greetings[Math.floor(Math.random()*greetings.length)];
+
+  // Health bars
+  updateHealthBars();
+
+  // Pet state animation
+  updatePetState();
+
+  // Dependants at level 3+
+  if (G.guardianLevel >= 3) {
+    document.getElementById('g-dependants').classList.remove('hidden');
+    const dep = document.getElementById('dep-child');
+    if (G.bond < 40) { dep.classList.add('fading'); } else { dep.classList.remove('fading'); }
+    const depP = document.getElementById('dep-partner');
+    if (G.bond < 25) { depP.classList.add('fading'); } else { depP.classList.remove('fading'); }
+  }
+
+  // Beast bar
+  renderBeastBar();
+
+  // Sparkles if healthy
+  if (avg > 70) spawnSparkles();
+}
+
+function updateHealthBars() {
+  const dims = { vitality:G.vitality, stability:G.stability, resilience:G.resilience, bond:G.bond, legacy:G.legacy };
+  Object.entries(dims).forEach(([k,v]) => {
+    const fill = document.getElementById('hb-'+k);
+    const val  = document.getElementById('hv-'+k);
+    fill.style.width = v+'%';
+    fill.className = 'hb-fill ' + (v > 60 ? 'good' : v > 30 ? 'mid' : 'bad');
+    val.textContent = v+'%';
+  });
+}
+
+function updatePetState() {
+  const avg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
+  const sprite = document.getElementById('g-pet-sprite');
+  sprite.className = 'pet-sprite ' + (avg>70?'state-great':avg>50?'state-good':avg>30?'state-mid':avg>15?'state-low':'state-crit');
+}
+
+function renderBeastBar() {
+  const bar = document.getElementById('g-beast-bar');
+  const header = bar.firstChild;
+  bar.innerHTML = '';
+  bar.appendChild(header);
+  const shieldBeasts = ['S01','S02','S03','S04','S05','S06','S07','S08'];
+  shieldBeasts.slice(0,5).forEach(id => {
+    const b = BEASTS[id];
+    const unlocked = G.beastsUnlocked.includes(id);
+    const slot = document.createElement('div');
+    slot.className = 'beast-slot' + (unlocked?'':' locked');
+    slot.title = unlocked ? `${b.n} — ${b.desc}` : 'Locked beast';
+    slot.innerHTML = `${b.e}<div class="beast-slot-label">${b.n.toUpperCase()}</div>`;
+    bar.appendChild(slot);
+  });
+}
+
+function spawnSparkles() {
+  const ctr = document.getElementById('sparkle-ctr');
+  ctr.innerHTML = '';
+  for (let i=0;i<8;i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.textContent = ['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)];
+    s.style.left = (10+Math.random()*80)+'%';
+    s.style.top  = (20+Math.random()*60)+'%';
+    s.style.animationDelay = (Math.random()*1.5)+'s';
+    ctr.appendChild(s);
+    setTimeout(() => s.remove(), 2500);
+  }
+}
+
+// ── TRIAL SYSTEM ──────────────────────────────────────────────────────────────
+function getNextScenario() {
+  const weights = ARCHETYPE_WEIGHTS[G.archetype] || [1,2,3,4,5,6,7,8];
+  for (const id of weights) {
+    if (!G.scenariosDone.includes(id)) return id;
+  }
+  // All done — pick random
+  return weights[Math.floor(Math.random()*weights.length)];
+}
+
+function getBeastChoices(correctId) {
+  // Always 3 options: correct + 2 random others
+  const correct = BEASTS[correctId];
+  const others = Object.entries(BEASTS).filter(([id]) => id !== correctId);
+  const picked = others.sort(() => Math.random()-.5).slice(0,2).map(([id,b]) => ({id,b}));
+  const choices = [
+    { id: correctId, b: correct, correct: true },
+    { id: picked[0].id, b: picked[0].b, correct: false },
+    { id: picked[1].id, b: picked[1].b, correct: false }
+  ].sort(() => Math.random()-.5);
+  return choices;
+}
+
+let trialTimer = null;
+let trialTimeLeft = 20;
+
+function startTrial() {
+  const scenarioId = getNextScenario();
+  const scenario   = SCENARIOS[scenarioId];
+  const choices    = getBeastChoices(scenario.correctBeast);
+  trialState = { scenarioId, scenario, choices, startTime: Date.now(), selectedBeast: null };
+  showScreen('s-trial');
+  showTrialPhase('announce');
+}
+
+function showTrialPhase(phase) {
+  const el = document.getElementById('trial-phase');
+  const s = trialState.scenario;
+
+  if (phase === 'announce') {
+    el.innerHTML = `
+      <div style="margin-bottom:24px;font-family:'Press Start 2P';font-size:8px;color:var(--muted)">TRIAL ${trialState.scenarioId} / 8</div>
+      <div class="threat-icon">${s.icon}</div>
+      <div class="threat-name">${s.name}</div>
+      <div class="threat-desc">${s.desc}</div>
+      <div style="height:24px"></div>
+      <button class="px-btn" onclick="showTrialPhase('select')">[ FACE THE TRIAL ]</button>
+    `;
+  } else if (phase === 'select') {
+    trialTimeLeft = 20;
+    el.innerHTML = `
+      <div style="font-family:'Press Start 2P';font-size:8px;color:var(--muted);margin-bottom:8px">CHOOSE YOUR SHIELD</div>
+      <div class="timer-bar-wrap" style="margin-bottom:16px"><div class="timer-bar" id="trial-timer" style="width:100%"></div></div>
+      <div style="font-family:'VT323';font-size:16px;color:var(--muted);margin-bottom:16px">Which guardian defends against this threat?</div>
+      <div class="beast-choices">
+        ${trialState.choices.map((c,i) => `
+          <div class="bc-option" id="choice-${i}" onclick="selectBeast('${c.id}',${i},${c.correct})">
+            <span class="bc-emoji">${c.b.e}</span>
+            <div class="bc-info">
+              <div class="bc-name">${c.b.n.toUpperCase()}</div>
+              <div class="bc-desc">${c.b.desc}</div>
+              <div class="bc-dim">${c.b.dim}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    `;
+    // Start countdown
+    if (trialTimer) clearInterval(trialTimer);
+    trialTimer = setInterval(() => {
+      trialTimeLeft--;
+      const pct = (trialTimeLeft / 20) * 100;
+      const bar = document.getElementById('trial-timer');
+      if (bar) {
+        bar.style.width = pct + '%';
+        if (pct < 40) bar.classList.add('urgent');
+      }
+      if (trialTimeLeft <= 0) {
+        clearInterval(trialTimer);
+        // Auto-fail on timeout
+        resolveTrial(false, null);
+      }
+    }, 1000);
+  }
+}
+
+function selectBeast(beastId, idx, isCorrect) {
+  if (trialTimer) clearInterval(trialTimer);
+  trialState.selectedBeast = beastId;
+  trialState.decisionTime = Date.now() - trialState.startTime;
+
+  const chosen = document.getElementById('choice-' + idx);
+  if (isCorrect) {
+    chosen.classList.add('correct');
+    showToast('✔ ' + BEASTS[beastId].n + ' activated!');
+    setTimeout(() => showTrialPhase('resolve_win'), 800);
+  } else {
+    chosen.classList.add('wrong');
+    // Show correct answer
+    trialState.choices.forEach((c,i) => { if(c.correct) document.getElementById('choice-'+i).classList.add('correct'); });
+    setTimeout(() => resolveTrial(false, beastId), 1200);
+  }
+}
+
+function showTrialPhase_resolveWin() {
+  resolveTrial(true, trialState.selectedBeast);
+}
+
+// Catch the phase name
+const origShowTrialPhase = showTrialPhase;
+// Override resolve_win
+function showTrialPhase(phase) {
+  if (phase === 'resolve_win') { showTrialPhase_resolveWin(); return; }
+  origShowTrialPhase(phase);
+}
+
+async function resolveTrial(success, beastId) {
+  const s = trialState.scenario;
+  const el = document.getElementById('trial-phase');
+
+  // Battle animation
+  el.innerHTML = `
+    <div class="battle-anim">
+      <span>${s.icon}</span>
+      <span class="battle-vs">${success ? '⚔️' : '💢'}</span>
+      <span>${beastId ? BEASTS[beastId]?.e||'🛡️' : '❌'}</span>
+    </div>
+    <div style="font-family:'VT323';font-size:22px;color:var(--muted);text-align:center">
+      ${success ? 'Shield activated...' : 'Threat bypasses...'}
+    </div>
+  `;
+
+  await sleep(1500);
+
+  // Call API
+  let reward = null;
+  try {
+    const r = await fetch('/api/trial', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        playerId: G.playerId,
+        scenarioId: trialState.scenarioId,
+        beastsUsed: beastId ? [beastId] : [],
+        outcome: success ? 'success' : 'failure',
+        dimensionAffected: s.dimension,
+        decisionTimeMs: trialState.decisionTime || 5000
+      })
+    });
+    reward = await r.json();
+    if (reward.ok) {
+      // Update local state
+      G[s.dimension] = reward.newHealth;
+      G.guardianLevel = reward.newLevel;
+      G.evolutionStage = reward.newEvolution;
+      if (reward.newBeast) G.beastsUnlocked.push(reward.newBeast);
+      if (!G.scenariosDone.includes(trialState.scenarioId)) G.scenariosDone.push(trialState.scenarioId);
+    }
+  } catch(e) { console.error(e); }
+
+  // Show outcome
+  el.innerHTML = `
+    <div class="outcome-title ${success?'win':'lose'}">${success ? '⚔ TRIAL SURVIVED' : '✘ TRIAL FAILED'}</div>
+    <div class="outcome-fact">${!success ? s.failFact : '"Threat neutralised. Guardian strengthened."'}</div>
+    <div class="outcome-debrief" style="margin-bottom:20px">${s.debrief}</div>
+    ${reward?.ok ? `
+    <div class="reward-box">
+      <div class="reward-label">REWARD</div>
+      <div class="reward-val">+${reward.xpGained} XP ${reward.rewardType!=='xp'?'· '+reward.rewardType.toUpperCase()+'!':''}</div>
+      ${reward.newBeast ? `<div style="font-family:'VT323';font-size:20px;color:var(--success);margin-top:6px">🎉 NEW BEAST: ${BEASTS[reward.newBeast]?.e} ${BEASTS[reward.newBeast]?.n}!</div>` : ''}
+    </div>` : ''}
+    <button class="px-btn" onclick="returnFromTrial()" style="margin-top:8px">[ CONTINUE ]</button>
+  `;
+}
+
+function returnFromTrial() {
+  loadGameScreen();
+  showScreen('s-game');
+  trialState = null;
+}
+
+// ── COLLECTION ────────────────────────────────────────────────────────────────
+function showCollection() {
+  const unlocked = G.beastsUnlocked;
+  const total = Object.keys(BEASTS).length;
+  document.getElementById('coll-sub').textContent = `Unlocked: ${unlocked.length} / ${total}`;
+
+  // Find active synergies
+  const activeSynergies = SYNERGIES.filter(syn => syn.beasts.every(b => unlocked.includes(b)));
+
+  function renderGrid(containerId, ids) {
+    const grid = document.getElementById(containerId);
+    grid.innerHTML = ids.map(id => {
+      const b = BEASTS[id];
+      const isUnlocked = unlocked.includes(id);
+      const syn = activeSynergies.find(s => s.beasts.includes(id));
+      return `<div class="beast-card ${isUnlocked?'unlocked':'locked'}">
+        ${syn ? `<span class="synergy-badge" title="${syn.name}: ${syn.bonus}">✨</span>` : ''}
+        <span class="bc-card-emoji">${b.e}</span>
+        <div class="bc-card-name">${b.n.toUpperCase()}</div>
+        <div class="bc-card-type">${b.desc}</div>
+        <span class="bc-rarity rarity-${b.rarity}">${b.rarity.toUpperCase()}</span>
+        ${!isUnlocked ? '<div style="font-family:VT323;font-size:12px;color:var(--muted);margin-top:4px">Not yet summoned.</div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  renderGrid('shield-grid', ['S01','S02','S03','S04','S05','S06','S07','S08']);
+  renderGrid('forge-grid',  ['F01','F02','F03','F04','F05','F06']);
+  showScreen('s-collection');
+}
+
+// ── PROFILE ───────────────────────────────────────────────────────────────────
+function showProfile() {
+  const petEmoji = ARCHETYPE_EMOJI[G.archetype] || '🐾';
+  document.getElementById('prof-pet-emoji').textContent = petEmoji;
+  document.getElementById('prof-petname').textContent   = G.petName;
+  document.getElementById('prof-archetype').textContent = 'THE ' + (G.archetype||'GUARDIAN');
+  document.getElementById('prof-evo').textContent = EVO_STAGES[G.evolutionStage] || 'Hatchling';
+  document.getElementById('prof-level').textContent    = 'Level ' + G.guardianLevel;
+  document.getElementById('prof-trials').textContent   = G.trialsComplete + ' / 8 scenarios';
+  document.getElementById('prof-streak').textContent   = G.loginStreak + ' days 🔥';
+  const createdAt = localStorage.getItem('aegis_created_at') || new Date().toISOString();
+  const days = Math.max(1, Math.floor((Date.now() - new Date(createdAt)) / 86400000));
+  document.getElementById('prof-days').textContent     = days + ' days';
+  document.getElementById('prof-beasts').textContent   = G.beastsUnlocked.length + ' / 14';
+
+  // Share card
+  const refLink = window.location.origin + '?ref=' + G.refCode;
+  document.getElementById('share-pet-emoji').textContent = petEmoji;
+  document.getElementById('share-pet-name').textContent  = G.petName;
+  document.getElementById('share-arch').textContent      = 'THE ' + (G.archetype||'GUARDIAN');
+  document.getElementById('ref-link-display').textContent = refLink;
+  showScreen('s-profile');
+}
+
+function copyRefLink() {
+  const link = window.location.origin + '?ref=' + G.refCode;
+  navigator.clipboard.writeText(link).then(() => showToast('✔ Referral link copied!')).catch(() => {
+    showToast(link); // fallback: show in toast
+  });
+}
+
+// ── AUDIO (simple beeps via Web Audio) ─────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur=0.12, type='square', vol=0.08) {
+  if (G.muted) return;
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  } catch(e){}
+}
+function playSuccess() { [523,659,784,1047].forEach((f,i) => setTimeout(()=>playTone(f,.15,'square',.07),i*80)); }
+function playFail()    { [330,262,196].forEach((f,i) => setTimeout(()=>playTone(f,.2,'sawtooth',.06),i*100)); }
+function playClick()   { playTone(880,.06,'square',.05); }
+function toggleMute()  {
+  G.muted = !G.muted;
+  document.getElementById('mute-icon').textContent = G.muted ? '🔇' : '🔊';
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Add click sound to all px-btn
+document.addEventListener('click', e => {
+  if (e.target.matches('.px-btn,.bnav-btn,.arch-card,.bc-option,.shield-opt')) playClick();
+});
+</script>
+</body>
+</html>

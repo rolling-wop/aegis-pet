@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS PET — Advisor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f; --cyan: #00f5d4; --violet: #7b2fff; --amber: #ffb703;
+  --danger: #ff006e; --success: #06d6a0; --text: #e2e8f0; --muted: #64748b;
+  --panel: rgba(10,10,15,0.92); --border: rgba(0,245,212,0.3);
+  --card-bg: rgba(15,20,35,0.95);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,245,212,0.015) 2px,rgba(0,245,212,0.015) 4px)}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg)}
+.login-box{background:var(--card-bg);border:1px solid var(--cyan);padding:48px 40px;border-radius:4px;text-align:center;max-width:380px;width:90%;
+  box-shadow:0 0 40px rgba(0,245,212,0.1)}
+.login-logo{font-family:'Press Start 2P';font-size:12px;color:var(--cyan);margin-bottom:8px;text-shadow:0 0 20px var(--cyan)}
+.login-title{font-family:'Press Start 2P';font-size:10px;color:var(--muted);margin-bottom:32px}
+.login-input{width:100%;padding:12px 16px;background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);font-family:'Inter';font-size:14px;outline:none;margin-bottom:16px}
+.login-input:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,245,212,0.15)}
+.login-btn{width:100%;padding:12px;background:var(--cyan);color:#000;font-family:'Press Start 2P';font-size:10px;border:none;
+  border-radius:4px;cursor:pointer;letter-spacing:1px}
+.login-btn:hover{background:#00dfc0;box-shadow:0 0 20px rgba(0,245,212,0.4)}
+.login-error{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+
+/* DASHBOARD */
+#dashboard{display:none;position:relative;z-index:1}
+.header{background:rgba(10,10,15,0.95);border-bottom:1px solid var(--border);padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.header-brand{font-family:'Press Start 2P';font-size:11px;color:var(--cyan);text-shadow:0 0 12px rgba(0,245,212,0.5)}
+.header-sub{font-family:'VT323';font-size:16px;color:var(--muted);margin-left:12px}
+.header-right{display:flex;align-items:center;gap:16px}
+.logout-btn{font-family:'Press Start 2P';font-size:8px;color:var(--muted);background:none;border:1px solid var(--muted);
+  padding:6px 10px;border-radius:4px;cursor:pointer}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.refresh-btn{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);background:rgba(0,245,212,0.1);border:1px solid var(--border);
+  padding:6px 10px;border-radius:4px;cursor:pointer}
+.refresh-btn:hover{background:rgba(0,245,212,0.2)}
+
+.main{padding:24px;max-width:1400px;margin:0 auto}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card-bg);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center}
+.stat-card-val{font-family:'Press Start 2P';font-size:22px;color:var(--cyan);margin-bottom:6px;text-shadow:0 0 12px rgba(0,245,212,0.4)}
+.stat-card.danger .stat-card-val{color:var(--danger);text-shadow:0 0 12px rgba(255,0,110,0.4)}
+.stat-card.success .stat-card-val{color:var(--success);text-shadow:0 0 12px rgba(6,214,160,0.4)}
+.stat-card.amber .stat-card-val{color:var(--amber)}
+.stat-card-label{font-family:'VT323';font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* FUNNEL */
+.funnel-card{background:var(--card-bg);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:24px}
+.section-title{font-family:'Press Start 2P';font-size:9px;color:var(--cyan);margin-bottom:16px;letter-spacing:1px}
+.funnel{display:flex;gap:0;align-items:stretch;overflow-x:auto}
+.funnel-stage{flex:1;min-width:100px;background:rgba(0,245,212,0.04);border:1px solid var(--border);
+  border-right:none;padding:12px 8px;text-align:center;position:relative}
+.funnel-stage:last-child{border-right:1px solid var(--border)}
+.funnel-stage::after{content:'▶';position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:10px;z-index:1}
+.funnel-stage:last-child::after{display:none}
+.funnel-count{font-family:'Press Start 2P';font-size:16px;color:var(--cyan);margin-bottom:4px}
+.funnel-label{font-family:'VT323';font-size:13px;color:var(--muted);line-height:1.3}
+
+/* CLIENT TABLE */
+.clients-card{background:var(--card-bg);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:24px}
+.search-bar{width:100%;padding:8px 12px;background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);font-family:'Inter';font-size:13px;margin-bottom:16px;outline:none}
+.search-bar:focus{border-color:var(--cyan)}
+.client-table{width:100%;border-collapse:collapse;font-size:12px}
+.client-table th{font-family:'Press Start 2P';font-size:7px;color:var(--muted);padding:8px 10px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.5px}
+.client-table td{padding:10px;border-bottom:1px solid rgba(0,245,212,0.06);vertical-align:middle}
+.client-table tr:hover td{background:rgba(0,245,212,0.04);cursor:pointer}
+.pet-tag{font-family:'VT323';font-size:14px;color:var(--cyan)}
+.arch-badge{display:inline-block;font-family:'Press Start 2P';font-size:6px;padding:3px 6px;border-radius:3px;
+  background:rgba(123,47,255,0.15);color:#a78bfa;border:1px solid rgba(123,47,255,0.3)}
+.profile-badge{display:inline-block;font-family:'VT323';font-size:12px;padding:2px 8px;border-radius:3px}
+.pb-BALANCED_STRATEGIST{background:rgba(6,214,160,0.15);color:var(--success);border:1px solid rgba(6,214,160,0.3)}
+.pb-BLIND_BUILDER{background:rgba(255,183,3,0.15);color:var(--amber);border:1px solid rgba(255,183,3,0.3)}
+.pb-PROCRASTINATOR{background:rgba(255,0,110,0.15);color:var(--danger);border:1px solid rgba(255,0,110,0.3)}
+.pb-default{background:rgba(100,116,139,0.15);color:var(--muted);border:1px solid rgba(100,116,139,0.3)}
+.mini-bar-wrap{width:80px;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;display:inline-block}
+.mini-bar{height:100%;border-radius:3px}
+.health-good{background:var(--cyan)}
+.health-mid{background:var(--amber)}
+.health-bad{background:var(--danger);animation:flicker .8s infinite}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:.5}}
+.alert-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);display:inline-block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,0,110,0.4)}70%{box-shadow:0 0 0 6px rgba(255,0,110,0)}}
+.view-btn{font-family:'Press Start 2P';font-size:7px;padding:5px 8px;background:rgba(0,245,212,0.1);
+  border:1px solid var(--border);color:var(--cyan);border-radius:3px;cursor:pointer;white-space:nowrap}
+.view-btn:hover{background:rgba(0,245,212,0.2)}
+
+/* CLIENT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;overflow-y:auto;padding:20px}
+.modal-overlay.open{display:block}
+.modal{background:var(--card-bg);border:1px solid var(--cyan);border-radius:4px;max-width:900px;margin:0 auto;
+  box-shadow:0 0 60px rgba(0,245,212,0.1);position:relative}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:1px solid var(--muted);color:var(--muted);font-family:'Press Start 2P';
+  font-size:8px;padding:6px 10px;border-radius:3px;cursor:pointer}
+.modal-close:hover{border-color:var(--danger);color:var(--danger)}
+.modal-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.modal-body{grid-template-columns:1fr}}
+.modal-section{background:rgba(0,245,212,0.03);border:1px solid var(--border);border-radius:4px;padding:16px}
+.modal-section-title{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);margin-bottom:14px;letter-spacing:.5px}
+.gap-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.gap-bar-label{font-family:'VT323';font-size:14px;color:var(--text);width:130px;flex-shrink:0}
+.gap-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
+.gap-bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.gap-val{font-family:'VT323';font-size:14px;width:36px;text-align:right;flex-shrink:0}
+.intelligence-box{background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;padding:14px;margin-bottom:12px}
+.intel-label{font-family:'Press Start 2P';font-size:7px;color:var(--muted);margin-bottom:8px;letter-spacing:.5px}
+.intel-val{font-family:'VT323';font-size:16px;color:var(--text);line-height:1.4}
+.opener-box{background:rgba(123,47,255,0.08);border:1px solid rgba(123,47,255,0.3);border-radius:4px;padding:14px;margin-bottom:12px}
+.opener-text{font-family:'VT323';font-size:17px;color:var(--text);line-height:1.5;font-style:italic}
+.copy-btn{font-family:'Press Start 2P';font-size:7px;padding:6px 10px;background:rgba(123,47,255,0.2);
+  border:1px solid rgba(123,47,255,0.4);color:#a78bfa;border-radius:3px;cursor:pointer;margin-top:8px;display:block}
+.copy-btn:hover{background:rgba(123,47,255,0.35)}
+.objection-item{font-family:'VT323';font-size:15px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border)}
+.objection-item:last-child{border:none}
+.wa-btn{display:block;width:100%;padding:10px;background:rgba(6,214,160,0.1);border:1px solid rgba(6,214,160,0.3);
+  color:var(--success);font-family:'Press Start 2P';font-size:8px;border-radius:4px;text-align:center;
+  text-decoration:none;cursor:pointer;margin-top:12px}
+.wa-btn:hover{background:rgba(6,214,160,0.2)}
+.badge-grid{display:flex;flex-wrap:wrap;gap:6px}
+.beast-badge{font-family:'VT323';font-size:16px;padding:4px 8px;border-radius:3px;
+  background:rgba(0,245,212,0.08);border:1px solid var(--border)}
+.beast-badge.locked{opacity:.4;filter:grayscale(1)}
+.level-pill{display:inline-block;font-family:'Press Start 2P';font-size:8px;padding:4px 10px;border-radius:3px;
+  background:rgba(0,245,212,0.1);border:1px solid var(--border);color:var(--cyan)}
+.trial-list{max-height:200px;overflow-y:auto}
+.trial-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px solid rgba(0,245,212,0.06);font-family:'VT323';font-size:14px}
+.trial-outcome-win{color:var(--success)}
+.trial-outcome-loss{color:var(--danger)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#0F172A;color:var(--text);padding:10px 16px;
+  border-radius:4px;font-family:'VT323';font-size:16px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;
+  border:1px solid var(--border)}
+.toast.show{opacity:1}
+
+.no-data{font-family:'VT323';font-size:18px;color:var(--muted);text-align:center;padding:40px}
+</style>
+</head>
+<body>
+
+<!-- SCANLINE -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,245,212,0.015) 2px,rgba(0,245,212,0.015) 4px)"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">⚔ AEGIS PET</div>
+    <div class="login-title">ADVISOR DASHBOARD</div>
+    <input type="password" class="login-input" id="pw-input" placeholder="Enter advisor password" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">[ ACCESS DASHBOARD ]</button>
+    <div class="login-error" id="login-error">⚠ INVALID CREDENTIALS</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="header" style="position:relative;z-index:50">
+    <div style="display:flex;align-items:center">
+      <span class="header-brand">⚔ AEGIS PET</span>
+      <span class="header-sub">&nbsp;Advisor Intelligence</span>
+    </div>
+    <div class="header-right">
+      <button class="refresh-btn" onclick="loadDashboard()">⟳ REFRESH</button>
+      <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="main" style="position:relative;z-index:1">
+    <!-- STATS -->
+    <div class="stat-row" id="stat-row">
+      <div class="stat-card"><div class="stat-card-val" id="s-total">—</div><div class="stat-card-label">Total Players</div></div>
+      <div class="stat-card success"><div class="stat-card-val" id="s-complete">—</div><div class="stat-card-label">Full Profiles</div></div>
+      <div class="stat-card amber"><div class="stat-card-val" id="s-today">—</div><div class="stat-card-label">New Today</div></div>
+      <div class="stat-card danger"><div class="stat-card-val" id="s-priority">—</div><div class="stat-card-label">Critical Gaps ⚠</div></div>
+    </div>
+
+    <!-- FUNNEL -->
+    <div class="funnel-card">
+      <div class="section-title">▸ PIPELINE FUNNEL</div>
+      <div class="funnel" id="funnel-row">
+        <div class="funnel-stage"><div class="funnel-count" id="f-started">0</div><div class="funnel-label">Game<br>Started</div></div>
+        <div class="funnel-stage"><div class="funnel-count" id="f-lead">0</div><div class="funnel-label">Lead<br>Captured</div></div>
+        <div class="funnel-stage"><div class="funnel-count" id="f-trial">0</div><div class="funnel-label">First<br>Trial</div></div>
+        <div class="funnel-stage"><div class="funnel-count" id="f-profile">0</div><div class="funnel-label">Profile<br>Complete</div></div>
+      </div>
+    </div>
+
+    <!-- CLIENT TABLE -->
+    <div class="clients-card">
+      <div class="section-title">▸ CLIENT PROFILES</div>
+      <input type="text" class="search-bar" id="search-bar" placeholder="🔍 Search by name, pet, archetype..." oninput="filterTable()">
+      <div style="overflow-x:auto">
+        <table class="client-table" id="client-table">
+          <thead><tr>
+            <th></th>
+            <th>CLIENT</th>
+            <th>PET</th>
+            <th>ARCHETYPE</th>
+            <th>PROFILE TYPE</th>
+            <th>HEALTH (AVG)</th>
+            <th>TRIALS</th>
+            <th>LEVEL</th>
+            <th>JOINED</th>
+            <th>ACTION</th>
+          </tr></thead>
+          <tbody id="client-tbody"></tbody>
+        </table>
+      </div>
+      <div class="no-data" id="no-clients" style="display:none">No clients yet. Share the game link to get started.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT MODAL -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modal-title" style="font-family:'Press Start 2P';font-size:11px;color:var(--cyan)"></div>
+        <div id="modal-sub" style="font-family:'VT323';font-size:16px;color:var(--muted);margin-top:4px"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">[ CLOSE ]</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let advisorToken = localStorage.getItem('aegis_advisor_token') || '';
+let allClients = [];
+
+// ── AUTH ────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  const r = await fetch('/api/advisor/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
+  const d = await r.json();
+  if (d.ok) {
+    advisorToken = d.token;
+    localStorage.setItem('aegis_advisor_token', advisorToken);
+    showDashboard();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('aegis_advisor_token');
+  advisorToken = '';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function authHeaders() { return { 'x-advisor-token': advisorToken, 'Content-Type': 'application/json' }; }
+
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.onload = async () => {
+  if (advisorToken) {
+    const r = await fetch('/api/advisor/clients', { headers: authHeaders() });
+    if (r.ok) { showDashboard(); return; }
+    localStorage.removeItem('aegis_advisor_token');
+  }
+};
+
+function showDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadDashboard();
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const r = await fetch('/api/advisor/clients', { headers: authHeaders() });
+  if (!r.ok) { doLogout(); return; }
+  const { clients, stats } = await r.json();
+  allClients = clients;
+
+  // Stats
+  document.getElementById('s-total').textContent = stats.total;
+  document.getElementById('s-complete').textContent = stats.profilesComplete;
+  document.getElementById('s-today').textContent = stats.newToday;
+  document.getElementById('s-priority').textContent = stats.highPriority;
+
+  // Funnel
+  document.getElementById('f-started').textContent = stats.stages.started;
+  document.getElementById('f-lead').textContent = stats.stages.leadCaptured;
+  document.getElementById('f-trial').textContent = stats.stages.tutorialDone;
+  document.getElementById('f-profile').textContent = stats.stages.profileDone;
+
+  renderTable(clients);
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+const ARCHETYPE_EMOJI = { PROTECTOR:'🐺', BUILDER:'🐂', WANDERER:'🦊', VISIONARY:'🐉', SURVIVOR:'🦌' };
+const PROFILE_SHORT = {
+  BLIND_BUILDER:'BLIND BUILDER', ANXIOUS_PROTECTOR:'ANXIOUS PROTECTOR', BALANCED_STRATEGIST:'BALANCED STRAT.',
+  PROCRASTINATOR:'PROCRASTINATOR', FAMILY_GUARDIAN:'FAMILY GUARDIAN', YOUNG_RISK_TAKER:'YOUNG RISK-TAKER',
+  LEGACY_PLANNER:'LEGACY PLANNER', SURVIVOR_TYPE:'SURVIVOR', UNENGAGED:'UNENGAGED'
+};
+
+function avgHealth(c) { return Math.round(((c.vitality||40)+(c.stability||40)+(c.resilience||40)+(c.bond||40)+(c.legacy||40))/5); }
+function minHealth(c) { return Math.min(c.vitality||40, c.stability||40, c.resilience||40, c.bond||40, c.legacy||40); }
+
+function renderTable(clients) {
+  const tbody = document.getElementById('client-tbody');
+  const noData = document.getElementById('no-clients');
+  if (!clients.length) { tbody.innerHTML = ''; noData.style.display='block'; return; }
+  noData.style.display = 'none';
+  const scenariosDoneCount = c => { try { return JSON.parse(c.scenarios_done||'[]').length; } catch { return 0; } };
+
+  tbody.innerHTML = clients.map(c => {
+    const avg = avgHealth(c);
+    const minH = minHealth(c);
+    const isAlert = minH < 30;
+    const barColor = avg > 60 ? 'var(--cyan)' : avg > 30 ? 'var(--amber)' : 'var(--danger)';
+    const profileKey = c.profile_type || 'UNENGAGED';
+    const profileClass = profileKey === 'BALANCED_STRATEGIST' ? 'pb-BALANCED_STRATEGIST' :
+      profileKey === 'BLIND_BUILDER' ? 'pb-BLIND_BUILDER' :
+      profileKey === 'PROCRASTINATOR' ? 'pb-PROCRASTINATOR' : 'pb-default';
+    const joined = new Date(c.created_at).toLocaleDateString('en-SG', {day:'2-digit',month:'short'});
+
+    return `<tr onclick="viewClient('${c.id}')">
+      <td>${isAlert ? '<span class="alert-dot"></span>' : ''}</td>
+      <td>
+        <div style="font-weight:600;font-size:13px">${c.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${c.phone}</div>
+      </td>
+      <td class="pet-tag">${ARCHETYPE_EMOJI[c.archetype]||'🐾'} ${c.pet_name}</td>
+      <td><span class="arch-badge">${c.archetype||'—'}</span></td>
+      <td><span class="profile-badge ${profileClass}">${PROFILE_SHORT[profileKey]||profileKey}</span></td>
+      <td>
+        <div class="mini-bar-wrap"><div class="mini-bar" style="width:${avg}%;background:${barColor}"></div></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:4px">${avg}%</span>
+      </td>
+      <td style="font-family:'Press Start 2P';font-size:10px;color:var(--cyan)">${scenariosDoneCount(c)}/8</td>
+      <td style="font-family:'Press Start 2P';font-size:10px">Lv${c.guardian_level||1}</td>
+      <td style="font-size:11px;color:var(--muted)">${joined}</td>
+      <td><button class="view-btn" onclick="event.stopPropagation();viewClient('${c.id}')">VIEW ▶</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() {
+  const q = document.getElementById('search-bar').value.toLowerCase();
+  const filtered = q ? allClients.filter(c =>
+    c.name.toLowerCase().includes(q) || c.pet_name.toLowerCase().includes(q) ||
+    (c.archetype||'').toLowerCase().includes(q) || (c.phone||'').includes(q)
+  ) : allClients;
+  renderTable(filtered);
+}
+
+// ── CLIENT MODAL ──────────────────────────────────────────────────────────────
+const BEAST_INFO = {
+  S01:{n:'Terrax',e:'🐢',d:'Hospitalisation'},S02:{n:'Lunara',e:'🐺',d:'Death/Dependants'},
+  S03:{n:'Ironhide',e:'🦏',d:'Accident'},S04:{n:'Steadfast',e:'🐂',d:'TPD/TI'},
+  S05:{n:'Veil',e:'🦌',d:'ECI'},S06:{n:'Sever',e:'🐆',d:'Critical Illness'},
+  S07:{n:'Pyre',e:'🦅',d:'Multipay CI'},S08:{n:'Eternal',e:'🐍',d:'Whole Life'},
+  F01:{n:'Ascendant',e:'🐉',d:'ILP/Wealth'},F02:{n:'Sovereign',e:'🦁',d:'Whole Life Cash'},
+  F03:{n:'Wavecrest',e:'🐬',d:'Savings'},F04:{n:'Chrysalis',e:'🦋',d:'Compounding'},
+  F05:{n:'Arcane',e:'🦊',d:'Investment'},F06:{n:'Anchor',e:'🐘',d:'Retirement'}
+};
+
+async function viewClient(id) {
+  const r = await fetch(`/api/advisor/client/${id}`, { headers: authHeaders() });
+  if (!r.ok) return;
+  const data = await r.json();
+  const { player, gameState: gs, trials, intelligence, behavioral, gaps } = data;
+  const avg = gs ? Math.round(((gs.vitality||40)+(gs.stability||40)+(gs.resilience||40)+(gs.bond||40)+(gs.legacy||40))/5) : 40;
+
+  document.getElementById('modal-title').textContent = `${ARCHETYPE_EMOJI[player.archetype]||'🐾'} ${player.name}`;
+  document.getElementById('modal-sub').textContent = `Pet: ${player.pet_name} · ${player.archetype} · Level ${gs?.guardian_level||1} · ${trials?.length||0} trials`;
+
+  const gapBarHtml = (label, val) => {
+    const col = val > 60 ? 'var(--cyan)' : val > 30 ? 'var(--amber)' : 'var(--danger)';
+    const status = val > 60 ? '✅' : val > 30 ? '⚠️' : '🔴';
+    return `<div class="gap-bar-row">
+      <div class="gap-bar-label">${status} ${label}</div>
+      <div class="gap-bar-wrap"><div class="gap-bar-fill" style="width:${val||40}%;background:${col}"></div></div>
+      <div class="gap-val" style="color:${col}">${val||40}%</div>
+    </div>`;
+  };
+
+  const beasts = JSON.parse(gs?.beasts_unlocked||'[]');
+  const allBeastIds = Object.keys(BEAST_INFO);
+  const beastBadges = allBeastIds.map(b => {
+    const bi = BEAST_INFO[b];
+    const unlocked = beasts.includes(b);
+    return `<div class="beast-badge ${unlocked?'':'locked'}" title="${bi.n} — ${bi.d}">${bi.e} ${bi.n}</div>`;
+  }).join('');
+
+  const trialList = (trials||[]).slice(0,10).map(t => {
+    const sc = ['—','THE SIGNAL','THE EARLY WHISPER','THE STORM','THE SILENCE','THE FREEZE','THE IMPACT','THE ECHO','THE HORIZON'];
+    return `<div class="trial-item">
+      <span>${sc[t.scenario_id]||t.scenario_id}</span>
+      <span class="${t.outcome==='success'?'trial-outcome-win':'trial-outcome-loss'}">${t.outcome==='success'?'✔ WIN':'✘ LOSS'}</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-family:VT323;font-size:14px;padding:8px 0">No trials yet</div>';
+
+  const waLink = `https://wa.me/${player.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(intelligence.appointmentOpener)}`;
+
+  document.getElementById('modal-body').innerHTML = `
+    <!-- Left col -->
+    <div>
+      <div class="modal-section" style="margin-bottom:16px">
+        <div class="modal-section-title">▸ PROTECTION GAP ANALYSIS</div>
+        ${gapBarHtml('Hospitalisation', gs?.vitality||40)}
+        ${gapBarHtml('Stability/TPD', gs?.stability||40)}
+        ${gapBarHtml('CI/Accident', gs?.resilience||40)}
+        ${gapBarHtml('Death/Dependants', gs?.bond||40)}
+        ${gapBarHtml('Legacy/Investment', gs?.legacy||40)}
+        <div style="margin-top:10px;font-family:'VT323';font-size:13px;color:var(--muted)">
+          Overall health: <span style="color:${avg>60?'var(--cyan)':avg>30?'var(--amber)':'var(--danger)'};font-size:18px;font-weight:700">${avg}%</span>
+        </div>
+      </div>
+      <div class="modal-section" style="margin-bottom:16px">
+        <div class="modal-section-title">▸ BEHAVIORAL SIGNALS</div>
+        <div class="intelligence-box">
+          <div class="intel-label">DECISION STYLE</div>
+          <div class="intel-val">${(behavioral?.avgDecisionTime||0) < 5000 ? '⚡ Fast & impulsive (< 5s avg)' : (behavioral?.avgDecisionTime||0) < 12000 ? '🎯 Considered (5-12s avg)' : '🔍 Analytical & deliberate (12s+)'}</div>
+        </div>
+        <div class="intelligence-box">
+          <div class="intel-label">MOST CHOSEN SHIELDS</div>
+          <div class="intel-val">${(behavioral?.topBeasts||[]).map(b => `${BEAST_INFO[b]?.e||'❓'} ${BEAST_INFO[b]?.n||b}`).join(', ') || 'Not enough data'}</div>
+        </div>
+        <div class="intelligence-box">
+          <div class="intel-label">BLIND SPOTS (IGNORED)</div>
+          <div class="intel-val" style="color:var(--amber)">${(behavioral?.ignoredBeasts||[]).slice(0,3).map(b => `${BEAST_INFO[b]?.e||'❓'} ${BEAST_INFO[b]?.d||b}`).join(', ') || 'None detected'}</div>
+        </div>
+        <div class="intelligence-box">
+          <div class="intel-label">FORGE VS SHIELD RATIO</div>
+          <div class="intel-val">${behavioral?.forgeRatio||0}% wealth-focused</div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">▸ BEAST COLLECTION</div>
+        <div class="badge-grid">${beastBadges}</div>
+      </div>
+    </div>
+
+    <!-- Right col -->
+    <div>
+      <div class="modal-section" style="margin-bottom:16px">
+        <div class="modal-section-title">▸ CLIENT INTELLIGENCE</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="level-pill">🎭 ${player.archetype}</span>
+          <span class="level-pill">🧠 ${intelligence.profileType}</span>
+          <span class="level-pill">❤️ ${player.what_matters}</span>
+          <span class="level-pill">🔥 ${gs?.login_streak||1}-day streak</span>
+        </div>
+        <div class="intelligence-box">
+          <div class="intel-label">MEETING STRATEGY</div>
+          <div class="intel-val">${intelligence.strategy}</div>
+        </div>
+        <div class="intelligence-box">
+          <div class="intel-label">TOP PRIORITY GAPS</div>
+          <div class="intel-val">${(gaps||[]).map((g,i) => `${i+1}. ${g.name} (${g.val}%)`).join('<br>')}</div>
+        </div>
+        <div class="intel-label" style="margin-bottom:6px;font-family:'Press Start 2P';font-size:7px;color:var(--muted)">PREDICTED OBJECTIONS</div>
+        <div style="margin-bottom:12px">${(intelligence.objections||[]).map(o => `<div class="objection-item">"${o}"</div>`).join('')}</div>
+      </div>
+      <div class="modal-section" style="margin-bottom:16px">
+        <div class="modal-section-title">▸ APPOINTMENT OPENER</div>
+        <div class="opener-box">
+          <div class="opener-text">${intelligence.appointmentOpener}</div>
+        </div>
+        <button class="copy-btn" onclick="copyText('${intelligence.appointmentOpener.replace(/'/g,"\\'")}')">📋 COPY MESSAGE</button>
+        <a class="wa-btn" href="${waLink}" target="_blank">💬 OPEN IN WHATSAPP</a>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">▸ TRIAL HISTORY</div>
+        <div class="trial-list">${trialList}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('client-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('client-modal').classList.remove('open'); }
+document.getElementById('client-modal').addEventListener('click', e => { if (e.target === document.getElementById('client-modal')) closeModal(); });
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('✔ Copied to clipboard'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
