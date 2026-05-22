@@ -462,6 +462,55 @@ select.lc-inp{cursor:pointer}
 .spacer{flex:1}
 .hidden{display:none!important}
 .neon-txt{text-shadow:0 0 12px currentColor}
+
+/* ── TAROT SCREEN ── */
+#s-tarot{background:#0d0b1e;justify-content:flex-start;padding:0;overflow-y:auto}
+.tarot-wrap{width:100%;max-width:480px;margin:0 auto;padding:28px 20px 60px;display:flex;flex-direction:column;align-items:center;z-index:1;position:relative}
+.tarot-stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;background:#0d0b1e}
+.t-star{position:absolute;border-radius:50%;background:#fff;animation:tStarPulse var(--dur,3s) ease-in-out infinite var(--delay,0s)}
+.t-star.t-s{width:1px;height:1px}.t-star.t-m{width:2px;height:2px}.t-star.t-l{width:3px;height:3px;background:var(--c,#fff)}
+@keyframes tStarPulse{0%,100%{opacity:.08}50%{opacity:1}}
+/* 3-D Card flip */
+.tarot-scene{perspective:1200px;width:190px;height:304px;margin:0 auto 20px;flex-shrink:0}
+.tarot-card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1.2s cubic-bezier(.4,0,.2,1)}
+.tarot-card.flipped{transform:rotateY(180deg)}
+.tarot-card-back,.tarot-card-front{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px}
+.tarot-card-back{background:linear-gradient(135deg,#1a0a2e 0%,#0d0624 50%,#0a0118 100%);border:2px solid rgba(123,47,255,.55);box-shadow:0 0 30px rgba(123,47,255,.35),inset 0 0 30px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.tarot-back-inner{position:absolute;inset:8px;border:1px solid rgba(123,47,255,.2);border-radius:8px;background-image:repeating-linear-gradient(45deg,rgba(123,47,255,.04) 0,rgba(123,47,255,.04) 1px,transparent 0,transparent 50%),repeating-linear-gradient(-45deg,rgba(123,47,255,.04) 0,rgba(123,47,255,.04) 1px,transparent 0,transparent 50%);background-size:16px 16px}
+.tarot-back-symbol{font-size:44px;z-index:1;filter:drop-shadow(0 0 14px rgba(123,47,255,.8))}
+.tarot-back-text{font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(167,139,250,.55);z-index:1;letter-spacing:2px;text-align:center}
+.tarot-card-front{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;text-align:center;background:linear-gradient(160deg,#1a0a2e 0%,#0a0a1e 60%,#0d0b1e 100%);border:2px solid rgba(0,245,212,.3);box-shadow:0 0 40px rgba(0,0,0,.5)}
+.tc-numeral{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--tc,#00f5d4);letter-spacing:3px;margin-bottom:6px}
+.tc-emoji{font-size:54px;margin:4px 0;filter:drop-shadow(0 0 18px var(--tc,#00f5d4))}
+.tc-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--tc,#00f5d4);margin-top:8px;line-height:1.8;letter-spacing:1px}
+.tc-mini-tagline{font-family:'VT323',monospace;font-size:13px;color:rgba(226,232,240,.6);margin-top:6px;line-height:1.4;font-style:italic;padding:0 4px}
+/* Reveal content */
+.tarot-reveal{width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;opacity:0;transition:opacity .6s ease}
+.tarot-reveal.show{opacity:1}
+.tarot-tagline-el{font-family:'VT323',monospace;font-size:22px;color:var(--cyan);text-align:center;line-height:1.6;font-style:italic;text-shadow:0 0 20px rgba(0,245,212,.4);min-height:56px;width:100%}
+.tarot-sec{width:100%;background:rgba(10,10,30,.8);border:1px solid rgba(0,245,212,.12);border-radius:4px;padding:13px 14px}
+.tarot-sec-ttl{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px}
+.tarot-trait{font-family:'VT323',monospace;font-size:18px;color:var(--txt);opacity:0;transform:translateX(-10px);transition:opacity .35s ease,transform .35s ease;display:flex;align-items:center;gap:8px;padding:2px 0}
+.tarot-trait.in{opacity:1;transform:translateX(0)}
+.tarot-trait::before{content:'▸';color:var(--tc-trait,var(--cyan));font-size:14px;flex-shrink:0}
+.tarot-shadow-sec{border-color:rgba(255,0,110,.25)!important;background:rgba(255,0,110,.05)!important}
+.tarot-shadow-ttl{color:var(--danger)!important}
+.tarot-shadow-body{font-family:'VT323',monospace;font-size:18px;color:rgba(255,0,110,.9);line-height:1.4}
+.tarot-light-sec{border-color:rgba(0,245,212,.25)!important;background:rgba(0,245,212,.04)!important}
+.tarot-light-ttl{color:var(--cyan)!important}
+.tarot-light-body{font-family:'VT323',monospace;font-size:18px;color:rgba(0,245,212,.9);line-height:1.4}
+.tarot-advice-sec{background:rgba(123,47,255,.09);border:1px solid rgba(123,47,255,.32);border-radius:4px;padding:14px;width:100%}
+.tarot-advice-body{font-family:'VT323',monospace;font-size:20px;color:#a78bfa;line-height:1.5;text-align:center}
+.tarot-btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-bottom:12px}
+/* Profile mini tarot card */
+.tarot-mini{display:flex;align-items:center;gap:12px;background:rgba(10,10,30,.8);border:1px solid rgba(123,47,255,.35);border-radius:4px;padding:12px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.tarot-mini:hover{border-color:rgba(123,47,255,.7);box-shadow:0 0 18px rgba(123,47,255,.22)}
+.tarot-mini-card{width:38px;height:62px;border-radius:4px;border:1px solid rgba(123,47,255,.45);background:linear-gradient(160deg,#1a0a2e,#0d0b1e);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px rgba(123,47,255,.2)}
+.tarot-mini-num{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--muted);margin-bottom:2px}
+.tarot-mini-em{font-size:20px}
+.tarot-mini-info{flex:1;min-width:0}
+.tarot-mini-ttl{font-family:'Press Start 2P',monospace;font-size:7px;color:#a78bfa;margin-bottom:4px}
+.tarot-mini-tag{font-family:'VT323',monospace;font-size:14px;color:var(--muted);line-height:1.4}
 </style>
 </head>
 <body>
@@ -776,6 +825,12 @@ select.lc-inp{cursor:pointer}
       <div class="prof-row"><span class="prof-key">Days Active</span><span class="prof-val" id="prof-days"></span></div>
       <div class="prof-row"><span class="prof-key">Beasts Unlocked</span><span class="prof-val" id="prof-beasts"></span></div>
     </div>
+    <div class="prof-section" id="prof-tarot-section" style="display:none">
+      <div class="prof-sec-title">✶ THE GUARDIAN READING</div>
+      <div class="tarot-mini" id="prof-tarot-mini" onclick="doRevealReading()"></div>
+      <button class="px-btn" style="width:100%;font-size:8px;margin-top:4px" onclick="doRevealReading()">[ REVEAL YOUR READING ]</button>
+    </div>
+
     <div class="prof-section">
       <div class="prof-sec-title">▸ SHARE YOUR GUARDIAN</div>
       <div class="share-card-export">
@@ -797,6 +852,35 @@ select.lc-inp{cursor:pointer}
         <br><br><a href="/advisor" style="color:var(--violet);font-size:11px">Advisor dashboard →</a>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: TAROT REVEAL ═══ -->
+<div class="screen" id="s-tarot">
+  <!-- animated starfield -->
+  <div class="tarot-stars-bg" id="tarot-bg"></div>
+
+  <div class="tarot-wrap">
+    <!-- header -->
+    <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(167,139,250,.7);letter-spacing:3px;text-align:center;margin-bottom:6px">THE GUARDIAN READING</div>
+    <div style="font-family:'VT323',monospace;font-size:16px;color:rgba(100,116,139,.7);text-align:center;margin-bottom:20px">Your choices reveal your truth</div>
+
+    <!-- 3-D card -->
+    <div class="tarot-scene">
+      <div class="tarot-card" id="tarot-card">
+        <!-- back face -->
+        <div class="tarot-card-back">
+          <div class="tarot-back-inner"></div>
+          <div class="tarot-back-symbol">✶</div>
+          <div class="tarot-back-text">AEGIS<br>READING</div>
+        </div>
+        <!-- front face (filled by JS) -->
+        <div class="tarot-card-front" id="tarot-card-front"></div>
+      </div>
+    </div>
+
+    <!-- reveal content (fades in after flip) -->
+    <div class="tarot-reveal" id="tarot-reveal"></div>
   </div>
 </div>
 
@@ -890,6 +974,62 @@ const PROFILE_LABELS = {
   BALANCED_STRATEGIST:'The Balanced Strategist', PROCRASTINATOR:'The Procrastinator',
   FAMILY_GUARDIAN:'The Family Guardian', YOUNG_RISK_TAKER:'The Young Risk-Taker',
   LEGACY_PLANNER:'The Legacy Planner', SURVIVOR_TYPE:'The Survivor', UNENGAGED:'The Unengaged'
+};
+const TAROT_DATA = {
+  BLIND_BUILDER:{numeral:'VII',emoji:'🏇',name:'THE CHARIOT',
+    tagline:"You charge forward with unstoppable will — but without the shield, victory becomes ruin.",
+    traits:['Relentless momentum','Wealth-first mindset','Driven by ambition','Fears stagnation'],
+    shadow:"Speed without a safety net. You move fast — but who picks up the pieces if the road breaks?",
+    light:"No one builds empires like you. Add one shield and your legacy becomes unstoppable.",
+    color:'#ffb703',advice:"Let's close one protection gap. 20 minutes — then your chariot has a co-pilot."},
+  ANXIOUS_PROTECTOR:{numeral:'II',emoji:'🌙',name:'THE HIGH PRIESTESS',
+    tagline:"You sense danger before it arrives.",
+    traits:['Deeply intuitive','Over-insured in some areas','Craves certainty','Protects first, optimises later'],
+    shadow:"Fear can make you pay for coverage you don't need, while gaps elsewhere go unseen.",
+    light:"Your instincts are right. Let's make sure the plan matches the intuition.",
+    color:'#a78bfa',advice:"A 20-minute review will show you exactly where you're over-protected — and where you're exposed."},
+  BALANCED_STRATEGIST:{numeral:'IV',emoji:'👑',name:'THE EMPEROR',
+    tagline:"Structure. Order. Mastery.",
+    traits:['Systematic thinker','High financial awareness','Demands data','Builds to last'],
+    shadow:"The plan that looks complete sometimes has one invisible crack that undoes everything.",
+    light:"You're already ahead. A structured review turns your foundation into a fortress.",
+    color:'#ffb703',advice:"Let's do a full 30-minute planning session. You'll leave with a complete picture — and a real plan."},
+  PROCRASTINATOR:{numeral:'0',emoji:'🎭',name:'THE FOOL',
+    tagline:"Infinite potential — but you haven't taken the step.",
+    traits:['Bright and aware','Delays by design',"Waiting for the 'right time'",'Underestimates urgency'],
+    shadow:'The right time was yesterday. The next best time is now.',
+    light:"Once you start, you're unstoppable. You just need one small step.",
+    color:'#06d6a0',advice:"I found one specific gap worth 20 minutes. Can we close it this week?"},
+  FAMILY_GUARDIAN:{numeral:'III',emoji:'🌿',name:'THE EMPRESS',
+    tagline:"The living shield of everyone you love.",
+    traits:['Fiercely loyal','Protects others before self','Love is the strategy','Legacy starts with people'],
+    shadow:"You protect everyone — except the one gap that protects them if you're gone.",
+    light:"The strength of your love is your greatest asset. Let's build the plan around it.",
+    color:'#06d6a0',advice:"I want to show you exactly what happens to the people you love if something unexpected hits. 20 minutes."},
+  YOUNG_RISK_TAKER:{numeral:'XVI',emoji:'⚡',name:'THE TOWER',
+    tagline:"You court the lightning. Even The Tower falls without a foundation.",
+    traits:['High risk tolerance','Believes in self-recovery','Youth as armour','Moves fast, thinks later'],
+    shadow:"Youth is not insurance. The tower looks strong until the moment it doesn't.",
+    light:"Your energy is your advantage. One foundation layer and you're truly unstoppable.",
+    color:'#ff006e',advice:"What's the plan if something big hits before the wealth builds? 20 minutes could change everything."},
+  LEGACY_PLANNER:{numeral:'V',emoji:'🏛️',name:'THE HIEROPHANT',
+    tagline:"You think in decades. Build in centuries.",
+    traits:['Long-horizon thinking','Values tradition and structure','Wealth as legacy','Seeks wisdom, not hype'],
+    shadow:"The long view sometimes misses the near-term risk that ends the journey prematurely.",
+    light:"Your vision is rare. Let's build a structure that protects the journey as much as the destination.",
+    color:'#7b2fff',advice:"Let's talk about building wealth AND legacy at the same time. Coffee, 30 minutes?"},
+  SURVIVOR_TYPE:{numeral:'VIII',emoji:'🦁',name:'STRENGTH',
+    tagline:"You've faced the worst and remained standing.",
+    traits:['Forged by adversity','Resilient beyond measure','Hard lessons embedded','Knows risk is real'],
+    shadow:"Strength without a safety net means every recovery costs more than it should.",
+    light:"You already know what's at stake. You're the easiest person to protect — because you get it.",
+    color:'#00f5d4',advice:"You've already been through this. Let's make sure the next wave doesn't cost as much. 20 minutes."},
+  UNENGAGED:{numeral:'XVII',emoji:'⭐',name:'THE STAR',
+    tagline:"Vast potential. Uncharted.",
+    traits:['Curious but cautious','Still finding the path','Open to guidance',"The story hasn't started yet"],
+    shadow:"Potential without direction drifts. The stars guide — but only if you look up.",
+    light:"Everything is still possible. One conversation could map the whole journey.",
+    color:'#00f5d4',advice:"Your guardian is still growing. Let's chart the path together — 20 minutes to start."}
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
@@ -1501,6 +1641,9 @@ async function resolveTrial(success, beastId) {
     if (reward.ok) {
       G[s.dimension]=reward.newHealth; G.guardianLevel=reward.newLevel;
       G.evolutionStage=reward.newEvolution;
+      if (reward.trialsComplete !== undefined) G.trialsComplete = reward.trialsComplete;
+      else G.trialsComplete = (G.trialsComplete||0)+1;
+      if (reward.profileType) G.profileType = reward.profileType;
       if (reward.newBeast) { G.beastsUnlocked.push(reward.newBeast); playBeastUnlock(); }
       if (!G.scenariosDone.includes(trialState.scenarioId)) G.scenariosDone.push(trialState.scenarioId);
     }
@@ -1522,8 +1665,14 @@ async function resolveTrial(success, beastId) {
 
 function returnFromTrial() {
   loadGameScreen();
-  showScreen('s-game');
   trialState = null;
+  // Tarot reveal: trigger on reaching 3 trials for the first time
+  if (G.trialsComplete >= 3 && !localStorage.getItem('aegis_tarot_seen')) {
+    localStorage.setItem('aegis_tarot_seen', 'true');
+    showTarotReveal(G.profileType);
+    return;
+  }
+  showScreen('s-game');
 }
 
 // ── COLLECTION ────────────────────────────────────────────────────────────────
@@ -1569,8 +1718,27 @@ function showProfile() {
   document.getElementById('share-pet-name').textContent  = G.petName;
   document.getElementById('share-arch').textContent      = 'THE '+(G.archetype||'GUARDIAN');
   document.getElementById('ref-link-display').textContent = refLink;
+  // Tarot mini card
+  const tarotSec = document.getElementById('prof-tarot-section');
+  const tarotMini = document.getElementById('prof-tarot-mini');
+  if (tarotSec && G.trialsComplete >= 3) {
+    tarotSec.style.display = 'block';
+    const tc = TAROT_DATA[G.profileType] || TAROT_DATA.UNENGAGED;
+    tarotMini.innerHTML = `
+      <div class="tarot-mini-card">
+        <div class="tarot-mini-num">${tc.numeral}</div>
+        <div class="tarot-mini-em">${tc.emoji}</div>
+      </div>
+      <div class="tarot-mini-info">
+        <div class="tarot-mini-ttl">${tc.name}</div>
+        <div class="tarot-mini-tag">&ldquo;${tc.tagline.substring(0,65)}${tc.tagline.length>65?'…':'&rdquo;'}</div>
+      </div>
+      <div style="font-family:'Press Start 2P';font-size:7px;color:rgba(167,139,250,.6)">REVEAL ▸</div>
+    `;
+  }
   showScreen('s-profile');
 }
+function doRevealReading() { showTarotReveal(G.profileType); }
 
 function copyRefLink() {
   const link = window.location.origin+'/?ref='+G.refCode;
@@ -1687,10 +1855,23 @@ function drawShareCard() {
   const refLink = window.location.origin+'/?ref='+G.refCode;
   ctx.fillText(refLink, 20, 245);
 
+  // Tarot card strip
+  const tc = TAROT_DATA[G.profileType] || TAROT_DATA.UNENGAGED;
+  ctx.strokeStyle = `${tc.color}55`;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20, 258); ctx.lineTo(W-20, 258); ctx.stroke();
+  ctx.font = '8px "Press Start 2P", monospace';
+  ctx.fillStyle = tc.color;
+  ctx.textAlign = 'left';
+  ctx.fillText(`${tc.numeral} · ${tc.name}`, 20, 274);
+  ctx.font = '13px "VT323", monospace';
+  ctx.fillStyle = 'rgba(226,232,240,0.55)';
+  const tShort = tc.tagline.length > 58 ? tc.tagline.substring(0,58)+'…' : tc.tagline;
+  ctx.fillText('"'+tShort+'"', 20, 290);
   // Footer
-  ctx.font = '9px "Press Start 2P", monospace';
-  ctx.fillStyle = 'rgba(100,116,139,0.8)';
-  ctx.fillText('Generated by AegisPet.app', 20, 300);
+  ctx.font = '8px "Press Start 2P", monospace';
+  ctx.fillStyle = 'rgba(100,116,139,0.6)';
+  ctx.fillText('Generated by AegisPet.app', 20, 310);
 
   // Corner decoration
   ctx.strokeStyle = 'rgba(0,245,212,0.4)';
@@ -1846,6 +2027,111 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── TAROT REVEAL SYSTEM ────────────────────────────────────────────────────────────────────────────
+function buildTarotStars() {
+  const bg = document.getElementById('tarot-bg');
+  if (!bg) return;
+  bg.innerHTML = '';
+  const palette = ['#ffffff','#a78bfa','#00f5d4','#ffb703','#c4b5fd'];
+  for (let i = 0; i < 130; i++) {
+    const el = document.createElement('div');
+    const szClass = Math.random() < .55 ? 't-s' : Math.random() < .7 ? 't-m' : 't-l';
+    el.className = 't-star ' + szClass;
+    const c = palette[Math.floor(Math.random() * palette.length)];
+    const dur = (2 + Math.random() * 4).toFixed(2);
+    const delay = (Math.random() * 5).toFixed(2);
+    el.style.cssText = `left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;--dur:${dur}s;--c:${c};animation-delay:${delay}s`;
+    bg.appendChild(el);
+  }
+}
+
+function showTarotReveal(profileType) {
+  const card = TAROT_DATA[profileType] || TAROT_DATA.UNENGAGED;
+  buildTarotStars();
+
+  // Populate card front
+  const front = document.getElementById('tarot-card-front');
+  front.style.setProperty('--tc', card.color);
+  front.style.setProperty('--tc-trait', card.color);
+  front.innerHTML = `
+    <div class="tc-numeral">${card.numeral}</div>
+    <div class="tc-emoji">${card.emoji}</div>
+    <div class="tc-name">${card.name}</div>
+    <div class="tc-mini-tagline">&ldquo;${card.tagline.substring(0,60)}${card.tagline.length>60?'&hellip;&rdquo;':'&rdquo;'}</div>
+  `;
+
+  // Reset flip + reveal
+  const tarotCard = document.getElementById('tarot-card');
+  tarotCard.classList.remove('flipped');
+  const reveal = document.getElementById('tarot-reveal');
+  reveal.classList.remove('show');
+  reveal.style.setProperty('--tc-trait', card.color);
+  reveal.innerHTML = `
+    <div class="tarot-tagline-el" id="tarot-tw"></div>
+    <div class="tarot-sec">
+      <div class="tarot-sec-ttl">▸ YOUR GUARDIAN TRAITS</div>
+      ${card.traits.map(t=>`<div class="tarot-trait" style="--tc-trait:${card.color}">${t}</div>`).join('')}
+    </div>
+    <div class="tarot-sec tarot-shadow-sec">
+      <div class="tarot-sec-ttl tarot-shadow-ttl">☽ THE SHADOW — YOUR BLIND SPOT</div>
+      <div class="tarot-shadow-body">${card.shadow}</div>
+    </div>
+    <div class="tarot-sec tarot-light-sec">
+      <div class="tarot-sec-ttl tarot-light-ttl">☀ THE LIGHT — YOUR STRENGTH</div>
+      <div class="tarot-light-body">${card.light}</div>
+    </div>
+    <div class="tarot-advice-sec">
+      <div class="tarot-sec-ttl" style="color:#a78bfa;margin-bottom:8px">💬 YOUR ADVISOR SAYS</div>
+      <div class="tarot-advice-body">&ldquo;${card.advice}&rdquo;</div>
+    </div>
+    <div class="tarot-btn-row">
+      <button class="px-btn" onclick="openShareCardModal()">[ SHARE MY READING ]</button>
+      <button class="px-btn" style="border-color:var(--muted);color:var(--muted)" onclick="showScreen('s-game')">[ CONTINUE ]</button>
+    </div>
+  `;
+
+  showScreen('s-tarot');
+
+  // Sequence: face-down visible → flip at 1.5s → reveal content at 2.9s
+  setTimeout(() => {
+    tarotCard.classList.add('flipped');
+    playTarotSound();
+  }, 1500);
+
+  setTimeout(() => {
+    reveal.classList.add('show');
+    // Typewriter for tagline, then animate traits in
+    typewriterEl(document.getElementById('tarot-tw'), card.tagline, 26, () => {
+      document.querySelectorAll('.tarot-trait').forEach((el, i) =>
+        setTimeout(() => el.classList.add('in'), i * 190)
+      );
+    });
+  }, 2900);
+}
+
+function typewriterEl(el, text, ms, onDone) {
+  if (!el) return;
+  el.textContent = ''; let i = 0;
+  (function tick() {
+    if (i < text.length) { el.textContent += text[i++]; setTimeout(tick, ms); }
+    else if (onDone) onDone();
+  })();
+}
+
+function playTarotSound() {
+  if (G.muted) return;
+  try {
+    const ctx = getAudio();
+    const t = ctx.currentTime;
+    // Ascending mystical arpeggio
+    [[196,.18],[247,.15],[294,.14],[370,.16],[494,.20],[587,.26],[784,.45]].forEach(([f,d],i) => {
+      playTone(f, d, 'sine', 0.05, t + i * 0.22);
+    });
+    // Sustained resonant chord after flip
+    setTimeout(() => { [392, 494, 659].forEach(f => playTone(f, 1.4, 'sine', 0.03)); }, 1700);
+  } catch(e) {}
 }
 
 // Add click sound + bg music trigger on first interaction

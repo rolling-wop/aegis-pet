@@ -274,7 +274,7 @@ app.post('/api/trial', async (req, res) => {
         `🧠 *${PROFILE_LABELS[profileType]||profileType}*\n⚠️ Top gaps: ${gaps.map(g=>g.name).join(', ')}\n\n💬 _${opener}_`
       );
     }
-    res.json({ ok:true, xpGained, rewardType, newBeast, newHealth, newLevel, newEvolution, roll });
+    res.json({ ok:true, xpGained, rewardType, newBeast, newHealth, newLevel, newEvolution, roll, profileType, trialsComplete:newTrials });
   } catch(e) { console.error(e); res.status(500).json({ error:e.message }); }
 });
 
