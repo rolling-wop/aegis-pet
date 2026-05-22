@@ -108,7 +108,7 @@ select.lc-inp{cursor:pointer}
 .wm-title{font-family:'Press Start 2P';font-size:9px;color:rgba(255,255,255,.15);text-align:center;letter-spacing:3px;margin:4px 0 12px;width:100%}
 .wm-chapters{width:100%;max-width:480px;padding:0 14px;margin:0 auto}
 .wm-node{display:flex;align-items:center;gap:12px;padding:13px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .2s;position:relative}
-.wm-node.active{border-color:var(--cyan);background:rgba(0,245,212,.05)}
+.wm-node.active{border-color:var(--cyan);background:rgba(0,245,212,.05);box-shadow:0 0 20px rgba(0,245,212,0.15),inset 0 0 20px rgba(0,245,212,0.03)}
 .wm-node.active:hover{background:rgba(0,245,212,.1)}
 .wm-node.cleared{border-color:rgba(6,214,160,.3);background:rgba(6,214,160,.02)}
 .wm-node.locked{opacity:.3;cursor:not-allowed}
@@ -135,7 +135,7 @@ select.lc-inp{cursor:pointer}
 .ci-enter-btn{opacity:0;transition:opacity .6s}
 
 /* ── BATTLE ── */
-#s-battle{padding:0;justify-content:flex-start}
+#s-battle{display:flex;flex-direction:column;padding:0;justify-content:flex-start;overflow:hidden}
 .battle-bg{position:fixed;inset:0;z-index:0;transition:background .5s}
 .battle-hud{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;padding:10px 14px 6px;width:100%;flex-shrink:0}
 .battle-hearts{display:flex;gap:4px;flex-wrap:wrap;max-width:140px}
@@ -146,17 +146,17 @@ select.lc-inp{cursor:pointer}
 .battle-boss-hp-bar{width:130px;height:6px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden;display:inline-block}
 .battle-boss-hp-fill{height:100%;background:var(--danger);border-radius:3px;transition:width .5s ease}
 .battle-boss-hp-val{font-family:'VT323';font-size:13px;color:rgba(255,255,255,.35);text-align:right}
-.battle-arena{display:flex;align-items:center;justify-content:space-around;width:100%;position:relative;z-index:2;padding:4px 12px;flex:1;min-height:0}
+.battle-arena{display:flex;align-items:center;justify-content:space-around;width:100%;position:relative;z-index:2;padding:0 16px;min-height:140px;max-height:160px;flex:0 0 auto}
 .battle-pet-side,.battle-boss-side{display:flex;align-items:center;justify-content:center;flex:1}
-.battle-pet-art{font-size:64px;animation:petIdle 2s ease-in-out infinite;display:block}
-.battle-boss-art{width:110px;height:130px;display:flex;align-items:center;justify-content:center;animation:bossFloat 3s ease-in-out infinite}
+.battle-pet-art{font-size:72px;animation:petIdle 2s ease-in-out infinite;display:block}
+.battle-boss-art{width:100px;height:100px;display:flex;align-items:center;justify-content:center;animation:bossFloat 3s ease-in-out infinite}
 .battle-boss-art svg{width:100%;height:100%}
 .battle-vs{font-family:'Press Start 2P';font-size:10px;color:rgba(255,255,255,.2);letter-spacing:2px;flex-shrink:0}
 .battle-dialogue{background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin:0 10px;padding:11px 14px;position:relative;z-index:2;flex-shrink:0}
 .battle-dialogue-speaker{font-family:'Press Start 2P';font-size:6px;color:var(--cyan);margin-bottom:5px;letter-spacing:1px}
 .battle-dialogue-text{font-family:'VT323';font-size:16px;color:rgba(255,255,255,.8);line-height:1.45;min-height:36px}
-.battle-timer-bar{height:3px;background:rgba(255,255,255,.07);margin:5px 10px;border-radius:2px;overflow:hidden;flex-shrink:0}
-.battle-timer-fill{height:100%;background:var(--cyan);border-radius:2px;transition:width .1s linear}
+.battle-timer-bar{height:4px;background:rgba(255,255,255,.06);margin:4px 0;overflow:hidden;flex-shrink:0}
+.battle-timer-fill{height:100%;background:var(--cyan);transition:width 0.1s linear,background 0.3s;border-radius:0;box-shadow:0 0 8px currentColor}
 .battle-situation{font-family:'VT323';font-size:14px;color:rgba(255,255,255,.6);padding:4px 12px;text-align:center;line-height:1.45;position:relative;z-index:2;flex-shrink:0;max-height:60px;overflow:hidden}
 .battle-question{font-family:'Press Start 2P';font-size:7px;color:rgba(255,255,255,.5);padding:4px 12px;text-align:center;letter-spacing:.5px;flex-shrink:0}
 .battle-choices{display:flex;flex-direction:column;gap:6px;padding:6px 10px 12px;position:relative;z-index:2;flex-shrink:0}
@@ -166,7 +166,7 @@ select.lc-inp{cursor:pointer}
 .battle-choice.wrong{background:rgba(255,0,110,.1)!important;border-color:var(--danger)!important;pointer-events:none}
 .battle-choice.disabled{pointer-events:none;opacity:.5}
 .battle-choice .choice-label{font-family:'Press Start 2P';font-size:7px;color:var(--muted);margin-right:8px}
-.battle-feedback{font-family:'VT323';font-size:13px;color:rgba(255,255,255,.5);padding:0 12px 4px;text-align:center;min-height:20px;flex-shrink:0;line-height:1.3}
+.battle-feedback{font-family:'VT323';font-size:16px;color:rgba(255,255,255,.75);padding:6px 14px;text-align:center;min-height:28px;flex-shrink:0;line-height:1.4;background:rgba(255,255,255,.04);border-radius:6px;margin:0 10px;transition:all .3s}
 .battle-effects{position:fixed;inset:0;pointer-events:none;z-index:50}
 @keyframes petIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes petAttack{0%,100%{transform:translateX(0)}40%{transform:translateX(22px)scale(1.1)}}
@@ -179,6 +179,17 @@ select.lc-inp{cursor:pointer}
 .dmg-number{position:absolute;font-family:'Press Start 2P';font-size:13px;pointer-events:none;animation:dmgFloat 1.2s ease-out forwards;z-index:100;white-space:nowrap}
 @keyframes screenShake{0%,100%{transform:translate(0)}10%{transform:translate(-7px,4px)}20%{transform:translate(7px,-4px)}30%{transform:translate(-5px,5px)}40%{transform:translate(5px,-5px)}50%{transform:translate(-3px,3px)}60%,70%{transform:translate(2px,-2px)}}
 .screen-shake{animation:screenShake .45s ease}
+@keyframes flashFade{0%{opacity:0.25}100%{opacity:0}}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.15);opacity:0.1}}
+.boss-emoji-art{position:relative;width:100px;height:100px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.boss-emoji-art.ci-size{width:140px;height:140px}
+.boss-emoji-inner{font-size:64px;z-index:2;position:relative;filter:drop-shadow(0 0 12px var(--ring));animation:bossFloat 3s ease-in-out infinite;line-height:1}
+.boss-emoji-art.ci-size .boss-emoji-inner{font-size:96px}
+.boss-ring{position:absolute;border-radius:50%;border:2px solid var(--ring);animation:ringPulse 2s ease-in-out infinite}
+.boss-ring-1{width:80px;height:80px;opacity:0.5}
+.boss-ring-2{width:100px;height:100px;opacity:0.25;animation-delay:0.5s}
+.boss-emoji-art.ci-size .boss-ring-1{width:110px;height:110px}
+.boss-emoji-art.ci-size .boss-ring-2{width:140px;height:140px}
 
 /* ── VICTORY / DEFEAT ── */
 #s-victory,#s-defeat{text-align:center;padding:32px 24px}
@@ -734,10 +745,10 @@ const CHAPTERS = {
     bgGradient:'radial-gradient(ellipse at 50% 0%,#1a1400,#0d0a00,#0a0a0f)',
     lore:"Silent. Patient. Inflixus erodes everything over time. Those who ignore the Specter wake to find nothing left. Time is her weapon.",
     bossHpMax:100, bossEmoji:'💀', scenarios:[301,302,303,304] },
-  4:{ name:'THE SHADOW DIVIDE', region:'Void Wastes', bossName:'Morvek the Dependency Lord', bossColor:'#718096',
+  4:{ name:'THE SHADOW DIVIDE', region:'Void Wastes', bossName:'Morvek the Dependency Lord', bossColor:'#4a5568',
     bgGradient:'radial-gradient(ellipse at 50% 50%,#0d0d1e,#080814,#0a0a0f)',
     lore:"Morvek does not attack you. He attacks the people who need you. He binds your dependants as weapons against your will.",
-    bossHpMax:100, bossEmoji:'⛓', scenarios:[401,402,403,404] },
+    bossHpMax:100, bossEmoji:'⛓️', scenarios:[401,402,403,404] },
   5:{ name:'THE FINAL SEAL', region:'Legacy Citadel', bossName:'Voidex the Legacy Destroyer', bossColor:'#4c1d95',
     bgGradient:'radial-gradient(ellipse at 50% 30%,#0d0020,#060010,#000)',
     lore:"The final chaos lord. Voidex devours legacies. Everything you've built, everything you'd leave behind — he wants all of it. This is what you have been preparing for.",
@@ -1266,6 +1277,11 @@ function startHatch(){
       document.getElementById('hatch-sub').textContent='Your guardian companion awakens';
       spawnConfetti();
       setTimeout(()=>{
+        // Hide hatching screen immediately before showing lead
+        const hs=document.getElementById('s-hatching');
+        hs.classList.remove('active');
+        hs.style.opacity='0';
+        hs.style.pointerEvents='none';
         showScreen('s-lead');
         document.getElementById('lead-petname').textContent=G.petName;
         document.getElementById('lead-pet-emoji').textContent=ARCHETYPES[G.archetype]?.emoji||'🐾';
@@ -1339,7 +1355,7 @@ function renderWorldMap(){
     const statusIcon=status==='cleared'?'✅':status==='active'?'⚔️':status==='failed'?'⚠️':'🔒';
     const node=document.createElement('div');
     node.className='wm-node '+status;
-    node.innerHTML=`<div class="wm-node-num">CH${i}</div><div class="wm-node-info"><div class="wm-node-name">${ch.name}</div><div class="wm-node-region">${ch.region}</div></div><div class="wm-node-status">${statusIcon}</div>`;
+    node.innerHTML=`<div class="wm-node-num">CH${i}</div><div class="wm-node-info"><div class="wm-node-name">${ch.name}</div><div class="wm-node-region">${ch.region} · ${ch.bossEmoji}</div></div><div class="wm-node-status">${statusIcon}</div>`;
     if(status==='active'||status==='cleared'||status==='failed'){
       node.onclick=()=>showChapterIntro(i);
     }
@@ -1371,29 +1387,59 @@ let pendingChapterId=0;
 function showChapterIntro(chId){
   pendingChapterId=chId;
   const ch=CHAPTERS[chId];
-  const bg=document.getElementById('ci-bg');
-  bg.style.background=ch.bgGradient;
-  document.getElementById('ci-region').textContent=ch.region.toUpperCase();
-  document.getElementById('ci-boss-art').innerHTML=getBossSvg(chId);
-  document.getElementById('ci-boss-name').textContent=ch.bossName.toUpperCase();
-  document.getElementById('ci-lore').textContent='';
-  document.getElementById('ci-enter-btn').style.opacity='0';
+
+  const region=document.getElementById('ci-region');
+  const art=document.getElementById('ci-boss-art');
+  const name=document.getElementById('ci-boss-name');
+  const lore=document.getElementById('ci-lore');
+  const btn=document.getElementById('ci-enter-btn');
+
+  // Reset all elements immediately
+  region.style.opacity='0';
+  art.style.opacity='0';
+  art.style.transform='scale(0.3)';
+  art.style.transition='';
+  name.style.opacity='0';
+  lore.style.opacity='0';
+  btn.style.opacity='0';
+  lore.textContent='';
+
+  document.getElementById('ci-bg').style.background=ch.bgGradient;
+  art.innerHTML=getBossSvg(chId);
+  name.textContent=ch.bossName.toUpperCase();
+
   showScreen('s-chapter-intro');
-  // animate in sequence
-  setTimeout(()=>{document.getElementById('ci-region').style.opacity='1';},300);
-  setTimeout(()=>{const art=document.getElementById('ci-boss-art');art.style.opacity='1';art.style.transform='scale(1)';},700);
-  setTimeout(()=>{document.getElementById('ci-boss-name').style.opacity='1';},1300);
-  setTimeout(()=>{
-    document.getElementById('ci-lore').style.opacity='1';
-    typewriter(document.getElementById('ci-lore'),ch.lore,20,()=>{
-      setTimeout(()=>{document.getElementById('ci-enter-btn').style.opacity='1';},600);
+
+  // Staggered reveal with double rAF to ensure paint happens first
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{region.style.opacity='1';},200);
+      setTimeout(()=>{
+        art.style.opacity='1';
+        art.style.transform='scale(1)';
+        art.style.transition='all 1s cubic-bezier(0.34,1.56,0.64,1)';
+      },600);
+      setTimeout(()=>{name.style.opacity='1';},1200);
+      setTimeout(()=>{
+        lore.style.opacity='1';
+        typewriter(lore,ch.lore,22,()=>{
+          setTimeout(()=>{btn.style.opacity='1';},500);
+        });
+      },1600);
     });
-  },1700);
+  });
 }
 
 function getBossSvg(chId){
-  const el=document.getElementById('bsvg-'+chId);
-  return el?el.outerHTML:'<span style="font-size:80px">'+CHAPTERS[chId].bossEmoji+'</span>';
+  const bossStyles={
+    1:{emoji:'🐉',ring:'#cc0000',label:"XAN'DRA"},
+    2:{emoji:'👻',ring:'#7b2fff',label:'MARVEX'},
+    3:{emoji:'💀',ring:'#ffb703',label:'INFLIXUS'},
+    4:{emoji:'⛓️',ring:'#4a5568',label:'MORVEK'},
+    5:{emoji:'🌑',ring:'#4c1d95',label:'VOIDEX'}
+  };
+  const b=bossStyles[chId]||bossStyles[1];
+  return `<div class="boss-emoji-art" style="--ring:${b.ring}"><div class="boss-emoji-inner">${b.emoji}</div><div class="boss-ring boss-ring-1"></div><div class="boss-ring boss-ring-2"></div></div>`;
 }
 
 function startBattle(){
@@ -1438,7 +1484,10 @@ function updateHUD(){
   // boss HP
   const pct=Math.max(0,(battleState.bossHp/battleState.bossHpMax)*100);
   document.getElementById('battle-boss-hp-fill').style.width=pct+'%';
-  document.getElementById('battle-boss-hp-val').textContent=Math.round(pct)+'%';
+  // hp-val is updated with progress in loadScenario; only update if not in a scenario
+  if(!battleState.scenarioIds||battleState.scenarioIds.length===0){
+    document.getElementById('battle-boss-hp-val').textContent=Math.round(pct)+'%';
+  }
   // hp bar color
   const fill=document.getElementById('battle-boss-hp-fill');
   fill.style.background=pct>50?'#ff006e':pct>25?'#ffb703':'#ff4500';
@@ -1450,12 +1499,16 @@ function loadScenario(sId){
   battleState.locked=false;
   // dialogue
   const ch=battleState.currentChapter;
-  document.getElementById('battle-dlg-speaker').textContent=ch.bossName.toUpperCase();
+  const progress=`${battleState.scenarioIndex+1} / ${battleState.scenarioIds.length}`;
+  document.getElementById('battle-dlg-speaker').textContent=ch.bossName.toUpperCase()+'  ·  SCENARIO '+(battleState.scenarioIndex+1)+'/'+battleState.scenarioIds.length;
   document.getElementById('battle-dlg-text').textContent='';
   typewriter(document.getElementById('battle-dlg-text'),sc.bossLine,30);
   // situation
   document.getElementById('battle-situation').textContent=sc.situation;
   document.getElementById('battle-question').textContent=sc.question;
+  // Update HUD with progress
+  const pct=Math.round((battleState.bossHp/battleState.bossHpMax)*100);
+  document.getElementById('battle-boss-hp-val').textContent=pct+'% · '+progress;
   document.getElementById('battle-feedback').textContent='';
   // choices
   const cc=document.getElementById('battle-choices');
@@ -1504,6 +1557,13 @@ function timeOut(){
   applyWrongChoice('vitality','Time ran out — the boss attacks!');
 }
 
+function flashScreen(color){
+  const flash=document.createElement('div');
+  flash.style.cssText=`position:fixed;inset:0;background:${color};opacity:0.25;pointer-events:none;z-index:200;animation:flashFade 0.4s ease-out forwards`;
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),500);
+}
+
 async function submitChoice(btn){
   if(battleState.locked) return;
   battleState.locked=true;
@@ -1514,12 +1574,14 @@ async function submitChoice(btn){
   if(correct){
     btn.classList.add('correct');
     document.getElementById('battle-feedback').textContent='✓ '+feedback;
+    flashScreen('rgba(6,214,160,0.3)');
     await applyCorrectChoice();
   }else{
     btn.classList.add('wrong');
     // highlight correct
     document.querySelectorAll('.battle-choice').forEach(b=>{if(b.dataset.correct==='true')b.classList.add('correct');});
     document.getElementById('battle-feedback').textContent='✗ '+feedback;
+    flashScreen('rgba(255,0,110,0.3)');
     const scId=battleState.scenarioIds[battleState.scenarioIndex];
     const sc=SCENARIOS[scId];
     await applyWrongChoice(sc.dimension, feedback);
@@ -1560,7 +1622,7 @@ async function applyCorrectChoice(){
       setTimeout(()=>showToast('🎉 '+BEASTS[newB].n+' unlocked!'),800);
     }
   }
-  setTimeout(()=>advanceScenario(),1600);
+  setTimeout(()=>advanceScenario(),2500);
 }
 
 async function applyWrongChoice(dim, feedback){
@@ -1576,9 +1638,9 @@ async function applyWrongChoice(dim, feedback){
       body:JSON.stringify({playerId:G.playerId,chapterId:battleState.chapterId,scenarioId:scId,correct:false,dimensionAffected:dim,decisionTimeMs:((30-battleState.timerVal)*1000)})});
   }catch(e){}
   if(battleState.hearts<=0){
-    setTimeout(()=>endChapter(false),1600);
+    setTimeout(()=>endChapter(false),2500);
   }else{
-    setTimeout(()=>advanceScenario(),1600);
+    setTimeout(()=>advanceScenario(),2800);
   }
 }
 
