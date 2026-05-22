@@ -66,6 +66,16 @@ async function initDB() {
       id INTEGER PRIMARY KEY AUTOINCREMENT, ref_code TEXT NOT NULL, visitor_ip TEXT,
       converted INTEGER DEFAULT 0, created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
     );
+    CREATE TABLE IF NOT EXISTS chapter_progress (
+      player_id TEXT NOT NULL, chapter_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'locked',
+      boss_hp INTEGER DEFAULT 100,
+      scenarios_done TEXT DEFAULT '[]',
+      hearts_remaining INTEGER DEFAULT 5,
+      completed_at TEXT,
+      PRIMARY KEY(player_id, chapter_id),
+      FOREIGN KEY(player_id) REFERENCES players(id)
+    );
   `);
   saveDB();
   console.log('✅ Database ready');
@@ -197,8 +207,9 @@ app.get('/api/player/:id', (req, res) => {
   if (!player) return res.status(404).json({ error:'Not found' });
   const gs = dbGet('SELECT * FROM game_state WHERE player_id = ?', [req.params.id]);
   const trials = dbAll('SELECT * FROM trial_results WHERE player_id = ? ORDER BY created_at DESC LIMIT 20', [req.params.id]);
+  const chapters = dbAll('SELECT * FROM chapter_progress WHERE player_id = ? ORDER BY chapter_id', [req.params.id]);
   dbRun('UPDATE players SET last_login = ? WHERE id = ?', [new Date().toISOString(), req.params.id]);
-  res.json({ player, gameState:gs, trials });
+  res.json({ player, gameState:gs, trials, chapters });
 });
 
 app.post('/api/login', (req, res) => {
@@ -275,6 +286,99 @@ app.post('/api/trial', async (req, res) => {
       );
     }
     res.json({ ok:true, xpGained, rewardType, newBeast, newHealth, newLevel, newEvolution, roll, profileType, trialsComplete:newTrials });
+  } catch(e) { console.error(e); res.status(500).json({ error:e.message }); }
+});
+
+// ── CHAPTER SYSTEM ──────────────────────────────────────────────────────────
+app.post('/api/game-start/:playerId', (req, res) => {
+  const { playerId } = req.params;
+  // Init chapter 1 as active, rest locked
+  for (let i = 1; i <= 5; i++) {
+    const existing = dbGet('SELECT * FROM chapter_progress WHERE player_id=? AND chapter_id=?', [playerId, i]);
+    if (!existing) {
+      dbRun('INSERT INTO chapter_progress (player_id,chapter_id,status,boss_hp) VALUES (?,?,?,?)',
+        [playerId, i, i===1?'active':'locked', i===5?150:100]);
+    }
+  }
+  res.json({ ok:true });
+});
+
+app.get('/api/chapters/:playerId', (req, res) => {
+  const rows = dbAll('SELECT * FROM chapter_progress WHERE player_id=? ORDER BY chapter_id', [req.params.playerId]);
+  res.json({ chapters: rows });
+});
+
+app.post('/api/chapter-trial', async (req, res) => {
+  try {
+    const { playerId, chapterId, scenarioId, correct, dimensionAffected, decisionTimeMs } = req.body;
+    const cp = dbGet('SELECT * FROM chapter_progress WHERE player_id=? AND chapter_id=?', [playerId, chapterId]);
+    if (!cp) return res.status(404).json({ error:'Chapter not found' });
+    const gs = dbGet('SELECT * FROM game_state WHERE player_id=?', [playerId]);
+    if (!gs) return res.status(404).json({ error:'Player not found' });
+
+    const done = JSON.parse(cp.scenarios_done||'[]');
+    if (!done.includes(scenarioId)) done.push(scenarioId);
+
+    let bossHp = cp.boss_hp;
+    let heartsRemaining = cp.hearts_remaining;
+    const dims = ['vitality','stability','resilience','bond','legacy'];
+    const dimKey = dims.includes(dimensionAffected) ? dimensionAffected : 'vitality';
+
+    if (correct) {
+      bossHp = Math.max(0, bossHp - 25);
+      const newVal = Math.min(100, (gs[dimKey]||40) + 15);
+      dbRun(`UPDATE game_state SET ${dimKey}=?, xp=xp+50, trials_complete=trials_complete+1 WHERE player_id=?`, [newVal, playerId]);
+    } else {
+      heartsRemaining = Math.max(0, heartsRemaining - 1);
+      const newVal = Math.max(5, (gs[dimKey]||40) - 10);
+      dbRun(`UPDATE game_state SET ${dimKey}=? WHERE player_id=?`, [newVal, playerId]);
+    }
+
+    dbRun('UPDATE chapter_progress SET boss_hp=?,hearts_remaining=?,scenarios_done=? WHERE player_id=? AND chapter_id=?',
+      [bossHp, heartsRemaining, JSON.stringify(done), playerId, chapterId]);
+
+    const updatedGs = dbGet('SELECT * FROM game_state WHERE player_id=?', [playerId]);
+    const profileType = classifyProfile(updatedGs);
+    dbRun('UPDATE game_state SET profile_type=? WHERE player_id=?', [profileType, playerId]);
+
+    res.json({ ok:true, bossHp, heartsRemaining, correct, profileType,
+      dimValue: updatedGs[dimKey], scenariosDone: done });
+  } catch(e) { console.error(e); res.status(500).json({ error:e.message }); }
+});
+
+app.post('/api/chapter-complete', async (req, res) => {
+  try {
+    const { playerId, chapterId, won } = req.body;
+    const now = new Date().toISOString();
+    dbRun('UPDATE chapter_progress SET status=?,completed_at=? WHERE player_id=? AND chapter_id=?',
+      [won?'cleared':'failed', now, playerId, chapterId]);
+    if (won && chapterId < 5) {
+      const next = dbGet('SELECT * FROM chapter_progress WHERE player_id=? AND chapter_id=?', [playerId, chapterId+1]);
+      if (next && next.status === 'locked') {
+        dbRun('UPDATE chapter_progress SET status=? WHERE player_id=? AND chapter_id=?', ['active', playerId, chapterId+1]);
+      }
+    }
+    // Telegram alert on chapter complete
+    const player = dbGet('SELECT * FROM players WHERE id=?', [playerId]);
+    const gs = dbGet('SELECT * FROM game_state WHERE player_id=?', [playerId]);
+    if (player && won) {
+      await sendTelegramAlert(`⚔️ *Chapter ${chapterId} CLEARED!*\n\n👤 *${player.name}*\n📱 ${player.phone}\n🎭 Profile: ${gs?.profile_type||'?'}\n_View dashboard: /advisor_`);
+    }
+    res.json({ ok:true, nextChapterId: won && chapterId < 5 ? chapterId+1 : null });
+  } catch(e) { console.error(e); res.status(500).json({ error:e.message }); }
+});
+
+app.post('/api/game-reset/:playerId', (req, res) => {
+  try {
+    const { playerId } = req.params;
+    dbRun('UPDATE game_state SET evolution_stage=1,guardian_level=1,xp=0,vitality=40,stability=40,resilience=40,bond=40,legacy=40,login_streak=1,trials_complete=0,beasts_unlocked=?,scenarios_done=?,last_trial_at=NULL,profile_type=? WHERE player_id=?',
+      ['[]','[]','UNENGAGED', playerId]);
+    dbRun('DELETE FROM chapter_progress WHERE player_id=?', [playerId]);
+    for (let i = 1; i <= 5; i++) {
+      dbRun('INSERT INTO chapter_progress (player_id,chapter_id,status,boss_hp) VALUES (?,?,?,?)',
+        [playerId, i, i===1?'active':'locked', i===5?150:100]);
+    }
+    res.json({ ok:true });
   } catch(e) { console.error(e); res.status(500).json({ error:e.message }); }
 });
 
