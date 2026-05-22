@@ -6,6 +6,10 @@
 <title>AEGIS PET — Chronicles of the Guardian Realm</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#00f5d4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AEGIS PET">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0f;--cyan:#00f5d4;--violet:#7b2fff;--amber:#ffb703;--danger:#ff006e;--success:#06d6a0;--txt:#e2e8f0;--muted:#64748b;--border:rgba(0,245,212,0.25)}
@@ -380,6 +384,11 @@ select.lc-inp{cursor:pointer}
 
 <!-- 6. WORLD MAP -->
 <div class="screen" id="s-worldmap">
+  <!-- PWA install banner -->
+  <div id="pwa-banner" style="display:none;background:rgba(0,245,212,0.08);border-bottom:1px solid rgba(0,245,212,0.2);padding:10px 16px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0">
+    <div style="font-family:'VT323';font-size:16px;color:var(--cyan);line-height:1.4">📲 Save AEGIS PET to your home screen for the full app experience</div>
+    <button onclick="dismissPWABanner()" style="font-family:'Press Start 2P';font-size:6px;color:var(--muted);background:none;border:1px solid rgba(255,255,255,0.1);padding:6px 8px;border-radius:4px;cursor:pointer;white-space:nowrap">GOT IT</button>
+  </div>
   <div class="wm-header">
     <div class="wm-pet-display" id="wm-pet-emoji"></div>
     <div class="wm-info">
@@ -1314,6 +1323,7 @@ async function doLeadCapture(){
 
 // ─── WORLD MAP ───
 function renderWorldMap(){
+  showPWABanner();
   const a=ARCHETYPES[G.archetype];
   document.getElementById('wm-pet-emoji').textContent=a?.emoji||'🐾';
   document.getElementById('wm-pet-name').textContent=G.petName;
@@ -1889,6 +1899,29 @@ function renderCollection(){
     slot.innerHTML=`<span class="beast-slot-emoji">${b.e}</span><div class="beast-slot-name">${b.n}</div>`;
     grid.appendChild(slot);
   });
+}
+
+// ─── PWA INSTALL ───
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+function showPWABanner() {
+  if (localStorage.getItem('pwa_banner_dismissed')) return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return; // already installed
+  document.getElementById('pwa-banner').style.display = 'flex';
+}
+function dismissPWABanner() {
+  localStorage.setItem('pwa_banner_dismissed', '1');
+  document.getElementById('pwa-banner').style.display = 'none';
+  // trigger Android native install prompt if available
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+  }
 }
 
 // ─── RESTART ───
