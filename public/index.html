@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AEGIS PET</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00f5d4">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -13,7 +15,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'VT323',monospace}
-/* scanlines */
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
   background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,0.018) 3px,rgba(0,245,212,0.018) 4px)}
 
@@ -36,21 +37,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
   background:none;border:1px solid var(--muted);padding:8px 12px;cursor:pointer;z-index:2}
 .skip-btn:hover{color:var(--cyan);border-color:var(--cyan)}
 
-/* ── EGG ── */
-.egg{width:90px;height:110px;background:radial-gradient(ellipse at 40% 35%,#fff 0%,var(--cyan) 30%,#0a3a3a 80%);
-  border-radius:50% 50% 45% 45%;box-shadow:0 0 40px var(--cyan),0 0 80px rgba(0,245,212,0.3);
-  animation:eggFloat 2s ease-in-out infinite;z-index:1;position:relative}
+/* ── EGG v2 (enhanced hatching) ── */
+.egg-shell{position:relative;width:90px;height:110px;z-index:1}
+.egg-body{width:90px;height:110px;background:radial-gradient(ellipse at 40% 35%,#fff 0%,var(--cyan) 30%,#0a3a3a 80%);
+  border-radius:50% 50% 45% 45%;box-shadow:0 0 40px var(--cyan),0 0 80px rgba(0,245,212,0.3);position:relative}
+/* Idle pulse */
+.egg-idle .egg-body{animation:eggFloat 2s ease-in-out infinite}
 @keyframes eggFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.egg-crack{position:absolute;inset:0;border-radius:inherit}
-.egg-crack::before{content:'';position:absolute;top:30%;left:50%;width:2px;height:35%;
-  background:var(--bg);transform:translateX(-50%) rotate(10deg);opacity:0}
-.egg.cracking .egg-crack::before{opacity:1;animation:crack .5s steps(3) forwards}
-@keyframes crack{0%{height:0}100%{height:40%}}
-.egg.hatching{animation:hatch .8s steps(4) forwards}
-@keyframes hatch{0%{transform:rotate(-5deg) scale(1)}25%{transform:rotate(5deg) scale(1.05)}
-  50%{transform:rotate(-8deg) scale(1.1)}75%{transform:rotate(8deg) scale(1.15)}100%{transform:scale(0) rotate(20deg);opacity:0}}
-.pet-emerge{font-size:72px;animation:emerge .5s ease-out forwards;display:none}
-@keyframes emerge{0%{transform:scale(0) translateY(30px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+/* Rumble phase */
+.egg-rumble .egg-body{animation:eggRumble .12s infinite}
+@keyframes eggRumble{0%{transform:translateX(0) rotate(0deg)}25%{transform:translateX(-4px) rotate(-3deg)}50%{transform:translateX(0)}75%{transform:translateX(4px) rotate(3deg)}100%{transform:translateX(0)}}
+/* Crack overlay */
+.egg-crack-overlay{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .3s}
+.egg-crack .egg-crack-overlay{opacity:1}
+.egg-crack-overlay::before,.egg-crack-overlay::after{content:'';position:absolute;background:var(--bg)}
+.egg-crack-overlay::before{top:20%;left:48%;width:2px;height:40%;transform:rotate(8deg);
+  clip-path:polygon(0 0,100% 5%,90% 30%,100% 55%,80% 100%,0 95%)}
+.egg-crack-overlay::after{top:30%;left:55%;width:2px;height:30%;transform:rotate(-12deg)}
+/* Glow burst */
+.egg-glow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,212,0.8),transparent 70%);
+  opacity:0;pointer-events:none}
+.egg-burst .egg-glow{animation:glowBurst .4s ease-out forwards}
+@keyframes glowBurst{0%{opacity:0;transform:scale(0.5)}50%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(2)}}
+
+/* Pet emerge */
+.pet-emerge{font-size:72px;animation:emerge .6s cubic-bezier(.34,1.56,.64,1) forwards;display:none;z-index:2}
+@keyframes emerge{0%{transform:scale(0) translateY(40px);opacity:0}70%{transform:scale(1.15) translateY(-8px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+
+/* ── CONFETTI ── */
+.confetti-piece{position:fixed;width:8px;height:8px;pointer-events:none;z-index:9990;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-20px) rotate(0deg)}100%{opacity:0;transform:translateY(110vh) rotate(720deg)}}
 
 /* ── NAMING ── */
 #s-naming{background:var(--bg)}
@@ -69,6 +85,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
 .px-btn.danger:hover{background:rgba(255,0,110,0.1);box-shadow:0 0 24px rgba(255,0,110,0.3)}
 .px-btn.violet{border-color:var(--violet);color:#a78bfa}
 .px-btn.violet:hover{background:rgba(123,47,255,0.15)}
+/* naming preview + counter */
+.naming-preview{display:flex;align-items:center;gap:10px;margin-top:12px;min-height:52px}
+.naming-arch-preview{font-size:40px;transition:all .3s}
+.naming-input-wrap{position:relative;display:inline-block}
+.naming-counter{font-family:'Press Start 2P';font-size:7px;color:var(--muted);text-align:right;margin-top:4px}
 
 /* ── ARCHETYPE ── */
 #s-archetype{overflow-y:auto;justify-content:flex-start;padding-top:40px}
@@ -119,7 +140,105 @@ select.lc-inp{cursor:pointer}
 .shield-name{font-family:'Press Start 2P';font-size:8px;color:var(--txt);margin-bottom:3px}
 .shield-desc{font-family:'VT323';font-size:14px;color:var(--muted)}
 
-/* ── MAIN GAME ── */
+/* ── PIXEL ART SPRITES ── */
+.pixel-sprite-container{position:relative;display:inline-block}
+/* Each archetype has unique pixel art via CSS box-shadow on ::before */
+.pixel-sprite{
+  display:block;width:8px;height:8px;position:relative;
+  /* Scale factor: 5x = 40px per "pixel" */
+  transform:scale(5);transform-origin:top left;
+  image-rendering:pixelated;margin-bottom:0;
+}
+.pixel-sprite-wrap{
+  display:flex;align-items:center;justify-content:center;
+  width:80px;height:80px;overflow:visible;
+}
+/* Dragon (Visionary) — cyan/violet palette */
+.sprite-dragon::before{
+  content:'';display:block;width:8px;height:8px;position:absolute;
+  box-shadow:
+    2px 0px 0 var(--cyan),3px 0px 0 var(--cyan),
+    1px 1px 0 var(--cyan),2px 1px 0 var(--violet),3px 1px 0 var(--violet),4px 1px 0 var(--cyan),
+    0px 2px 0 var(--cyan),1px 2px 0 var(--violet),2px 2px 0 #fff,3px 2px 0 #fff,4px 2px 0 var(--violet),5px 2px 0 var(--cyan),
+    0px 3px 0 var(--cyan),1px 3px 0 var(--cyan),2px 3px 0 var(--cyan),3px 3px 0 var(--cyan),4px 3px 0 var(--cyan),5px 3px 0 var(--cyan),
+    1px 4px 0 var(--violet),2px 4px 0 var(--cyan),3px 4px 0 var(--cyan),4px 4px 0 var(--violet),
+    0px 5px 0 var(--cyan),2px 5px 0 var(--cyan),3px 5px 0 var(--cyan),5px 5px 0 var(--cyan),
+    1px 6px 0 var(--violet),2px 6px 0 var(--cyan),3px 6px 0 var(--cyan),4px 6px 0 var(--violet),
+    2px 7px 0 var(--cyan),3px 7px 0 var(--cyan);
+}
+/* Wolf (Protector) — amber/cyan palette */
+.sprite-wolf::before{
+  content:'';display:block;width:8px;height:8px;position:absolute;
+  box-shadow:
+    1px 0px 0 var(--amber),4px 0px 0 var(--amber),
+    0px 1px 0 var(--amber),1px 1px 0 #fff,2px 1px 0 var(--amber),3px 1px 0 var(--amber),4px 1px 0 #fff,5px 1px 0 var(--amber),
+    0px 2px 0 var(--amber),1px 2px 0 var(--amber),2px 2px 0 #fff,3px 2px 0 #fff,4px 2px 0 var(--amber),5px 2px 0 var(--amber),
+    0px 3px 0 var(--amber),1px 3px 0 var(--cyan),2px 3px 0 var(--amber),3px 3px 0 var(--amber),4px 3px 0 var(--cyan),5px 3px 0 var(--amber),
+    1px 4px 0 var(--amber),2px 4px 0 var(--amber),3px 4px 0 var(--amber),4px 4px 0 var(--amber),
+    1px 5px 0 var(--amber),2px 5px 0 #a0522d,3px 5px 0 #a0522d,4px 5px 0 var(--amber),
+    0px 6px 0 var(--amber),2px 6px 0 var(--amber),3px 6px 0 var(--amber),5px 6px 0 var(--amber),
+    0px 7px 0 var(--amber),1px 7px 0 var(--amber),4px 7px 0 var(--amber),5px 7px 0 var(--amber);
+}
+/* Fox (Wanderer) — orange palette */
+.sprite-fox::before{
+  content:'';display:block;width:8px;height:8px;position:absolute;
+  box-shadow:
+    0px 0px 0 #ff6b00,5px 0px 0 #ff6b00,
+    0px 1px 0 #ff6b00,1px 1px 0 #ff9500,2px 1px 0 #ff9500,3px 1px 0 #ff9500,4px 1px 0 #ff9500,5px 1px 0 #ff6b00,
+    0px 2px 0 #ff9500,1px 2px 0 #fff,2px 2px 0 #ff9500,3px 2px 0 #ff9500,4px 2px 0 #fff,5px 2px 0 #ff9500,
+    0px 3px 0 #ff9500,1px 3px 0 #ff9500,2px 3px 0 #ff9500,3px 3px 0 #ff9500,4px 3px 0 #ff9500,5px 3px 0 #ff9500,
+    1px 4px 0 #ff6b00,2px 4px 0 #fff,3px 4px 0 #fff,4px 4px 0 #ff6b00,
+    1px 5px 0 #ff9500,2px 5px 0 #ff9500,3px 5px 0 #ff9500,4px 5px 0 #ff9500,
+    0px 6px 0 #ff9500,2px 6px 0 #ff6b00,3px 6px 0 #ff6b00,5px 6px 0 #ff9500,
+    0px 7px 0 #ff9500,1px 7px 0 #ff9500,4px 7px 0 #ff9500,5px 7px 0 #ff9500;
+}
+/* Bull (Builder) */
+.sprite-bull::before{
+  content:'';display:block;width:8px;height:8px;position:absolute;
+  box-shadow:
+    0px 0px 0 #8B4513,5px 0px 0 #8B4513,
+    0px 1px 0 #8B4513,1px 1px 0 #a0522d,2px 1px 0 #a0522d,3px 1px 0 #a0522d,4px 1px 0 #a0522d,5px 1px 0 #8B4513,
+    0px 2px 0 #a0522d,1px 2px 0 #fff,2px 2px 0 #a0522d,3px 2px 0 #a0522d,4px 2px 0 #fff,5px 2px 0 #a0522d,
+    0px 3px 0 var(--cyan),1px 3px 0 #a0522d,2px 3px 0 #a0522d,3px 3px 0 #a0522d,4px 3px 0 #a0522d,5px 3px 0 var(--cyan),
+    1px 4px 0 #a0522d,2px 4px 0 var(--cyan),3px 4px 0 var(--cyan),4px 4px 0 #a0522d,
+    0px 5px 0 #8B4513,1px 5px 0 #a0522d,2px 5px 0 #a0522d,3px 5px 0 #a0522d,4px 5px 0 #a0522d,5px 5px 0 #8B4513,
+    0px 6px 0 #8B4513,1px 6px 0 #8B4513,4px 6px 0 #8B4513,5px 6px 0 #8B4513,
+    0px 7px 0 #8B4513,5px 7px 0 #8B4513;
+}
+/* Deer (Survivor) */
+.sprite-deer::before{
+  content:'';display:block;width:8px;height:8px;position:absolute;
+  box-shadow:
+    1px 0px 0 var(--success),4px 0px 0 var(--success),
+    0px 1px 0 #a0522d,1px 1px 0 var(--success),2px 1px 0 var(--success),3px 1px 0 var(--success),4px 1px 0 var(--success),5px 1px 0 #a0522d,
+    0px 2px 0 #a0522d,1px 2px 0 #fff,2px 2px 0 #a0522d,3px 2px 0 #a0522d,4px 2px 0 #fff,5px 2px 0 #a0522d,
+    0px 3px 0 #a0522d,1px 3px 0 var(--success),2px 3px 0 #a0522d,3px 3px 0 #a0522d,4px 3px 0 var(--success),5px 3px 0 #a0522d,
+    1px 4px 0 #a0522d,2px 4px 0 #a0522d,3px 4px 0 #a0522d,4px 4px 0 #a0522d,
+    1px 5px 0 #a0522d,3px 5px 0 #a0522d,
+    1px 6px 0 #8B4513,2px 6px 0 #8B4513,3px 6px 0 #8B4513,4px 6px 0 #8B4513,
+    1px 7px 0 #8B4513,4px 7px 0 #8B4513;
+}
+
+/* Sprite animations by health state */
+.sprite-state-great .pixel-sprite{animation:spriteHop .5s ease-in-out infinite alternate}
+.sprite-state-good .pixel-sprite{animation:spriteBob 1.4s ease-in-out infinite}
+.sprite-state-mid .pixel-sprite{animation:spriteSway 3s ease-in-out infinite}
+.sprite-state-low .pixel-sprite{animation:spriteSway 5s ease-in-out infinite;filter:saturate(0.5) brightness(0.8)}
+.sprite-state-crit .pixel-sprite{animation:spriteSlump 2s ease-in-out infinite;filter:grayscale(1) brightness(0.5)}
+/* Evolution stage modifiers */
+.sprite-evo-2 .pixel-sprite{transform:scale(6);filter:drop-shadow(0 0 4px var(--cyan))}
+.sprite-evo-3 .pixel-sprite{transform:scale(7);filter:drop-shadow(0 0 6px var(--cyan)) drop-shadow(0 0 12px var(--violet))}
+.sprite-evo-4 .pixel-sprite{transform:scale(8);filter:drop-shadow(0 0 8px var(--amber)) drop-shadow(0 0 16px var(--cyan)) brightness(1.2)}
+
+@keyframes spriteHop{0%{transform:scale(5) translateY(0) rotate(-3deg)}100%{transform:scale(5) translateY(-4px) rotate(3deg)}}
+@keyframes spriteBob{0%,100%{transform:scale(5) translateY(0)}50%{transform:scale(5) translateY(-3px)}}
+@keyframes spriteSway{0%,100%{transform:scale(5) translateX(0)}50%{transform:scale(5) translateX(-2px)}}
+@keyframes spriteSlump{0%,100%{transform:scale(5) rotate(0deg)}50%{transform:scale(5) rotate(-5deg) translateY(2px)}}
+/* Dance special */
+.sprite-dance .pixel-sprite{animation:spriteDance .3s steps(2) infinite!important}
+@keyframes spriteDance{0%{transform:scale(5) rotate(-8deg) translateY(-2px)}100%{transform:scale(5) rotate(8deg) translateY(2px)}}
+
+/* MAIN GAME ── */
 #s-game{justify-content:flex-start;padding:0;overflow-y:auto}
 .game-wrap{width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
 
@@ -135,15 +254,9 @@ select.lc-inp{cursor:pointer}
 
 /* pet stage */
 .pet-stage{display:flex;align-items:center;justify-content:center;padding:20px;position:relative;min-height:200px}
-.pet-sprite{font-size:88px;line-height:1;position:relative;z-index:2;transition:filter .5s}
-.pet-sprite.state-great{animation:petDance .6s infinite alternate}
-.pet-sprite.state-good{animation:petBob 1.5s ease-in-out infinite}
-.pet-sprite.state-mid{animation:petSlow 3s ease-in-out infinite}
-.pet-sprite.state-low{animation:petSlow 5s ease-in-out infinite;filter:saturate(0.4) brightness(0.8)}
-.pet-sprite.state-crit{filter:grayscale(1) brightness(0.6);animation:petSlow 8s ease-in-out infinite}
-@keyframes petDance{0%{transform:translateY(0) rotate(-5deg)}100%{transform:translateY(-8px) rotate(5deg)}}
-@keyframes petBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes petSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.pet-sprite-outer{position:relative;z-index:2;display:flex;align-items:center;justify-content:center}
+/* fallback emoji */
+.pet-emoji-fallback{font-size:88px;line-height:1}
 
 /* sparkles */
 .sparkle-container{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -183,6 +296,32 @@ select.lc-inp{cursor:pointer}
   padding:8px 14px;background:rgba(0,245,212,0.04);border-top:1px solid var(--border);
   border-bottom:1px solid var(--border)}
 
+/* ── REFERRAL SECTION ── */
+.referral-section{padding:10px 14px;border-top:1px solid var(--border)}
+.ref-sec-title{font-family:'Press Start 2P';font-size:7px;color:var(--violet);margin-bottom:10px;letter-spacing:.5px}
+.ref-stats-row{display:flex;gap:12px;margin-bottom:10px}
+.ref-stat-box{flex:1;background:rgba(123,47,255,0.08);border:1px solid rgba(123,47,255,0.3);border-radius:4px;padding:8px;text-align:center}
+.ref-stat-num{font-family:'Press Start 2P';font-size:14px;color:var(--violet)}
+.ref-stat-label{font-family:'VT323';font-size:13px;color:var(--muted);margin-top:2px}
+.ref-link-display{font-family:'VT323';font-size:14px;color:var(--muted);word-break:break-all;
+  background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;margin-bottom:6px}
+.ref-copy-btn{font-family:'Press Start 2P';font-size:7px;padding:7px 12px;
+  background:rgba(123,47,255,0.15);border:1px solid rgba(123,47,255,0.4);color:#a78bfa;
+  border-radius:4px;cursor:pointer;margin-right:6px}
+.ref-challenge-btn{font-family:'Press Start 2P';font-size:7px;padding:7px 12px;
+  background:rgba(0,245,212,0.08);border:1px solid var(--border);color:var(--cyan);
+  border-radius:4px;cursor:pointer}
+.ref-friend-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.ref-friend-item{background:rgba(10,10,20,0.8);border:1px solid var(--border);border-radius:4px;
+  padding:8px 10px;display:flex;align-items:center;gap:8px}
+.ref-friend-emoji{font-size:22px;flex-shrink:0}
+.ref-friend-info{flex:1;min-width:0}
+.ref-friend-name{font-family:'Press Start 2P';font-size:7px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-friend-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:3px;overflow:hidden}
+.ref-friend-bar{height:100%;background:var(--violet);border-radius:2px}
+.ref-invited-banner{background:rgba(0,245,212,0.06);border:1px solid var(--border);border-radius:4px;
+  padding:8px 12px;font-family:'VT323';font-size:16px;color:var(--cyan);text-align:center;margin-bottom:8px}
+
 /* bottom nav */
 .bottomnav{display:flex;border-top:1px solid var(--border);background:rgba(10,10,15,0.97);
   position:sticky;bottom:0;z-index:20}
@@ -200,20 +339,17 @@ select.lc-inp{cursor:pointer}
 /* ── TRIAL ── */
 #s-trial{background:var(--bg);z-index:15}
 .trial-phase{width:100%;max-width:480px;text-align:center}
-/* announce */
 .threat-icon{font-size:80px;animation:threatPulse 1s ease-in-out infinite}
 @keyframes threatPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 10px var(--danger))}
   50%{transform:scale(1.1);filter:drop-shadow(0 0 25px var(--danger))}}
 .threat-name{font-family:'Press Start 2P';font-size:clamp(11px,3.5vw,16px);color:var(--danger);
   margin:12px 0 8px;text-shadow:0 0 16px rgba(255,0,110,0.5)}
 .threat-desc{font-family:'VT323';font-size:20px;color:var(--txt);max-width:380px;margin:0 auto}
-/* timer */
 .timer-bar-wrap{width:100%;max-width:380px;height:6px;background:rgba(255,255,255,0.1);
   border-radius:3px;overflow:hidden;margin:16px 0}
 .timer-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));
   border-radius:3px;transition:width .5s linear}
 .timer-bar.urgent{background:linear-gradient(90deg,var(--amber),var(--danger))}
-/* select */
 .beast-choices{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px;margin-top:16px}
 .bc-option{background:rgba(10,10,20,0.92);border:1px solid var(--border);border-radius:4px;
   padding:12px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;text-align:left}
@@ -226,16 +362,13 @@ select.lc-inp{cursor:pointer}
 .bc-name{font-family:'Press Start 2P';font-size:8px;color:var(--txt);margin-bottom:3px}
 .bc-desc{font-family:'VT323';font-size:14px;color:var(--muted)}
 .bc-dim{font-family:'VT323';font-size:13px;color:var(--cyan)}
-/* resolve */
 .battle-anim{font-size:60px;display:flex;gap:16px;align-items:center;justify-content:center;margin:24px 0}
 .battle-vs{font-family:'Press Start 2P';font-size:14px;color:var(--muted)}
-/* outcome */
 .outcome-title{font-family:'Press Start 2P';font-size:clamp(14px,5vw,22px);margin-bottom:12px}
 .outcome-title.win{color:var(--success);text-shadow:0 0 20px rgba(6,214,160,0.5)}
 .outcome-title.lose{color:var(--danger);text-shadow:0 0 20px rgba(255,0,110,0.5)}
 .outcome-fact{font-family:'VT323';font-size:20px;color:var(--amber);max-width:380px;margin:0 auto 12px;line-height:1.4}
 .outcome-debrief{font-family:'VT323';font-size:18px;color:var(--muted);max-width:380px;margin:0 auto}
-/* reward */
 .reward-box{background:rgba(0,245,212,0.08);border:1px solid var(--cyan);border-radius:4px;
   padding:16px 24px;margin:16px 0;text-align:center;animation:rewardGlow 1.5s ease-in-out infinite}
 @keyframes rewardGlow{0%,100%{box-shadow:0 0 12px rgba(0,245,212,0.2)}50%{box-shadow:0 0 30px rgba(0,245,212,0.5)}}
@@ -260,13 +393,12 @@ select.lc-inp{cursor:pointer}
 .bc-card-emoji{font-size:38px;display:block;margin-bottom:6px}
 .bc-card-name{font-family:'Press Start 2P';font-size:6px;color:var(--txt);margin-bottom:3px}
 .bc-card-type{font-family:'VT323';font-size:13px;color:var(--muted);line-height:1.3}
-.bc-rarity{display:inline-block;font-family:'Press Start 2P';font-size:5px;padding:2px 5px;
-  border-radius:2px;margin-top:4px}
+.bc-rarity{display:inline-block;font-family:'Press Start 2P';font-size:5px;padding:2px 5px;border-radius:2px;margin-top:4px}
 .rarity-common{background:rgba(100,116,139,0.2);color:var(--muted)}
 .rarity-uncommon{background:rgba(0,245,212,0.15);color:var(--cyan)}
 .rarity-rare{background:rgba(123,47,255,0.2);color:#a78bfa}
 .rarity-epic{background:rgba(255,183,3,0.2);color:var(--amber)}
-.synergy-badge{position:absolute;top:4px;right:4px;font-size:10px;title:'Synergy active!'}
+.synergy-badge{position:absolute;top:4px;right:4px;font-size:10px}
 .back-btn{font-family:'Press Start 2P';font-size:8px;color:var(--muted);background:none;
   border:1px solid var(--muted);padding:8px 12px;cursor:pointer;margin-top:0}
 .back-btn:hover{color:var(--cyan);border-color:var(--cyan)}
@@ -285,7 +417,9 @@ select.lc-inp{cursor:pointer}
 .prof-row:last-child{border:none}
 .prof-key{color:var(--muted)}
 .prof-val{color:var(--txt);font-weight:600}
-.share-card{background:linear-gradient(135deg,rgba(0,245,212,0.08),rgba(123,47,255,0.08));
+
+/* Share card + export */
+.share-card-export{background:linear-gradient(135deg,rgba(0,245,212,0.08),rgba(123,47,255,0.08));
   border:1px solid var(--cyan);border-radius:4px;padding:20px;text-align:center;margin-top:12px}
 .share-card-pet{font-size:52px;margin-bottom:8px}
 .share-card-name{font-family:'Press Start 2P';font-size:11px;color:var(--cyan);margin-bottom:4px}
@@ -295,6 +429,26 @@ select.lc-inp{cursor:pointer}
 .copy-ref-btn{font-family:'Press Start 2P';font-size:7px;padding:8px 14px;background:rgba(123,47,255,0.15);
   border:1px solid rgba(123,47,255,0.4);color:#a78bfa;border-radius:4px;cursor:pointer;margin-top:10px}
 .copy-ref-btn:hover{background:rgba(123,47,255,0.3)}
+.export-card-btn{font-family:'Press Start 2P';font-size:7px;padding:8px 14px;background:rgba(0,245,212,0.1);
+  border:1px solid var(--border);color:var(--cyan);border-radius:4px;cursor:pointer;margin-top:8px;margin-left:6px}
+.export-card-btn:hover{background:rgba(0,245,212,0.2)}
+
+/* Share card preview modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9990;
+  display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;
+  pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  padding:20px;max-width:400px;width:100%;text-align:center}
+.modal-title{font-family:'Press Start 2P';font-size:9px;color:var(--cyan);margin-bottom:14px}
+#share-canvas-preview{max-width:100%;border:1px solid var(--border);border-radius:4px;margin-bottom:14px}
+.modal-btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* PWA / push notif button */
+.push-notif-btn{font-family:'Press Start 2P';font-size:7px;padding:8px 14px;
+  background:rgba(0,245,212,0.06);border:1px solid var(--border);color:var(--muted);
+  border-radius:4px;cursor:pointer;margin:6px 14px;display:block;width:calc(100% - 28px)}
+.push-notif-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,212,0.1)}
 
 /* ── TOAST / UTIL ── */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0F172A;
@@ -321,17 +475,34 @@ select.lc-inp{cursor:pointer}
 
 <!-- ═══ SCREEN: NAMING ═══ -->
 <div class="screen" id="s-naming">
-  <div class="egg" id="egg-naming"></div>
+  <div class="egg-shell egg-idle" id="egg-naming">
+    <div class="egg-body"></div>
+    <div class="egg-crack-overlay"></div>
+    <div class="egg-glow"></div>
+  </div>
   <div style="height:28px"></div>
   <div class="px-title">Something is trying<br>to reach you.</div>
   <div class="px-sub">Give it a name.</div>
-  <input class="px-input" id="pet-name-inp" maxlength="12" placeholder="Enter name..." autocomplete="off">
+  <div class="naming-input-wrap">
+    <input class="px-input" id="pet-name-inp" maxlength="12" placeholder="Enter name..." autocomplete="off">
+    <div class="naming-counter" id="naming-counter">0 / 12</div>
+  </div>
+  <div class="naming-preview">
+    <span class="naming-arch-preview" id="naming-arch-preview">🥚</span>
+    <span style="font-family:'VT323';font-size:20px;color:var(--muted)" id="naming-preview-text">— Choose archetype first</span>
+  </div>
   <button class="px-btn" onclick="doNaming()">[ SUMMON ]</button>
 </div>
 
 <!-- ═══ SCREEN: HATCHING ═══ -->
 <div class="screen" id="s-hatching">
-  <div class="egg" id="egg-hatch"></div>
+  <div id="hatch-egg-wrap">
+    <div class="egg-shell egg-idle" id="egg-hatch">
+      <div class="egg-body"></div>
+      <div class="egg-crack-overlay"></div>
+      <div class="egg-glow"></div>
+    </div>
+  </div>
   <div class="pet-emerge" id="pet-emerge"></div>
   <div style="height:24px"></div>
   <div id="hatch-msg" style="font-family:'VT323';font-size:26px;color:var(--cyan);opacity:0;transition:opacity 1s;text-align:center"></div>
@@ -460,7 +631,13 @@ select.lc-inp{cursor:pointer}
     <!-- pet stage -->
     <div class="pet-stage">
       <div class="sparkle-container" id="sparkle-ctr"></div>
-      <div class="pet-sprite state-good" id="g-pet-sprite"></div>
+      <div class="pet-sprite-outer sprite-state-good sprite-evo-1" id="g-pet-sprite-outer">
+        <!-- pixel sprite + emoji fallback -->
+        <div id="g-pixel-sprite-wrap" class="pixel-sprite-wrap">
+          <div class="pixel-sprite sprite-wolf" id="g-pixel-sprite"></div>
+        </div>
+        <div class="pet-emoji-fallback hidden" id="g-pet-emoji-fallback">🐾</div>
+      </div>
     </div>
     <!-- dependants (shown at level 3+) -->
     <div class="dependants hidden" id="g-dependants">
@@ -504,6 +681,31 @@ select.lc-inp{cursor:pointer}
     <div class="beast-bar" id="g-beast-bar">
       <div style="font-family:'Press Start 2P';font-size:7px;color:var(--muted);width:100%;margin-bottom:4px">SHIELDS</div>
     </div>
+    <!-- referral section -->
+    <div class="referral-section" id="g-referral">
+      <div class="ref-sec-title">👥 REFERRAL</div>
+      <div id="ref-invited-msg"></div>
+      <div class="ref-stats-row">
+        <div class="ref-stat-box">
+          <div class="ref-stat-num" id="ref-clicks">0</div>
+          <div class="ref-stat-label">LINK CLICKS</div>
+        </div>
+        <div class="ref-stat-box">
+          <div class="ref-stat-num" id="ref-converts">0</div>
+          <div class="ref-stat-label">FRIENDS JOINED</div>
+        </div>
+      </div>
+      <div class="ref-link-display" id="ref-link-game"></div>
+      <div>
+        <button class="ref-copy-btn" onclick="copyRefLinkGame()">📋 COPY LINK</button>
+        <button class="ref-challenge-btn" onclick="challengeFriend()">⚔️ CHALLENGE</button>
+      </div>
+      <div class="ref-friend-list" id="ref-friend-list"></div>
+    </div>
+    <!-- push notification opt-in -->
+    <button class="push-notif-btn" id="push-btn" onclick="requestPushPermission()">
+      🔔 GET DAILY TRIAL REMINDERS
+    </button>
     <div class="spacer"></div>
     <!-- bottom nav -->
     <div class="bottomnav">
@@ -575,15 +777,18 @@ select.lc-inp{cursor:pointer}
       <div class="prof-row"><span class="prof-key">Beasts Unlocked</span><span class="prof-val" id="prof-beasts"></span></div>
     </div>
     <div class="prof-section">
-      <div class="prof-sec-title">▸ CHALLENGE A FRIEND</div>
-      <div class="share-card">
+      <div class="prof-sec-title">▸ SHARE YOUR GUARDIAN</div>
+      <div class="share-card-export">
         <div class="share-card-pet" id="share-pet-emoji"></div>
         <div class="share-card-name" id="share-pet-name"></div>
         <div class="share-card-arch" id="share-arch"></div>
         <div class="share-card-cta">Can your guardian do better?</div>
         <div class="ref-link" id="ref-link-display"></div>
       </div>
-      <button class="copy-ref-btn" onclick="copyRefLink()">📋 COPY REFERRAL LINK</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        <button class="copy-ref-btn" onclick="copyRefLink()">📋 COPY LINK</button>
+        <button class="export-card-btn" onclick="openShareCardModal()">🖼️ SHARE CARD</button>
+      </div>
     </div>
     <div style="padding:0 14px">
       <div style="font-family:'VT323';font-size:13px;color:var(--muted);text-align:center;line-height:1.5">
@@ -591,6 +796,19 @@ select.lc-inp{cursor:pointer}
         Consult a licensed financial advisor for personalised recommendations.
         <br><br><a href="/advisor" style="color:var(--violet);font-size:11px">Advisor dashboard →</a>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SHARE CARD MODAL ═══ -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <div class="modal-title">🖼️ PROFILE CARD</div>
+    <canvas id="share-canvas-preview" width="600" height="320" style="width:100%;max-width:560px"></canvas>
+    <div class="modal-btn-row">
+      <button class="px-btn" onclick="downloadShareCard()">⬇ DOWNLOAD</button>
+      <button class="px-btn violet" onclick="nativeShare()" id="native-share-btn" style="display:none">📤 SHARE</button>
+      <button class="back-btn" onclick="closeModal()" style="margin-top:0">✕ CLOSE</button>
     </div>
   </div>
 </div>
@@ -603,6 +821,7 @@ select.lc-inp{cursor:pointer}
 <script>
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const ARCHETYPE_EMOJI = { PROTECTOR:'🐺', BUILDER:'🐂', WANDERER:'🦊', VISIONARY:'🐉', SURVIVOR:'🦌' };
+const ARCHETYPE_SPRITE_CLASS = { PROTECTOR:'sprite-wolf', BUILDER:'sprite-bull', WANDERER:'sprite-fox', VISIONARY:'sprite-dragon', SURVIVOR:'sprite-deer' };
 const ARCHETYPE_PLEDGES = {
   PROTECTOR:'I will defend what matters most.',
   BUILDER:'I will build strength before the storm.',
@@ -666,6 +885,12 @@ const SYNERGIES = [
   {beasts:['F03','F04'],name:'Compound Stream',bonus:'Savings accelerated'}
 ];
 const EVO_STAGES = ['','Hatchling','Seedling','Guardian','Champion','Eternal'];
+const PROFILE_LABELS = {
+  BLIND_BUILDER:'The Blind Builder', ANXIOUS_PROTECTOR:'The Anxious Protector',
+  BALANCED_STRATEGIST:'The Balanced Strategist', PROCRASTINATOR:'The Procrastinator',
+  FAMILY_GUARDIAN:'The Family Guardian', YOUNG_RISK_TAKER:'The Young Risk-Taker',
+  LEGACY_PLANNER:'The Legacy Planner', SURVIVOR_TYPE:'The Survivor', UNENGAGED:'The Unengaged'
+};
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let G = {
@@ -673,29 +898,48 @@ let G = {
   petName: localStorage.getItem('aegis_pet_name') || '',
   archetype: localStorage.getItem('aegis_archetype') || '',
   refCode: localStorage.getItem('aegis_ref_code') || '',
-  muted: false,
-  // game state (synced from server)
+  muted: localStorage.getItem('aegis_muted') === 'true',
+  pushSubscribed: localStorage.getItem('aegis_push_subscribed') === 'true',
   vitality:40, stability:40, resilience:40, bond:40, legacy:40,
   guardianLevel:1, xp:0, trialsComplete:0, evolutionStage:1,
   loginStreak:1, beastsUnlocked:[], scenariosDone:[], profileType:'UNENGAGED'
 };
 let selectedArchetype = null;
-let trialState = null; // current trial data
+let trialState = null;
 
 // ── SCREEN MANAGER ───────────────────────────────────────────────────────────
-function showScreen(id, fromBack=false) {
+function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 window.onload = async () => {
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // Check mute state
+  if (G.muted) document.getElementById('mute-icon').textContent = '🔇';
+
   // Check referral code in URL
   const urlRef = new URLSearchParams(window.location.search).get('ref');
-  if (urlRef) document.getElementById('lc-ref').value = urlRef;
+  if (urlRef) {
+    document.getElementById('lc-ref').value = urlRef;
+    localStorage.setItem('aegis_referred_by', urlRef);
+    // Show invited-by banner
+    try {
+      const r = await fetch(`/api/ref/${urlRef}`);
+      if (r.ok) {
+        const p = await r.json();
+        const banner = document.getElementById('ref-invited-msg');
+        if (banner) banner.innerHTML = `<div class="ref-invited-banner">🎮 You were invited by <b>${p.name}</b>'s pet <b>${p.pet_name}</b>!</div>`;
+      }
+    } catch(e) {}
+  }
 
   if (G.playerId) {
-    // Returning player — load state
     try {
       const r = await fetch(`/api/player/${G.playerId}`);
       if (r.ok) {
@@ -703,16 +947,15 @@ window.onload = async () => {
         G.petName   = player.pet_name;
         G.archetype = player.archetype;
         applyGameState(gameState);
-        // Daily login
         await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ playerId: G.playerId }) });
         loadGameScreen();
         showScreen('s-game');
+        loadReferralStats();
         return;
       }
     } catch(e) { console.error(e); }
   }
-  // New player — start cinematic
   startCinematic();
 };
 
@@ -729,13 +972,11 @@ function startCinematic() {
   el.innerHTML = '';
   let currentLineEl = document.createElement('div');
   el.appendChild(currentLineEl);
-
   const cursor = document.createElement('span');
   cursor.className = 'cine-cursor';
 
   function typeChar() {
     if (lineIdx >= lines.length) {
-      // Show egg after text
       setTimeout(() => {
         el.innerHTML = '<div style="font-size:52px;animation:eggFloat 2s ease-in-out infinite">🥚</div>';
         setTimeout(skipCinematic, 3000);
@@ -759,58 +1000,123 @@ function startCinematic() {
   }
   setTimeout(typeChar, 600);
 }
-
 function skipCinematic() { showScreen('s-naming'); }
 
 // ── NAMING ────────────────────────────────────────────────────────────────────
+const nameInp = document.getElementById('pet-name-inp');
+nameInp.addEventListener('input', () => {
+  const v = nameInp.value;
+  document.getElementById('naming-counter').textContent = v.length + ' / 12';
+  const previewTxt = document.getElementById('naming-preview-text');
+  if (v) previewTxt.textContent = v + (G.archetype ? '' : ' — choose archetype');
+  else previewTxt.textContent = '— Choose archetype first';
+  if (G.archetype) {
+    document.getElementById('naming-arch-preview').textContent = ARCHETYPE_EMOJI[G.archetype] || '🥚';
+  }
+});
+nameInp.addEventListener('keydown', e => { if(e.key==='Enter') doNaming(); });
+
 function doNaming() {
   const name = document.getElementById('pet-name-inp').value.trim();
   if (!name) { showToast('Give your pet a name first!'); return; }
   G.petName = name;
+  if (!G.archetype) {
+    // Go to archetype first
+    showScreen('s-archetype');
+    return;
+  }
   showScreen('s-hatching');
   startHatching();
 }
-document.getElementById('pet-name-inp').addEventListener('keydown', e => { if(e.key==='Enter') doNaming(); });
 
-// ── HATCHING ──────────────────────────────────────────────────────────────────
+// ── HATCHING v2 ──────────────────────────────────────────────────────────────
 function startHatching() {
-  const egg = document.getElementById('egg-hatch');
+  const eggEl = document.getElementById('egg-hatch');
   const emerge = document.getElementById('pet-emerge');
   const msg = document.getElementById('hatch-msg');
-  egg.style.display = 'block';
+  eggEl.style.display = 'block';
   emerge.style.display = 'none';
-  emerge.textContent = '🥚';
   msg.style.opacity = '0';
 
-  // Crack sequence
-  setTimeout(() => egg.classList.add('cracking'), 800);
-  setTimeout(() => egg.classList.add('hatching'), 1800);
+  // 1. Idle pulse (already default — just wait)
+  // 2. Rumble phase at t=800ms
   setTimeout(() => {
-    egg.style.display = 'none';
+    eggEl.className = 'egg-shell egg-rumble';
+    playEggRumble();
+  }, 800);
+
+  // 3. Crack phase at t=2000ms
+  setTimeout(() => {
+    eggEl.className = 'egg-shell egg-crack';
+    playCrack();
+  }, 2000);
+
+  // 4. Glow burst at t=2800ms
+  setTimeout(() => {
+    eggEl.className = 'egg-shell egg-burst';
+    playBurst();
+  }, 2800);
+
+  // 5. Emerge phase at t=3200ms
+  setTimeout(() => {
+    eggEl.style.display = 'none';
     emerge.style.display = 'block';
     emerge.textContent = G.archetype ? (ARCHETYPE_EMOJI[G.archetype]||'🐾') : '🐾';
-  }, 2400);
+    playEmerge();
+  }, 3200);
+
+  // 6. Message + confetti at t=3800ms
   setTimeout(() => {
     msg.style.opacity = '1';
     msg.textContent = `${G.petName} is here.`;
-  }, 3200);
-  setTimeout(() => showScreen('s-archetype'), 5000);
+    spawnConfetti();
+    playFanfare();
+  }, 3800);
+
+  // Go to archetype after t=5500ms
+  setTimeout(() => showScreen('s-archetype'), 5500);
+}
+
+function spawnConfetti() {
+  const colors = ['#00f5d4','#7b2fff','#ffb703','#ff006e','#06d6a0','#fff'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}vw;
+      top:-10px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${1.5 + Math.random()*2}s;
+      animation-delay:${Math.random()*0.5}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
 }
 
 // ── ARCHETYPE ─────────────────────────────────────────────────────────────────
 function selectArchetype(arch, card) {
   selectedArchetype = arch;
   G.archetype = arch;
+  localStorage.setItem('aegis_archetype', arch);
   document.querySelectorAll('.arch-card').forEach(c => { c.classList.remove('selected','dimmed'); c.classList.add('dimmed'); });
   card.classList.remove('dimmed'); card.classList.add('selected');
-  const pledgeBox = document.getElementById('pledge-box');
   document.getElementById('pledge-txt').textContent = '"' + ARCHETYPE_PLEDGES[arch] + '"';
-  pledgeBox.style.display = 'block';
+  document.getElementById('pledge-box').style.display = 'block';
   document.getElementById('pledge-btn').style.display = 'inline-block';
+  // Update naming preview
+  document.getElementById('naming-arch-preview').textContent = ARCHETYPE_EMOJI[arch] || '🥚';
 }
 
 function doPledge() {
   if (!selectedArchetype) { showToast('Choose your archetype first'); return; }
+  if (!G.petName) {
+    // Go back to naming
+    showScreen('s-naming');
+    return;
+  }
   showScreen('s-lead');
   document.getElementById('lead-pet').textContent = ARCHETYPE_EMOJI[selectedArchetype];
   document.getElementById('lead-title').textContent = `${G.petName} needs a safe place to live.`;
@@ -822,17 +1128,14 @@ async function doLeadCapture() {
   const name    = document.getElementById('lc-name').value.trim();
   const phone   = document.getElementById('lc-phone').value.trim();
   const matters = document.getElementById('lc-matters').value;
-  const ref     = document.getElementById('lc-ref').value.trim();
+  const ref     = document.getElementById('lc-ref').value.trim() || localStorage.getItem('aegis_referred_by') || '';
   const pdpa    = document.getElementById('lc-pdpa').checked;
-
   if (!name || !phone) { showToast('Name and WhatsApp required'); return; }
   if (!pdpa) { showToast('Please accept the PDPA consent'); return; }
   if (!/^\d{8}$/.test(phone)) { showToast('Enter 8-digit Singapore number'); return; }
 
   const btn = document.getElementById('lead-submit-btn');
-  btn.textContent = '[ SUMMONING... ]';
-  btn.disabled = true;
-
+  btn.textContent = '[ SUMMONING... ]'; btn.disabled = true;
   try {
     const r = await fetch('/api/start', {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -841,19 +1144,20 @@ async function doLeadCapture() {
     });
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
-    G.playerId = d.playerId;
-    G.refCode = d.refCode;
+    G.playerId = d.playerId; G.refCode = d.refCode;
     localStorage.setItem('aegis_player_id', d.playerId);
     localStorage.setItem('aegis_pet_name', G.petName);
     localStorage.setItem('aegis_archetype', G.archetype);
     localStorage.setItem('aegis_ref_code', d.refCode);
+    localStorage.setItem('aegis_created_at', new Date().toISOString());
     showScreen('s-tutorial');
     document.getElementById('tut-petname').textContent = G.petName;
     document.getElementById('tut-pet').textContent = ARCHETYPE_EMOJI[G.archetype];
+    // Request push permission after onboarding
+    setTimeout(requestPushPermission, 2000);
   } catch(e) {
     showToast('Error: ' + e.message);
-    btn.textContent = `[ PROTECT ${G.petName} ]`;
-    btn.disabled = false;
+    btn.textContent = `[ PROTECT ${G.petName} ]`; btn.disabled = false;
   }
 }
 
@@ -863,9 +1167,11 @@ function tutorialChoice(type, el) {
     el.classList.add('correct');
     document.getElementById('tut-pet').style.animation = 'petDance .4s infinite alternate';
     showToast('✔ Correct! Terrax defends the core!');
-    setTimeout(() => { loadGameScreen(); showScreen('s-game'); }, 1800);
+    playSuccess();
+    setTimeout(() => { loadGameScreen(); showScreen('s-game'); loadReferralStats(); }, 1800);
   } else {
     el.classList.add('wrong');
+    playFail();
     showToast('Not quite — try the Vitality Shield!');
     setTimeout(() => el.classList.remove('wrong'), 1000);
   }
@@ -874,88 +1180,90 @@ function tutorialChoice(type, el) {
 // ── GAME SCREEN ───────────────────────────────────────────────────────────────
 function applyGameState(gs) {
   if (!gs) return;
-  G.vitality     = gs.vitality || 40;
-  G.stability    = gs.stability || 40;
-  G.resilience   = gs.resilience || 40;
-  G.bond         = gs.bond || 40;
-  G.legacy       = gs.legacy || 40;
-  G.guardianLevel = gs.guardian_level || 1;
-  G.xp           = gs.xp || 0;
-  G.trialsComplete = gs.trials_complete || 0;
-  G.evolutionStage = gs.evolution_stage || 1;
-  G.loginStreak  = gs.login_streak || 1;
-  G.beastsUnlocked = JSON.parse(gs.beasts_unlocked || '[]');
-  G.scenariosDone  = JSON.parse(gs.scenarios_done || '[]');
-  G.profileType   = gs.profile_type || 'UNENGAGED';
+  G.vitality=gs.vitality||40; G.stability=gs.stability||40;
+  G.resilience=gs.resilience||40; G.bond=gs.bond||40; G.legacy=gs.legacy||40;
+  G.guardianLevel=gs.guardian_level||1; G.xp=gs.xp||0;
+  G.trialsComplete=gs.trials_complete||0; G.evolutionStage=gs.evolution_stage||1;
+  G.loginStreak=gs.login_streak||1;
+  G.beastsUnlocked=JSON.parse(gs.beasts_unlocked||'[]');
+  G.scenariosDone=JSON.parse(gs.scenarios_done||'[]');
+  G.profileType=gs.profile_type||'UNENGAGED';
 }
 
 function loadGameScreen() {
-  const petEmoji = ARCHETYPE_EMOJI[G.archetype] || '🐾';
   document.getElementById('g-pet-name').textContent = G.petName;
   document.getElementById('g-level').textContent = 'Lv' + G.guardianLevel;
-  document.getElementById('g-pet-sprite').textContent = petEmoji;
+
+  // Update pixel sprite
+  updatePixelSprite();
 
   // Greeting
   const avg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
   const greetings = avg > 70
-    ? [`Good morning! ${G.petName} slept well last night. ⭐`,
-       `${G.petName} is feeling strong today! 💪`,
-       `${G.petName} is ready for challenges! ⚔️`]
+    ? [`Good morning! ${G.petName} slept well last night. ⭐`,`${G.petName} is feeling strong today! 💪`,`${G.petName} is ready for challenges! ⚔️`]
     : avg > 40
-    ? [`${G.petName} slept restlessly. Needs more protection.`,
-       `A new day. New trials await ${G.petName}.`,
-       `${G.petName} is watching the horizon.`]
-    : [`${G.petName} looks worried. Threats are closing in.`,
-       `${G.petName} needs your help. Gaps remain.`,
-       `Warning: ${G.petName}'s shields are weak.`];
+    ? [`${G.petName} slept restlessly. Needs more protection.`,`A new day. New trials await ${G.petName}.`,`${G.petName} is watching the horizon.`]
+    : [`${G.petName} looks worried. Threats are closing in.`,`${G.petName} needs your help. Gaps remain.`,`Warning: ${G.petName}'s shields are weak.`];
   document.getElementById('g-greeting').textContent = greetings[Math.floor(Math.random()*greetings.length)];
 
-  // Health bars
   updateHealthBars();
-
-  // Pet state animation
   updatePetState();
+  renderBeastBar();
 
   // Dependants at level 3+
   if (G.guardianLevel >= 3) {
     document.getElementById('g-dependants').classList.remove('hidden');
-    const dep = document.getElementById('dep-child');
-    if (G.bond < 40) { dep.classList.add('fading'); } else { dep.classList.remove('fading'); }
-    const depP = document.getElementById('dep-partner');
-    if (G.bond < 25) { depP.classList.add('fading'); } else { depP.classList.remove('fading'); }
+    document.getElementById('dep-child').classList.toggle('fading', G.bond < 40);
+    document.getElementById('dep-partner').classList.toggle('fading', G.bond < 25);
   }
 
-  // Beast bar
-  renderBeastBar();
+  // Push button state
+  const pushBtn = document.getElementById('push-btn');
+  if (G.pushSubscribed) {
+    pushBtn.textContent = '🔔 DAILY REMINDERS ON';
+    pushBtn.classList.add('active');
+  }
 
-  // Sparkles if healthy
+  // Referral section
+  const refLink = window.location.origin + '/?ref=' + G.refCode;
+  document.getElementById('ref-link-game').textContent = refLink;
+
   if (avg > 70) spawnSparkles();
+}
+
+function updatePixelSprite() {
+  const outer = document.getElementById('g-pet-sprite-outer');
+  const sprite = document.getElementById('g-pixel-sprite');
+  // Set archetype sprite class
+  sprite.className = 'pixel-sprite ' + (ARCHETYPE_SPRITE_CLASS[G.archetype] || 'sprite-wolf');
+  // Set evolution class on outer wrapper
+  const evoClass = G.evolutionStage >= 4 ? 'sprite-evo-4' : G.evolutionStage >= 3 ? 'sprite-evo-3' : G.evolutionStage >= 2 ? 'sprite-evo-2' : '';
+  outer.className = 'pet-sprite-outer ' + getHealthStateClass() + ' ' + evoClass;
+}
+
+function getHealthStateClass() {
+  const avg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
+  return avg>70?'sprite-state-great':avg>50?'sprite-state-good':avg>30?'sprite-state-mid':avg>15?'sprite-state-low':'sprite-state-crit';
 }
 
 function updateHealthBars() {
   const dims = { vitality:G.vitality, stability:G.stability, resilience:G.resilience, bond:G.bond, legacy:G.legacy };
   Object.entries(dims).forEach(([k,v]) => {
-    const fill = document.getElementById('hb-'+k);
-    const val  = document.getElementById('hv-'+k);
-    fill.style.width = v+'%';
-    fill.className = 'hb-fill ' + (v > 60 ? 'good' : v > 30 ? 'mid' : 'bad');
-    val.textContent = v+'%';
+    document.getElementById('hb-'+k).style.width = v+'%';
+    document.getElementById('hb-'+k).className = 'hb-fill ' + (v>60?'good':v>30?'mid':'bad');
+    document.getElementById('hv-'+k).textContent = v+'%';
   });
 }
 
 function updatePetState() {
-  const avg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
-  const sprite = document.getElementById('g-pet-sprite');
-  sprite.className = 'pet-sprite ' + (avg>70?'state-great':avg>50?'state-good':avg>30?'state-mid':avg>15?'state-low':'state-crit');
+  updatePixelSprite();
 }
 
 function renderBeastBar() {
   const bar = document.getElementById('g-beast-bar');
   const header = bar.firstChild;
-  bar.innerHTML = '';
-  bar.appendChild(header);
-  const shieldBeasts = ['S01','S02','S03','S04','S05','S06','S07','S08'];
-  shieldBeasts.slice(0,5).forEach(id => {
+  bar.innerHTML = ''; bar.appendChild(header);
+  ['S01','S02','S03','S04','S05','S06','S07','S08'].slice(0,5).forEach(id => {
     const b = BEASTS[id];
     const unlocked = G.beastsUnlocked.includes(id);
     const slot = document.createElement('div');
@@ -967,45 +1275,134 @@ function renderBeastBar() {
 }
 
 function spawnSparkles() {
-  const ctr = document.getElementById('sparkle-ctr');
-  ctr.innerHTML = '';
+  const ctr = document.getElementById('sparkle-ctr'); ctr.innerHTML = '';
   for (let i=0;i<8;i++) {
     const s = document.createElement('div');
     s.className = 'sparkle';
     s.textContent = ['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)];
-    s.style.left = (10+Math.random()*80)+'%';
-    s.style.top  = (20+Math.random()*60)+'%';
-    s.style.animationDelay = (Math.random()*1.5)+'s';
+    s.style.left=(10+Math.random()*80)+'%'; s.style.top=(20+Math.random()*60)+'%';
+    s.style.animationDelay=(Math.random()*1.5)+'s';
     ctr.appendChild(s);
     setTimeout(() => s.remove(), 2500);
   }
 }
 
+// ── REFERRAL STATS ────────────────────────────────────────────────────────────
+async function loadReferralStats() {
+  if (!G.playerId) return;
+  try {
+    const r = await fetch(`/api/referral-stats/${G.playerId}`);
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById('ref-clicks').textContent = d.clicks || 0;
+    document.getElementById('ref-converts').textContent = d.conversions || 0;
+    // Render friend list
+    const list = document.getElementById('ref-friend-list');
+    list.innerHTML = '';
+    if (d.friends && d.friends.length > 0) {
+      d.friends.forEach(f => {
+        const avg = ((f.vitality||40)+(f.stability||40)+(f.resilience||40)+(f.bond||40)+(f.legacy||40))/5;
+        const myAvg = (G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
+        const item = document.createElement('div');
+        item.className = 'ref-friend-item';
+        item.innerHTML = `
+          <span class="ref-friend-emoji">${ARCHETYPE_EMOJI[f.archetype]||'🐾'}</span>
+          <div class="ref-friend-info">
+            <div class="ref-friend-name">${f.pet_name||'Guardian'} (${f.name||'?'})</div>
+            <div class="ref-friend-bar-wrap">
+              <div class="ref-friend-bar" style="width:${avg}%"></div>
+            </div>
+          </div>
+          <span style="font-family:'Press Start 2P';font-size:7px;color:${avg>=myAvg?'var(--danger)':'var(--success)'}">
+            ${avg>=myAvg?'▲':'▼'} ${Math.round(avg)}%
+          </span>`;
+        list.appendChild(item);
+      });
+    }
+  } catch(e) {}
+}
+
+function copyRefLinkGame() {
+  const link = window.location.origin + '/?ref=' + G.refCode;
+  navigator.clipboard.writeText(link).then(() => showToast('✔ Referral link copied!')).catch(() => showToast(link));
+  playClick();
+}
+
+function challengeFriend() {
+  const link = window.location.origin + '/?ref=' + G.refCode;
+  const msg = `⚔️ My pet ${G.petName} challenges you! Can you build a stronger guardian? 🐾\n\nPlay AEGIS PET: ${link}`;
+  if (navigator.share) {
+    navigator.share({ title: 'AEGIS PET Challenge', text: msg, url: link }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(msg).then(() => showToast('✔ Challenge message copied!'));
+  }
+}
+
+// ── PWA PUSH NOTIFICATIONS ─────────────────────────────────────────────────
+async function requestPushPermission() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.log('Push not supported');
+    return;
+  }
+  if (G.pushSubscribed) return;
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    // Get VAPID public key
+    const keyRes = await fetch('/api/push/vapid-public-key');
+    const { publicKey } = await keyRes.json();
+
+    // Subscribe
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+
+    // Send to server
+    await fetch('/api/push/subscribe', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ playerId: G.playerId, subscription: sub.toJSON() })
+    });
+
+    G.pushSubscribed = true;
+    localStorage.setItem('aegis_push_subscribed', 'true');
+    const btn = document.getElementById('push-btn');
+    if (btn) { btn.textContent = '🔔 DAILY REMINDERS ON'; btn.classList.add('active'); }
+    showToast('🔔 Daily reminders enabled!');
+  } catch(e) { console.error('Push subscription failed:', e); }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
 // ── TRIAL SYSTEM ──────────────────────────────────────────────────────────────
 function getNextScenario() {
   const weights = ARCHETYPE_WEIGHTS[G.archetype] || [1,2,3,4,5,6,7,8];
-  for (const id of weights) {
-    if (!G.scenariosDone.includes(id)) return id;
-  }
-  // All done — pick random
+  for (const id of weights) { if (!G.scenariosDone.includes(id)) return id; }
   return weights[Math.floor(Math.random()*weights.length)];
 }
 
 function getBeastChoices(correctId) {
-  // Always 3 options: correct + 2 random others
   const correct = BEASTS[correctId];
   const others = Object.entries(BEASTS).filter(([id]) => id !== correctId);
   const picked = others.sort(() => Math.random()-.5).slice(0,2).map(([id,b]) => ({id,b}));
-  const choices = [
+  return [
     { id: correctId, b: correct, correct: true },
     { id: picked[0].id, b: picked[0].b, correct: false },
     { id: picked[1].id, b: picked[1].b, correct: false }
   ].sort(() => Math.random()-.5);
-  return choices;
 }
 
-let trialTimer = null;
-let trialTimeLeft = 20;
+let trialTimer = null, trialTimeLeft = 20;
 
 function startTrial() {
   const scenarioId = getNextScenario();
@@ -1013,142 +1410,111 @@ function startTrial() {
   const choices    = getBeastChoices(scenario.correctBeast);
   trialState = { scenarioId, scenario, choices, startTime: Date.now(), selectedBeast: null };
   showScreen('s-trial');
-  showTrialPhase('announce');
+  renderTrialAnnounce();
 }
 
-function showTrialPhase(phase) {
+function renderTrialAnnounce() {
   const el = document.getElementById('trial-phase');
   const s = trialState.scenario;
+  el.innerHTML = `
+    <div style="margin-bottom:24px;font-family:'Press Start 2P';font-size:8px;color:var(--muted)">TRIAL ${trialState.scenarioId} / 8</div>
+    <div class="threat-icon">${s.icon}</div>
+    <div class="threat-name">${s.name}</div>
+    <div class="threat-desc">${s.desc}</div>
+    <div style="height:24px"></div>
+    <button class="px-btn" onclick="renderTrialSelect()">[ FACE THE TRIAL ]</button>
+  `;
+}
 
-  if (phase === 'announce') {
-    el.innerHTML = `
-      <div style="margin-bottom:24px;font-family:'Press Start 2P';font-size:8px;color:var(--muted)">TRIAL ${trialState.scenarioId} / 8</div>
-      <div class="threat-icon">${s.icon}</div>
-      <div class="threat-name">${s.name}</div>
-      <div class="threat-desc">${s.desc}</div>
-      <div style="height:24px"></div>
-      <button class="px-btn" onclick="showTrialPhase('select')">[ FACE THE TRIAL ]</button>
-    `;
-  } else if (phase === 'select') {
-    trialTimeLeft = 20;
-    el.innerHTML = `
-      <div style="font-family:'Press Start 2P';font-size:8px;color:var(--muted);margin-bottom:8px">CHOOSE YOUR SHIELD</div>
-      <div class="timer-bar-wrap" style="margin-bottom:16px"><div class="timer-bar" id="trial-timer" style="width:100%"></div></div>
-      <div style="font-family:'VT323';font-size:16px;color:var(--muted);margin-bottom:16px">Which guardian defends against this threat?</div>
-      <div class="beast-choices">
-        ${trialState.choices.map((c,i) => `
-          <div class="bc-option" id="choice-${i}" onclick="selectBeast('${c.id}',${i},${c.correct})">
-            <span class="bc-emoji">${c.b.e}</span>
-            <div class="bc-info">
-              <div class="bc-name">${c.b.n.toUpperCase()}</div>
-              <div class="bc-desc">${c.b.desc}</div>
-              <div class="bc-dim">${c.b.dim}</div>
-            </div>
-          </div>`).join('')}
-      </div>
-    `;
-    // Start countdown
-    if (trialTimer) clearInterval(trialTimer);
-    trialTimer = setInterval(() => {
-      trialTimeLeft--;
-      const pct = (trialTimeLeft / 20) * 100;
-      const bar = document.getElementById('trial-timer');
-      if (bar) {
-        bar.style.width = pct + '%';
-        if (pct < 40) bar.classList.add('urgent');
-      }
-      if (trialTimeLeft <= 0) {
-        clearInterval(trialTimer);
-        // Auto-fail on timeout
-        resolveTrial(false, null);
-      }
-    }, 1000);
-  }
+function renderTrialSelect() {
+  trialTimeLeft = 20;
+  const el = document.getElementById('trial-phase');
+  el.innerHTML = `
+    <div style="font-family:'Press Start 2P';font-size:8px;color:var(--muted);margin-bottom:8px">CHOOSE YOUR SHIELD</div>
+    <div class="timer-bar-wrap" style="margin-bottom:16px"><div class="timer-bar" id="trial-timer" style="width:100%"></div></div>
+    <div style="font-family:'VT323';font-size:16px;color:var(--muted);margin-bottom:16px">Which guardian defends against this threat?</div>
+    <div class="beast-choices">
+      ${trialState.choices.map((c,i) => `
+        <div class="bc-option" id="choice-${i}" onclick="selectBeast('${c.id}',${i},${c.correct})">
+          <span class="bc-emoji">${c.b.e}</span>
+          <div class="bc-info">
+            <div class="bc-name">${c.b.n.toUpperCase()}</div>
+            <div class="bc-desc">${c.b.desc}</div>
+            <div class="bc-dim">${c.b.dim}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+  if (trialTimer) clearInterval(trialTimer);
+  trialTimer = setInterval(() => {
+    trialTimeLeft--;
+    const bar = document.getElementById('trial-timer');
+    if (bar) { bar.style.width = (trialTimeLeft/20*100)+'%'; if(trialTimeLeft<8) bar.classList.add('urgent'); }
+    if (trialTimeLeft <= 0) { clearInterval(trialTimer); resolveTrial(false, null); }
+  }, 1000);
 }
 
 function selectBeast(beastId, idx, isCorrect) {
   if (trialTimer) clearInterval(trialTimer);
   trialState.selectedBeast = beastId;
   trialState.decisionTime = Date.now() - trialState.startTime;
-
-  const chosen = document.getElementById('choice-' + idx);
+  const chosen = document.getElementById('choice-'+idx);
   if (isCorrect) {
     chosen.classList.add('correct');
+    playSuccess();
     showToast('✔ ' + BEASTS[beastId].n + ' activated!');
-    setTimeout(() => showTrialPhase('resolve_win'), 800);
+    setTimeout(() => resolveTrial(true, beastId), 800);
   } else {
     chosen.classList.add('wrong');
-    // Show correct answer
+    playFail();
     trialState.choices.forEach((c,i) => { if(c.correct) document.getElementById('choice-'+i).classList.add('correct'); });
     setTimeout(() => resolveTrial(false, beastId), 1200);
   }
 }
 
-function showTrialPhase_resolveWin() {
-  resolveTrial(true, trialState.selectedBeast);
-}
-
-// Catch the phase name
-const origShowTrialPhase = showTrialPhase;
-// Override resolve_win
-function showTrialPhase(phase) {
-  if (phase === 'resolve_win') { showTrialPhase_resolveWin(); return; }
-  origShowTrialPhase(phase);
-}
-
 async function resolveTrial(success, beastId) {
   const s = trialState.scenario;
   const el = document.getElementById('trial-phase');
-
-  // Battle animation
   el.innerHTML = `
     <div class="battle-anim">
       <span>${s.icon}</span>
-      <span class="battle-vs">${success ? '⚔️' : '💢'}</span>
-      <span>${beastId ? BEASTS[beastId]?.e||'🛡️' : '❌'}</span>
+      <span class="battle-vs">${success?'⚔️':'💢'}</span>
+      <span>${beastId?BEASTS[beastId]?.e||'🛡️':'❌'}</span>
     </div>
     <div style="font-family:'VT323';font-size:22px;color:var(--muted);text-align:center">
-      ${success ? 'Shield activated...' : 'Threat bypasses...'}
+      ${success?'Shield activated...':'Threat bypasses...'}
     </div>
   `;
-
   await sleep(1500);
 
-  // Call API
   let reward = null;
   try {
     const r = await fetch('/api/trial', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        playerId: G.playerId,
-        scenarioId: trialState.scenarioId,
-        beastsUsed: beastId ? [beastId] : [],
-        outcome: success ? 'success' : 'failure',
-        dimensionAffected: s.dimension,
-        decisionTimeMs: trialState.decisionTime || 5000
+        playerId:G.playerId, scenarioId:trialState.scenarioId,
+        beastsUsed:beastId?[beastId]:[], outcome:success?'success':'failure',
+        dimensionAffected:s.dimension, decisionTimeMs:trialState.decisionTime||5000
       })
     });
     reward = await r.json();
     if (reward.ok) {
-      // Update local state
-      G[s.dimension] = reward.newHealth;
-      G.guardianLevel = reward.newLevel;
-      G.evolutionStage = reward.newEvolution;
-      if (reward.newBeast) G.beastsUnlocked.push(reward.newBeast);
+      G[s.dimension]=reward.newHealth; G.guardianLevel=reward.newLevel;
+      G.evolutionStage=reward.newEvolution;
+      if (reward.newBeast) { G.beastsUnlocked.push(reward.newBeast); playBeastUnlock(); }
       if (!G.scenariosDone.includes(trialState.scenarioId)) G.scenariosDone.push(trialState.scenarioId);
     }
   } catch(e) { console.error(e); }
 
-  // Show outcome
   el.innerHTML = `
-    <div class="outcome-title ${success?'win':'lose'}">${success ? '⚔ TRIAL SURVIVED' : '✘ TRIAL FAILED'}</div>
-    <div class="outcome-fact">${!success ? s.failFact : '"Threat neutralised. Guardian strengthened."'}</div>
+    <div class="outcome-title ${success?'win':'lose'}">${success?'⚔ TRIAL SURVIVED':'✘ TRIAL FAILED'}</div>
+    <div class="outcome-fact">${!success?s.failFact:'"Threat neutralised. Guardian strengthened."'}</div>
     <div class="outcome-debrief" style="margin-bottom:20px">${s.debrief}</div>
     ${reward?.ok ? `
     <div class="reward-box">
       <div class="reward-label">REWARD</div>
       <div class="reward-val">+${reward.xpGained} XP ${reward.rewardType!=='xp'?'· '+reward.rewardType.toUpperCase()+'!':''}</div>
-      ${reward.newBeast ? `<div style="font-family:'VT323';font-size:20px;color:var(--success);margin-top:6px">🎉 NEW BEAST: ${BEASTS[reward.newBeast]?.e} ${BEASTS[reward.newBeast]?.n}!</div>` : ''}
+      ${reward.newBeast?`<div style="font-family:'VT323';font-size:20px;color:var(--success);margin-top:6px">🎉 NEW BEAST: ${BEASTS[reward.newBeast]?.e} ${BEASTS[reward.newBeast]?.n}!</div>`:''}
     </div>` : ''}
     <button class="px-btn" onclick="returnFromTrial()" style="margin-top:8px">[ CONTINUE ]</button>
   `;
@@ -1163,29 +1529,23 @@ function returnFromTrial() {
 // ── COLLECTION ────────────────────────────────────────────────────────────────
 function showCollection() {
   const unlocked = G.beastsUnlocked;
-  const total = Object.keys(BEASTS).length;
-  document.getElementById('coll-sub').textContent = `Unlocked: ${unlocked.length} / ${total}`;
-
-  // Find active synergies
+  document.getElementById('coll-sub').textContent = `Unlocked: ${unlocked.length} / ${Object.keys(BEASTS).length}`;
   const activeSynergies = SYNERGIES.filter(syn => syn.beasts.every(b => unlocked.includes(b)));
-
   function renderGrid(containerId, ids) {
-    const grid = document.getElementById(containerId);
-    grid.innerHTML = ids.map(id => {
+    document.getElementById(containerId).innerHTML = ids.map(id => {
       const b = BEASTS[id];
       const isUnlocked = unlocked.includes(id);
       const syn = activeSynergies.find(s => s.beasts.includes(id));
       return `<div class="beast-card ${isUnlocked?'unlocked':'locked'}">
-        ${syn ? `<span class="synergy-badge" title="${syn.name}: ${syn.bonus}">✨</span>` : ''}
+        ${syn?`<span class="synergy-badge" title="${syn.name}: ${syn.bonus}">✨</span>`:''}
         <span class="bc-card-emoji">${b.e}</span>
         <div class="bc-card-name">${b.n.toUpperCase()}</div>
         <div class="bc-card-type">${b.desc}</div>
         <span class="bc-rarity rarity-${b.rarity}">${b.rarity.toUpperCase()}</span>
-        ${!isUnlocked ? '<div style="font-family:VT323;font-size:12px;color:var(--muted);margin-top:4px">Not yet summoned.</div>' : ''}
+        ${!isUnlocked?'<div style="font-family:VT323;font-size:12px;color:var(--muted);margin-top:4px">Not yet summoned.</div>':''}
       </div>`;
     }).join('');
   }
-
   renderGrid('shield-grid', ['S01','S02','S03','S04','S05','S06','S07','S08']);
   renderGrid('forge-grid',  ['F01','F02','F03','F04','F05','F06']);
   showScreen('s-collection');
@@ -1196,73 +1556,308 @@ function showProfile() {
   const petEmoji = ARCHETYPE_EMOJI[G.archetype] || '🐾';
   document.getElementById('prof-pet-emoji').textContent = petEmoji;
   document.getElementById('prof-petname').textContent   = G.petName;
-  document.getElementById('prof-archetype').textContent = 'THE ' + (G.archetype||'GUARDIAN');
-  document.getElementById('prof-evo').textContent = EVO_STAGES[G.evolutionStage] || 'Hatchling';
-  document.getElementById('prof-level').textContent    = 'Level ' + G.guardianLevel;
-  document.getElementById('prof-trials').textContent   = G.trialsComplete + ' / 8 scenarios';
-  document.getElementById('prof-streak').textContent   = G.loginStreak + ' days 🔥';
-  const createdAt = localStorage.getItem('aegis_created_at') || new Date().toISOString();
-  const days = Math.max(1, Math.floor((Date.now() - new Date(createdAt)) / 86400000));
-  document.getElementById('prof-days').textContent     = days + ' days';
-  document.getElementById('prof-beasts').textContent   = G.beastsUnlocked.length + ' / 14';
-
-  // Share card
-  const refLink = window.location.origin + '?ref=' + G.refCode;
+  document.getElementById('prof-archetype').textContent = 'THE '+(G.archetype||'GUARDIAN');
+  document.getElementById('prof-evo').textContent = EVO_STAGES[G.evolutionStage]||'Hatchling';
+  document.getElementById('prof-level').textContent    = 'Level '+G.guardianLevel;
+  document.getElementById('prof-trials').textContent   = G.trialsComplete+' / 8 scenarios';
+  document.getElementById('prof-streak').textContent   = G.loginStreak+' days 🔥';
+  const days = Math.max(1, Math.floor((Date.now()-new Date(localStorage.getItem('aegis_created_at')||Date.now()))/86400000));
+  document.getElementById('prof-days').textContent     = days+' days';
+  document.getElementById('prof-beasts').textContent   = G.beastsUnlocked.length+' / 14';
+  const refLink = window.location.origin+'/?ref='+G.refCode;
   document.getElementById('share-pet-emoji').textContent = petEmoji;
   document.getElementById('share-pet-name').textContent  = G.petName;
-  document.getElementById('share-arch').textContent      = 'THE ' + (G.archetype||'GUARDIAN');
+  document.getElementById('share-arch').textContent      = 'THE '+(G.archetype||'GUARDIAN');
   document.getElementById('ref-link-display').textContent = refLink;
   showScreen('s-profile');
 }
 
 function copyRefLink() {
-  const link = window.location.origin + '?ref=' + G.refCode;
-  navigator.clipboard.writeText(link).then(() => showToast('✔ Referral link copied!')).catch(() => {
-    showToast(link); // fallback: show in toast
+  const link = window.location.origin+'/?ref='+G.refCode;
+  navigator.clipboard.writeText(link).then(() => showToast('✔ Referral link copied!')).catch(() => showToast(link));
+}
+
+// ── SHARE CARD (Canvas API) ───────────────────────────────────────────────────
+function openShareCardModal() {
+  drawShareCard();
+  const modal = document.getElementById('share-modal');
+  modal.classList.add('show');
+  // Show native share button if available
+  if (navigator.share || navigator.canShare) {
+    document.getElementById('native-share-btn').style.display = 'inline-block';
+  }
+}
+
+function closeModal() {
+  document.getElementById('share-modal').classList.remove('show');
+}
+
+function drawShareCard() {
+  const canvas = document.getElementById('share-canvas-preview');
+  const ctx = canvas.getContext('2d');
+  const W = 600, H = 320;
+  canvas.width = W; canvas.height = H;
+
+  // Background
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,245,212,0.07)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Border
+  ctx.strokeStyle = 'rgba(0,245,212,0.5)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(2, 2, W-4, H-4);
+
+  // Inner glow
+  const gradient = ctx.createLinearGradient(0, 0, W, H);
+  gradient.addColorStop(0, 'rgba(0,245,212,0.05)');
+  gradient.addColorStop(1, 'rgba(123,47,255,0.05)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(2, 2, W-4, H-4);
+
+  // Header: AEGIS PET
+  ctx.font = '14px "Press Start 2P", monospace';
+  ctx.fillStyle = '#00f5d4';
+  ctx.fillText('AEGIS PET', 20, 36);
+
+  // Pet emoji (large)
+  ctx.font = '72px serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(ARCHETYPE_EMOJI[G.archetype]||'🐾', W-20, 90);
+
+  // Pet name
+  ctx.textAlign = 'left';
+  ctx.font = '20px "Press Start 2P", monospace';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(G.petName, 20, 80);
+
+  // Level + profile type
+  ctx.font = '11px "Press Start 2P", monospace';
+  ctx.fillStyle = '#64748b';
+  const profileLabel = PROFILE_LABELS[G.profileType] || 'The Unengaged';
+  ctx.fillText(`Lv.${G.guardianLevel}  ${profileLabel}`, 20, 105);
+
+  // Stats bars
+  const dims = [
+    {k:'V', v:G.vitality, c:'#00f5d4'},
+    {k:'S', v:G.stability, c:'#7b2fff'},
+    {k:'R', v:G.resilience, c:'#ff006e'},
+    {k:'B', v:G.bond, c:'#ffb703'},
+    {k:'L', v:G.legacy, c:'#06d6a0'}
+  ];
+  const barY = 130;
+  const barW = 90, barH = 14, barGap = 18;
+  ctx.font = '9px "Press Start 2P", monospace';
+  dims.forEach((d, i) => {
+    const x = 20 + i * (barW + barGap);
+    // Label
+    ctx.fillStyle = '#64748b';
+    ctx.fillText(d.k, x, barY - 4);
+    // Track
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.fillRect(x, barY, barW, barH);
+    // Fill
+    ctx.fillStyle = d.c;
+    ctx.fillRect(x, barY, Math.round(barW * d.v / 100), barH);
+    // Value
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText(d.v+'%', x, barY + barH + 14);
+  });
+
+  // Divider line
+  ctx.strokeStyle = 'rgba(0,245,212,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20, 185); ctx.lineTo(W-20, 185); ctx.stroke();
+
+  // Trial + beast counts
+  ctx.font = '11px "Press Start 2P", monospace';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('🏆 '+G.trialsComplete+' trials', 20, 215);
+  ctx.fillText('🐾 '+G.beastsUnlocked.length+' beasts', 200, 215);
+  ctx.fillText('⚡ Lv.'+G.guardianLevel, 380, 215);
+
+  // Ref link
+  ctx.font = '10px "VT323", monospace';
+  ctx.fillStyle = '#7b2fff';
+  const refLink = window.location.origin+'/?ref='+G.refCode;
+  ctx.fillText(refLink, 20, 245);
+
+  // Footer
+  ctx.font = '9px "Press Start 2P", monospace';
+  ctx.fillStyle = 'rgba(100,116,139,0.8)';
+  ctx.fillText('Generated by AegisPet.app', 20, 300);
+
+  // Corner decoration
+  ctx.strokeStyle = 'rgba(0,245,212,0.4)';
+  ctx.lineWidth = 1;
+  [[0,0],[W,0],[0,H],[W,H]].forEach(([cx,cy]) => {
+    const s = 20;
+    const dx = cx===0?1:-1, dy = cy===0?1:-1;
+    ctx.beginPath(); ctx.moveTo(cx+dx*2, cy+dy*2+s*dy); ctx.lineTo(cx+dx*2, cy+dy*2); ctx.lineTo(cx+dx*2+s*dx, cy+dy*2); ctx.stroke();
   });
 }
 
-// ── AUDIO (simple beeps via Web Audio) ─────────────────────────────────────
+async function downloadShareCard() {
+  const canvas = document.getElementById('share-canvas-preview');
+  const fileName = `aegis-${G.petName.toLowerCase().replace(/\s+/g,'-')}-card.png`;
+  const link = document.createElement('a');
+  link.download = fileName;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('⬇ Card downloaded!');
+}
+
+async function nativeShare() {
+  const canvas = document.getElementById('share-canvas-preview');
+  canvas.toBlob(async blob => {
+    const file = new File([blob], `aegis-${G.petName}-card.png`, { type:'image/png' });
+    const refLink = window.location.origin+'/?ref='+G.refCode;
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
+      try {
+        await navigator.share({ title:'AEGIS PET - My Guardian', text:`${G.petName} is ready for battle! Join me: ${refLink}`, files:[file] });
+      } catch(e) { if(e.name!=='AbortError') downloadShareCard(); }
+    } else if (navigator.share) {
+      navigator.share({ title:'AEGIS PET', text:`${G.petName} is ready! ${refLink}`, url:refLink }).catch(()=>{});
+    } else { downloadShareCard(); }
+  }, 'image/png');
+}
+
+// ── WEB AUDIO CHIPTUNE ENGINE ─────────────────────────────────────────────────
 let audioCtx = null;
+let bgMusicNodes = null;
+let bgMusicState = '';
+
 function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
-function playTone(freq, dur=0.12, type='square', vol=0.08) {
+
+function playTone(freq, dur=0.12, type='square', vol=0.08, when=null) {
   if (G.muted) return;
   try {
     const ctx = getAudio();
+    const t = when || ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
     osc.type = type; osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-    osc.start(); osc.stop(ctx.currentTime + dur);
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    osc.start(t); osc.stop(t + dur);
   } catch(e){}
 }
-function playSuccess() { [523,659,784,1047].forEach((f,i) => setTimeout(()=>playTone(f,.15,'square',.07),i*80)); }
-function playFail()    { [330,262,196].forEach((f,i) => setTimeout(()=>playTone(f,.2,'sawtooth',.06),i*100)); }
-function playClick()   { playTone(880,.06,'square',.05); }
-function toggleMute()  {
-  G.muted = !G.muted;
-  document.getElementById('mute-icon').textContent = G.muted ? '🔇' : '🔊';
+
+function playSuccess() {
+  [523,659,784,1047].forEach((f,i) => playTone(f,.15,'square',.07,null));
+  setTimeout(()=>playTone(1047,.25,'square',.09), 320);
+}
+function playFail() {
+  [330,262,196].forEach((f,i) => setTimeout(()=>playTone(f,.2,'sawtooth',.06), i*100));
+}
+function playClick() { playTone(880,.06,'square',.04); }
+function playBeastUnlock() {
+  const notes=[523,659,784,1047,1318,1047,784,659,523];
+  notes.forEach((f,i)=>setTimeout(()=>playTone(f,.12,'square',.07),i*60));
+}
+function playEggRumble() {
+  [80,85,80,88].forEach((f,i)=>setTimeout(()=>playTone(f,.08,'sawtooth',.05),i*120));
+}
+function playCrack() {
+  [440,220,110].forEach((f,i)=>setTimeout(()=>playTone(f,.1,'sawtooth',.08),i*80));
+}
+function playBurst() { playTone(1047,.4,'square',.1); setTimeout(()=>playTone(1318,.2,'square',.08),100); }
+function playEmerge() { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.18,'square',.07),i*100)); }
+function playFanfare() {
+  const melody = [523,659,784,880,1047,880,784,659,523,659,784,1047,1047];
+  melody.forEach((f,i)=>setTimeout(()=>playTone(f,.15,'square',.07),i*100));
+}
+
+// Background music based on health state
+function updateBgMusic() {
+  if (G.muted) { stopBgMusic(); return; }
+  const avg=(G.vitality+G.stability+G.resilience+G.bond+G.legacy)/5;
+  const state=avg>70?'great':avg>50?'good':avg>30?'mid':avg>15?'low':'crit';
+  if (state===bgMusicState) return;
+  stopBgMusic();
+  bgMusicState=state;
+  playBgLoop(state);
+}
+
+function stopBgMusic() {
+  if (bgMusicNodes) {
+    try { bgMusicNodes.forEach(n=>n.stop()); } catch(e){}
+    bgMusicNodes=null;
+  }
+}
+
+function playBgLoop(state) {
+  if (G.muted || !audioCtx) return;
+  // Simple arpeggiated loop — different feel per state
+  const patterns = {
+    great: [{f:523,d:.12},{f:659,d:.12},{f:784,d:.12},{f:1047,d:.12},{f:784,d:.12},{f:659,d:.12}],
+    good:  [{f:440,d:.2},{f:523,d:.2},{f:587,d:.2},{f:523,d:.2}],
+    mid:   [{f:392,d:.3},{f:349,d:.3},{f:330,d:.3},{f:294,d:.3}],
+    low:   [{f:220,d:.4},{f:196,d:.4},{f:233,d:.4},{f:220,d:.4}],
+    crit:  [{f:147,d:.15},{f:147,d:.15},{f:165,d:.15},{f:147,d:.15},{f:139,d:.6}]
+  };
+  const pat=patterns[state]||patterns.good;
+  let t=audioCtx.currentTime+0.1;
+  const nodes=[];
+  // Play 3 loops then stop (subtle, non-intrusive)
+  for(let rep=0;rep<2;rep++) {
+    pat.forEach(note=>{
+      try{
+        const osc=audioCtx.createOscillator();
+        const gain=audioCtx.createGain();
+        osc.connect(gain);gain.connect(audioCtx.destination);
+        osc.type='square';osc.frequency.value=note.f;
+        gain.gain.setValueAtTime(0.03,t);
+        gain.gain.exponentialRampToValueAtTime(0.001,t+note.d);
+        osc.start(t);osc.stop(t+note.d);
+        nodes.push(osc);
+        t+=note.d;
+      }catch(e){}
+    });
+    t+=0.3;
+  }
+  bgMusicNodes=nodes;
+}
+
+function toggleMute() {
+  G.muted=!G.muted;
+  localStorage.setItem('aegis_muted', G.muted?'true':'false');
+  document.getElementById('mute-icon').textContent=G.muted?'🔇':'🔊';
+  if(G.muted) stopBgMusic(); else updateBgMusic();
+  playClick();
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// Add click sound to all px-btn
-document.addEventListener('click', e => {
-  if (e.target.matches('.px-btn,.bnav-btn,.arch-card,.bc-option,.shield-opt')) playClick();
-});
+// Add click sound + bg music trigger on first interaction
+let firstInteraction=false;
+document.addEventListener('click',e=>{
+  if(!firstInteraction){
+    firstInteraction=true;
+    // Resume audio context on first click (browser policy)
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  }
+  if(e.target.matches('.px-btn,.bnav-btn,.arch-card,.bc-option,.shield-opt,.ref-copy-btn,.ref-challenge-btn')) playClick();
+},{passive:true});
 </script>
 </body>
 </html>

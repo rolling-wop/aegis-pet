@@ -5,6 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const path    = require('path');
 const fs      = require('fs');
 const initSqlJs = require('sql.js');
+const webPush = require('web-push');
+
+// VAPID keys for push notifications
+const VAPID_PUBLIC_KEY  = 'BPCFtrBu2633noWjzOMfBnd7w42erJw2cN0x6jbE5o2oqh0pyR_tHGU_IImkPsb6xPYSnmjOJybq2c-Yta8Zg7I';
+const VAPID_PRIVATE_KEY = 'I-zfOoJUTphho31V2jdBOiD_7h-HEn4SseWSdtLD7zw';
+webPush.setVapidDetails('mailto:aegispet@example.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 const app = express();
 app.use(express.json());
@@ -52,6 +58,13 @@ async function initDB() {
     );
     CREATE TABLE IF NOT EXISTS advisor_sessions (
       token TEXT PRIMARY KEY, created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+    );
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      player_id TEXT NOT NULL, subscription TEXT NOT NULL, created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+    );
+    CREATE TABLE IF NOT EXISTS referral_clicks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, ref_code TEXT NOT NULL, visitor_ip TEXT,
+      converted INTEGER DEFAULT 0, created_at TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
     );
   `);
   saveDB();
@@ -266,9 +279,79 @@ app.post('/api/trial', async (req, res) => {
 });
 
 app.get('/api/ref/:code', (req, res) => {
-  const p = dbGet('SELECT id,name,pet_name,archetype FROM players WHERE referral_code=?',[req.params.code.toUpperCase()]);
+  const code = req.params.code.toUpperCase();
+  const p = dbGet('SELECT id,name,pet_name,archetype FROM players WHERE referral_code=?',[code]);
   if (!p) return res.status(404).json({ error:'Invalid code' });
+  // Log click
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  dbRun('INSERT INTO referral_clicks (ref_code,visitor_ip) VALUES (?,?)', [code, ip]);
   res.json(p);
+});
+
+// Push notification endpoints
+app.get('/api/push/vapid-public-key', (req, res) => {
+  res.json({ publicKey: VAPID_PUBLIC_KEY });
+});
+
+app.post('/api/push/subscribe', (req, res) => {
+  try {
+    const { playerId, subscription } = req.body;
+    if (!playerId || !subscription) return res.status(400).json({ error: 'Missing fields' });
+    // Remove existing subscription for player then insert new one
+    dbRun('DELETE FROM push_subscriptions WHERE player_id = ?', [playerId]);
+    dbRun('INSERT INTO push_subscriptions (player_id, subscription) VALUES (?,?)',
+      [playerId, JSON.stringify(subscription)]);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/push/trigger-daily', advisorAuth, async (req, res) => {
+  try {
+    const subs = dbAll('SELECT * FROM push_subscriptions');
+    let sent = 0, failed = 0;
+    for (const row of subs) {
+      try {
+        const sub = JSON.parse(row.subscription);
+        await webPush.sendNotification(sub, JSON.stringify({
+          title: '⚔️ Your pet needs you!',
+          body: 'Daily trial ready. Keep your guardian strong!',
+          icon: '/icon-192.png',
+          badge: '/icon-192.png'
+        }));
+        sent++;
+      } catch(e) {
+        failed++;
+        // Remove invalid subscription
+        if (e.statusCode === 410) {
+          dbRun('DELETE FROM push_subscriptions WHERE player_id = ?', [row.player_id]);
+        }
+      }
+    }
+    res.json({ ok: true, sent, failed });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Referral stats endpoint
+app.get('/api/referral-stats/:playerId', (req, res) => {
+  try {
+    const player = dbGet('SELECT * FROM players WHERE id=?', [req.params.playerId]);
+    if (!player) return res.status(404).json({ error: 'Not found' });
+    const clicks = dbGet('SELECT COUNT(*) as cnt FROM referral_clicks WHERE ref_code=?', [player.referral_code]);
+    const friends = dbAll('SELECT p.name, p.pet_name, p.archetype, p.created_at, gs.profile_type, gs.vitality, gs.stability, gs.resilience, gs.bond, gs.legacy FROM players p LEFT JOIN game_state gs ON gs.player_id=p.id WHERE p.referred_by=?', [player.referral_code]);
+    const conversions = friends.length;
+    // Mark clicks as converted where we have actual conversions
+    res.json({ clicks: clicks?.cnt || 0, conversions, friends });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Friend comparison endpoint
+app.get('/api/friend-compare/:playerId/:friendId', (req, res) => {
+  try {
+    const me = dbGet('SELECT p.*,gs.vitality,gs.stability,gs.resilience,gs.bond,gs.legacy,gs.guardian_level,gs.trials_complete,gs.beasts_unlocked,gs.evolution_stage FROM players p LEFT JOIN game_state gs ON gs.player_id=p.id WHERE p.id=?', [req.params.playerId]);
+    const friend = dbGet('SELECT p.*,gs.vitality,gs.stability,gs.resilience,gs.bond,gs.legacy,gs.guardian_level,gs.trials_complete,gs.beasts_unlocked,gs.evolution_stage FROM players p LEFT JOIN game_state gs ON gs.player_id=p.id WHERE p.id=?', [req.params.friendId]);
+    if (!me || !friend) return res.status(404).json({ error: 'Not found' });
+    res.json({ me, friend });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── ADVISOR API ───────────────────────────────────────────────────────────────
