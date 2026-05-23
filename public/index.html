@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="AEGIS PET">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 <style>
 :root{--bg:#0a0a0f;--cyan:#00f5d4;--violet:#7b2fff;--amber:#ffb703;--danger:#ff006e;--success:#06d6a0;--txt:#e2e8f0;--muted:#64748b;--border:rgba(0,245,212,0.25)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -318,6 +319,7 @@ select.lc-inp{cursor:pointer}
   <div class="px-title">CHOOSE YOUR GUARDIAN CLASS</div>
   <div class="px-sub">Your archetype shapes your companion's spirit</div>
   <div class="arch-grid" id="arch-grid"></div>
+  <div id="hero-lottie" style="width:140px;height:140px;display:none;margin:8px auto 0"></div>
   <div class="pledge-box" id="pledge-box">
     <div class="pledge-txt" id="pledge-txt"></div>
     <button class="px-btn" style="margin-top:14px" id="pledge-btn" onclick="goToNaming()" style="display:none">[ BIND THE PLEDGE ]</button>
@@ -424,7 +426,7 @@ select.lc-inp{cursor:pointer}
   <div class="ci-bg" id="ci-bg"></div>
   <div class="ci-content">
     <div class="ci-region" id="ci-region"></div>
-    <div class="ci-boss-art" id="ci-boss-art"></div>
+    <div id="ci-boss-lottie" style="width:140px;height:140px"></div>
     <div class="ci-boss-name" id="ci-boss-name"></div>
     <div class="ci-lore" id="ci-lore"></div>
     <button class="px-btn danger ci-enter-btn" id="ci-enter-btn" onclick="startBattle()">[ ENTER BATTLE ]</button>
@@ -443,9 +445,9 @@ select.lc-inp{cursor:pointer}
     </div>
   </div>
   <div class="battle-arena">
-    <div class="battle-pet-side"><div class="battle-pet-art" id="battle-pet-art"></div></div>
+    <div class="battle-pet-side"><div id="battle-pet-lottie" style="width:80px;height:80px"></div></div>
     <div class="battle-vs">VS</div>
-    <div class="battle-boss-side"><div class="battle-boss-art" id="battle-boss-art"></div></div>
+    <div class="battle-boss-side"><div id="battle-boss-lottie" style="width:80px;height:80px"></div></div>
   </div>
   <div class="battle-dialogue" id="battle-dialogue">
     <div class="battle-dialogue-speaker" id="battle-dlg-speaker"></div>
@@ -461,7 +463,7 @@ select.lc-inp{cursor:pointer}
 
 <!-- 9. VICTORY -->
 <div class="screen" id="s-victory">
-  <div class="result-icon">🏆</div>
+  <div id="victory-lottie" style="width:80px;height:80px;margin:0 auto 16px"></div>
   <div class="result-title" style="color:var(--success)">SEAL BROKEN!</div>
   <div class="result-subtitle" id="victory-chapter-name"></div>
   <div class="result-fact" id="victory-fact"></div>
@@ -470,7 +472,7 @@ select.lc-inp{cursor:pointer}
 
 <!-- 10. DEFEAT -->
 <div class="screen" id="s-defeat">
-  <div class="result-icon">💀</div>
+  <div id="defeat-lottie" style="width:80px;height:80px;margin:0 auto 16px"></div>
   <div class="result-title" style="color:var(--danger)">GUARDIAN FALLS</div>
   <div class="result-subtitle" id="defeat-chapter-name"></div>
   <div class="result-fact" id="defeat-fact"></div>
@@ -706,11 +708,11 @@ select.lc-inp{cursor:pointer}
 // GAME DATA
 // ─────────────────────────────────────────────────────────────
 const ARCHETYPES = {
-  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'I see what others miss. I build what others fear.' },
-  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"My strength is my family's safety." },
-  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'I create. I accumulate. I leave a mark.' },
-  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'I adapt. I survive. I thrive on uncertainty.' },
-  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:'I have been tested. I will not break again.' }
+  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'I see what others miss. I build what others fear.', lottieUrl:'https://assets4.lottiefiles.com/packages/lf20_vnikrcia.json' },
+  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"My strength is my family's safety.", lottieUrl:'https://assets1.lottiefiles.com/packages/lf20_syqnfe7c.json' },
+  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'I create. I accumulate. I leave a mark.', lottieUrl:'https://assets6.lottiefiles.com/packages/lf20_bq4xpnlf.json' },
+  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'I adapt. I survive. I thrive on uncertainty.', lottieUrl:'https://assets9.lottiefiles.com/packages/lf20_rwq6ciql.json' },
+  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:'I have been tested. I will not break again.', lottieUrl:'https://assets5.lottiefiles.com/packages/lf20_obhph6wf.json' }
 };
 
 const BEASTS = {
@@ -736,23 +738,23 @@ const CHAPTERS = {
   1:{ name:'THE AWAKENING', region:'Ember Fields', bossName:"Xan'Dra the Debt Dragon", bossColor:'#cc0000',
     bgGradient:'radial-gradient(ellipse at 50% 100%,#3a0000,#180000,#0a0a0f)',
     lore:"Long dormant beneath the financial realm, Xan'Dra awakens. Her debt-fire scorches all who are unprepared. She feeds on unprotected health and frozen income.",
-    bossHpMax:100, bossEmoji:'🐉', scenarios:[101,102,103,104] },
+    bossHpMax:100, bossEmoji:'🐉', lottieUrl:'https://assets3.lottiefiles.com/packages/lf20_UJNc2t.json', scenarios:[101,102,103,104] },
   2:{ name:'THE STORM FRONT', region:'Shattered Markets', bossName:'Marvex the Market Wraith', bossColor:'#7b2fff',
     bgGradient:'radial-gradient(ellipse at 50% 100%,#160030,#0d0018,#0a0a0f)',
     lore:"The markets shatter. Marvex materialises from every panic sell and abandoned policy. She profits from your impatience and fear.",
-    bossHpMax:100, bossEmoji:'👻', scenarios:[201,202,203,204] },
+    bossHpMax:100, bossEmoji:'👻', lottieUrl:'https://assets2.lottiefiles.com/packages/lf20_qp1q7mct.json', scenarios:[201,202,203,204] },
   3:{ name:'THE LONG WINTER', region:'Frost Plains', bossName:'Inflixus the Inflation Specter', bossColor:'#ffb703',
     bgGradient:'radial-gradient(ellipse at 50% 0%,#1a1400,#0d0a00,#0a0a0f)',
     lore:"Silent. Patient. Inflixus erodes everything over time. Those who ignore the Specter wake to find nothing left. Time is her weapon.",
-    bossHpMax:100, bossEmoji:'💀', scenarios:[301,302,303,304] },
+    bossHpMax:100, bossEmoji:'💀', lottieUrl:'https://assets7.lottiefiles.com/packages/lf20_s9miyk3p.json', scenarios:[301,302,303,304] },
   4:{ name:'THE SHADOW DIVIDE', region:'Void Wastes', bossName:'Morvek the Dependency Lord', bossColor:'#4a5568',
     bgGradient:'radial-gradient(ellipse at 50% 50%,#0d0d1e,#080814,#0a0a0f)',
     lore:"Morvek does not attack you. He attacks the people who need you. He binds your dependants as weapons against your will.",
-    bossHpMax:100, bossEmoji:'⛓️', scenarios:[401,402,403,404] },
+    bossHpMax:100, bossEmoji:'⛓️', lottieUrl:'https://assets8.lottiefiles.com/packages/lf20_svy4ivyb.json', scenarios:[401,402,403,404] },
   5:{ name:'THE FINAL SEAL', region:'Legacy Citadel', bossName:'Voidex the Legacy Destroyer', bossColor:'#4c1d95',
     bgGradient:'radial-gradient(ellipse at 50% 30%,#0d0020,#060010,#000)',
     lore:"The final chaos lord. Voidex devours legacies. Everything you've built, everything you'd leave behind — he wants all of it. This is what you have been preparing for.",
-    bossHpMax:150, bossEmoji:'🌑', scenarios:[501,502,503,504] }
+    bossHpMax:150, bossEmoji:'🌑', lottieUrl:'https://assets10.lottiefiles.com/packages/lf20_ystsffqy.json', scenarios:[501,502,503,504] }
 };
 
 const SCENARIOS = {
@@ -1072,6 +1074,27 @@ function showToast(msg,dur=2200){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
+const lottiePlayers={};
+function loadLottie(id,url,fallbackEmoji,loop=true){
+  if(lottiePlayers[id]){try{lottiePlayers[id].destroy();}catch(e){} delete lottiePlayers[id];}
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML='';
+  if(!url){el.innerHTML=`<span style="font-size:80px">${fallbackEmoji}</span>`;return;}
+  try{
+    const a=lottie.loadAnimation({container:el,renderer:'svg',loop,autoplay:true,path:url});
+    a.addEventListener('data_failed',()=>{el.innerHTML=`<span style="font-size:80px">${fallbackEmoji}</span>`;});
+    lottiePlayers[id]=a;
+  }catch(e){el.innerHTML=`<span style="font-size:80px">${fallbackEmoji}</span>`;}
+}
+function heroNav(key){
+  const a=ARCHETYPES[key];
+  if(!a)return;
+  const el=document.getElementById('hero-lottie');
+  if(el)el.style.display='block';
+  loadLottie('hero-lottie',a.lottieUrl,a.emoji);
+}
+
 function typewriter(el, text, speed=22, cb){
   el.textContent=''; let i=0;
   const iv=setInterval(()=>{
@@ -1231,6 +1254,7 @@ function selectArchetype(key,card){
   selectedArchetype=key;
   document.querySelectorAll('.arch-card').forEach(c=>{c.classList.remove('selected','dimmed');c.classList.add('dimmed');});
   card.classList.remove('dimmed');card.classList.add('selected');
+  heroNav(key);
   const pb=document.getElementById('pledge-box');
   document.getElementById('pledge-txt').textContent='"'+ARCHETYPES[key].stmt+'"';
   pb.style.display='block';
@@ -1389,7 +1413,7 @@ function showChapterIntro(chId){
   const ch=CHAPTERS[chId];
 
   const region=document.getElementById('ci-region');
-  const art=document.getElementById('ci-boss-art');
+  const art=document.getElementById('ci-boss-lottie');
   const name=document.getElementById('ci-boss-name');
   const lore=document.getElementById('ci-lore');
   const btn=document.getElementById('ci-enter-btn');
@@ -1405,7 +1429,7 @@ function showChapterIntro(chId){
   lore.textContent='';
 
   document.getElementById('ci-bg').style.background=ch.bgGradient;
-  art.innerHTML=getBossSvg(chId);
+  loadLottie('ci-boss-lottie',ch.lottieUrl,ch.bossEmoji);
   name.textContent=ch.bossName.toUpperCase();
 
   showScreen('s-chapter-intro');
@@ -1464,8 +1488,8 @@ function startChapterBattle(chId){
   const bg=document.getElementById('battle-bg');
   bg.style.background=ch.bgGradient;
   document.getElementById('battle-boss-name-hud').textContent=ch.bossName;
-  document.getElementById('battle-pet-art').textContent=ARCHETYPES[G.archetype]?.emoji||'🐾';
-  document.getElementById('battle-boss-art').innerHTML=getBossSvg(chId);
+  loadLottie('battle-pet-lottie',ARCHETYPES[G.archetype]?.lottieUrl||'',ARCHETYPES[G.archetype]?.emoji||'🐾');
+  loadLottie('battle-boss-lottie',CHAPTERS[chId]?.lottieUrl||'',CHAPTERS[chId]?.bossEmoji||'👾');
   updateHUD();
   showScreen('s-battle');
   loadScenario(battleState.scenarioIds[0]);
@@ -1594,7 +1618,7 @@ async function applyCorrectChoice(){
   // boss hurt
   setTimeout(()=>animateBoss('hurt'),400);
   // damage number on boss
-  showDamage('-25',document.getElementById('battle-boss-art'),true);
+  showDamage('-25',document.getElementById('battle-boss-lottie'),true);
   // server call
   const scId=battleState.scenarioIds[battleState.scenarioIndex];
   const sc=SCENARIOS[scId];
@@ -1629,7 +1653,7 @@ async function applyWrongChoice(dim, feedback){
   animateBoss('attack');
   setTimeout(()=>{animatePet('hurt');triggerScreenShake();},350);
   battleState.hearts=Math.max(0,battleState.hearts-1);
-  showDamage('-❤️',document.getElementById('battle-pet-art'),false);
+  showDamage('-❤️',document.getElementById('battle-pet-lottie'),false);
   updateHUD();
   // server call
   const scId=battleState.scenarioIds[battleState.scenarioIndex];
@@ -1678,6 +1702,7 @@ function showVictory(chId){
   const ch=CHAPTERS[chId];
   document.getElementById('victory-chapter-name').textContent=ch.name+' — SEAL BROKEN';
   document.getElementById('victory-fact').textContent='The '+ch.bossName+' retreats. The realm breathes again. Continue your journey, Guardian.';
+  loadLottie('victory-lottie','https://assets1.lottiefiles.com/packages/lf20_touohxv0.json','🏆',false);
   showScreen('s-victory');
   spawnConfetti();
 }
@@ -1686,6 +1711,7 @@ function showDefeat(chId){
   const ch=CHAPTERS[chId];
   document.getElementById('defeat-chapter-name').textContent=ch.name+' — CHAPTER FAILED';
   document.getElementById('defeat-fact').textContent='You fought. You fell. But a fallen guardian is not destroyed — only reminded of what matters. Study the gaps. Rise stronger.';
+  loadLottie('defeat-lottie','https://assets3.lottiefiles.com/packages/lf20_XAGkFCFmpb.json','💀',false);
   showScreen('s-defeat');
 }
 
@@ -1702,15 +1728,15 @@ function afterChapter(){
 
 // ─── ANIMATIONS ───
 function animatePet(type){
-  const el=document.getElementById('battle-pet-art');
+  const el=document.getElementById('battle-pet-lottie');
   el.style.animation='none';
   setTimeout(()=>{el.style.animation=`pet${type.charAt(0).toUpperCase()+type.slice(1)} 0.5s ease`;},20);
-  setTimeout(()=>{el.style.animation='petIdle 2s ease-in-out infinite';},600);
+  setTimeout(()=>{el.style.animation='none';},600);
 }
 function animateBoss(type){
-  const el=document.getElementById('battle-boss-art');
+  const el=document.getElementById('battle-boss-lottie');
   el.style.animation=`boss${type.charAt(0).toUpperCase()+type.slice(1)} 0.5s ease`;
-  setTimeout(()=>{el.style.animation='bossFloat 3s ease-in-out infinite';},600);
+  setTimeout(()=>{el.style.animation='none';},600);
 }
 function triggerScreenShake(){
   document.body.classList.add('screen-shake');
