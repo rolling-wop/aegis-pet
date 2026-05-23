@@ -60,6 +60,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
 .pledge-box{background:rgba(0,245,212,.05);border:1px solid var(--border);border-radius:4px;padding:12px 18px;max-width:480px;width:100%;margin-top:14px;text-align:center;display:none}
 .pledge-txt{font-family:'VT323';font-size:18px;color:var(--cyan);font-style:italic}
 
+/* ── HERO SELECT ── */
+#s-archetype{padding:0;overflow:hidden}
+.hero-select-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;padding:20px 60px;gap:10px;text-align:center}
+.hero-eyebrow{font-family:'Press Start 2P';font-size:7px;color:rgba(255,255,255,.25);letter-spacing:3px;margin-bottom:4px}
+.hero-card{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:320px;transition:opacity .3s ease,transform .3s ease}
+.hero-card.slide-out{opacity:0;transform:translateX(-40px)}
+.hero-card.slide-in{animation:heroSlideIn .3s ease forwards}
+@keyframes heroSlideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.hero-lottie-ring{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.hero-ring-anim{position:absolute;border-radius:50%;border:2px solid var(--hero-color,#00f5d4);animation:ringPulse 2s ease-in-out infinite}
+.hero-ring-1{width:120px;height:120px;opacity:.5}
+.hero-ring-2{width:150px;height:150px;opacity:.2;animation-delay:.6s}
+.hero-role{font-family:'Press Start 2P';font-size:6px;letter-spacing:4px;color:var(--hero-color,#00f5d4);opacity:.7;text-transform:uppercase}
+.hero-name{font-family:'Press Start 2P';font-size:clamp(11px,3.5vw,15px);color:var(--hero-color,#00f5d4);text-shadow:0 0 16px var(--hero-color,#00f5d4);letter-spacing:2px}
+.hero-stmt{font-family:'VT323';font-size:clamp(15px,4.5vw,19px);color:rgba(255,255,255,.55);font-style:italic;max-width:280px;line-height:1.5}
+.hero-stats{width:100%;max-width:260px;display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.hero-stat-row{display:flex;align-items:center;gap:8px}
+.hero-stat-lbl{font-family:'Press Start 2P';font-size:6px;color:rgba(255,255,255,.35);width:60px;flex-shrink:0;text-align:right}
+.hero-stat-track{flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.hero-stat-fill{height:100%;border-radius:2px;background:var(--hero-color,#00f5d4);transition:width .6s ease}
+.hero-dots{display:flex;gap:8px;margin:8px 0 4px}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s;cursor:pointer}
+.hero-dot.active{background:var(--hero-color,#00f5d4);box-shadow:0 0 8px var(--hero-color,#00f5d4);transform:scale(1.3)}
+.hero-nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);font-size:14px;padding:14px 10px;cursor:pointer;z-index:20;border-radius:4px;transition:all .2s}
+.hero-nav-btn:hover{border-color:var(--hero-color,#00f5d4);color:var(--hero-color,#00f5d4)}
+#hero-prev{left:6px}
+#hero-next{right:6px}
+.hero-choose-btn{margin-top:4px}
+
 /* ── NAMING ── */
 #s-naming{background:var(--bg)}
 .naming-row{display:flex;align-items:center;gap:10px;margin:12px 0}
@@ -97,6 +126,34 @@ select.lc-inp{cursor:pointer}
 .lc-check-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--cyan)}
 .lc-check-row label{font-family:'VT323';font-size:13px;color:var(--muted);line-height:1.4}
 
+/* ── QUEST TILES ── */
+.quest-tiles{display:flex;gap:8px;width:100%}
+.quest-tile{flex:1;background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px}
+.quest-tile:active{transform:scale(.97)}
+.quest-tile.selected{background:rgba(0,245,212,.1);border-color:var(--cyan);box-shadow:0 0 16px rgba(0,245,212,.2)}
+.quest-tile.dimmed{opacity:.3;filter:grayscale(.7)}
+.quest-tile-icon{font-size:32px;line-height:1}
+.quest-tile-name{font-family:'Press Start 2P';font-size:6px;color:var(--cyan);letter-spacing:.5px}
+.quest-tile-desc{font-family:'VT323';font-size:12px;color:rgba(255,255,255,.4);line-height:1.3}
+
+/* ── TUTORIAL BATTLE ── */
+#s-tutorial{background:radial-gradient(ellipse at 50% 100%,#3a0000,#180000,#0a0a0f);justify-content:flex-start;align-items:center;overflow-y:auto;padding:0}
+.tut-scroll{width:100%;max-width:480px;padding:24px 16px 40px;display:flex;flex-direction:column;gap:12px;margin:0 auto}
+.tut-badge{font-family:'Press Start 2P';font-size:7px;color:var(--cyan);letter-spacing:3px;text-align:center;padding:6px 16px;border:1px solid rgba(0,245,212,.3);border-radius:4px;align-self:center}
+.tut-boss-card{background:rgba(204,0,0,.07);border:1px solid rgba(204,0,0,.25);border-radius:8px;padding:14px 16px}
+.tut-boss-art{display:flex;align-items:center;gap:14px}
+.tut-boss-quote{font-family:'VT323';font-size:clamp(14px,4.5vw,18px);color:rgba(255,120,120,.85);font-style:italic;line-height:1.5;flex:1}
+.tut-situation{font-family:'VT323';font-size:clamp(14px,4.5vw,18px);color:rgba(255,255,255,.65);line-height:1.7;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px}
+.tut-question{font-family:'Press Start 2P';font-size:clamp(8px,2.5vw,10px);color:var(--cyan);text-align:center;padding:0 4px;line-height:1.8}
+.tut-choices{display:flex;flex-direction:column;gap:8px}
+.tut-result{display:none;flex-direction:column;align-items:center;text-align:center;padding:16px;border-radius:8px;gap:8px}
+.tut-result.correct{background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.3)}
+.tut-result.wrong{background:rgba(255,0,110,.06);border:1px solid rgba(255,0,110,.2)}
+.tut-result-icon{font-size:44px}
+.tut-result-title{font-family:'Press Start 2P';font-size:9px;line-height:1.6}
+.tut-result-text{font-family:'VT323';font-size:16px;color:rgba(255,255,255,.55);line-height:1.5}
+.tut-continue{margin-top:8px;font-size:8px!important;width:100%}
+
 /* ── WORLD MAP ── */
 #s-worldmap{background:var(--bg);justify-content:flex-start;padding:0;overflow-y:auto}
 .wm-header{display:flex;align-items:center;gap:12px;padding:16px 16px 8px;width:100%;max-width:480px;margin:0 auto}
@@ -124,6 +181,19 @@ select.lc-inp{cursor:pointer}
 .wm-nav-btn:hover,.wm-nav-btn:active{background:rgba(0,245,212,.08);border-color:var(--cyan);color:var(--cyan)}
 .wm-game-complete-btn{display:block;width:100%;max-width:452px;margin:0 auto 12px;font-family:'Press Start 2P';font-size:8px;padding:14px;background:rgba(0,245,212,.08);border:1px solid var(--cyan);color:var(--cyan);border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:1px}
 .wm-game-complete-btn:hover{background:rgba(0,245,212,.15)}
+
+/* ── LIVING WORLD MAP ── */
+.wm-pet-display{animation:petIdle 2s ease-in-out infinite}
+.wm-node.active{animation:nodeGlow 2s ease-in-out infinite}
+@keyframes nodeGlow{0%,100%{box-shadow:0 0 20px rgba(0,245,212,.15),inset 0 0 20px rgba(0,245,212,.03)}50%{box-shadow:0 0 35px rgba(0,245,212,.35),inset 0 0 35px rgba(0,245,212,.08)}}
+.wm-node.active .wm-node-status{display:inline-block;animation:activeBossPulse 1.5s ease-in-out infinite}
+@keyframes activeBossPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.wm-node.cleared .wm-node-status{animation:clearedSpark 2s ease-in-out infinite}
+@keyframes clearedSpark{0%,100%{opacity:1}50%{opacity:.6;filter:brightness(1.4)}}
+.wm-node.locked{position:relative;overflow:hidden}
+.wm-node.locked::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.45);border-radius:10px;pointer-events:none;backdrop-filter:blur(1px)}
+.wm-boss-taunt{font-family:'VT323';font-size:13px;color:rgba(255,80,80,.65);margin-top:2px;min-height:15px;transition:opacity .6s;font-style:italic}
+.wm-social-proof{font-family:'VT323';font-size:12px;color:rgba(255,255,255,.22);margin-top:2px}
 
 /* ── CHAPTER INTRO ── */
 #s-chapter-intro{background:#000;overflow:hidden}
@@ -316,14 +386,22 @@ select.lc-inp{cursor:pointer}
 
 <!-- 2. ARCHETYPE -->
 <div class="screen" id="s-archetype">
-  <div class="px-title">CHOOSE YOUR GUARDIAN CLASS</div>
-  <div class="px-sub">Your archetype shapes your companion's spirit</div>
-  <div class="arch-grid" id="arch-grid"></div>
-  <div id="hero-lottie" style="width:140px;height:140px;display:none;margin:8px auto 0"></div>
-  <div class="pledge-box" id="pledge-box">
-    <div class="pledge-txt" id="pledge-txt"></div>
-    <button class="px-btn" style="margin-top:14px" id="pledge-btn" onclick="goToNaming()" style="display:none">[ BIND THE PLEDGE ]</button>
+  <div class="hero-select-wrap" id="hero-select-wrap">
+    <div class="hero-eyebrow">CHOOSE YOUR GUARDIAN CLASS</div>
+    <div class="hero-card" id="hero-card">
+      <div class="hero-lottie-ring" id="hero-ring">
+        <div id="hero-lottie" style="width:130px;height:130px;"></div>
+      </div>
+      <div class="hero-role" id="hero-role"></div>
+      <div class="hero-name" id="hero-name"></div>
+      <div class="hero-stmt" id="hero-stmt"></div>
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+    <div class="hero-dots" id="hero-dots"></div>
+    <button class="px-btn hero-choose-btn" id="hero-choose-btn" onclick="goToNaming()">[ FORGE THIS PATH ]</button>
   </div>
+  <button class="hero-nav-btn" id="hero-prev" onclick="heroNavIdx(-1)">&#9664;</button>
+  <button class="hero-nav-btn" id="hero-next" onclick="heroNavIdx(1)">&#9654;</button>
 </div>
 
 <!-- 3. NAMING -->
@@ -355,33 +433,67 @@ select.lc-inp{cursor:pointer}
   <button class="px-btn" id="hatch-btn" onclick="startHatch()" style="margin-top:16px">[ HATCH ]</button>
 </div>
 
+<!-- 4.5: TUTORIAL BATTLE -->
+<div class="screen" id="s-tutorial">
+  <div class="tut-scroll" id="tut-scroll">
+    <div class="tut-badge">⚔ YOUR FIRST TRIAL</div>
+    <div class="tut-boss-card" id="tut-boss-card">
+      <div class="tut-boss-art">
+        <div class="boss-emoji-art" style="--ring:#cc0000;width:60px;height:60px">
+          <div class="boss-emoji-inner" style="font-size:40px">🐉</div>
+          <div class="boss-ring boss-ring-1"></div>
+        </div>
+        <div class="tut-boss-quote" id="tut-boss-quote"></div>
+      </div>
+    </div>
+    <div class="tut-situation" id="tut-situation"></div>
+    <div class="tut-question" id="tut-question"></div>
+    <div class="tut-choices" id="tut-choices"></div>
+    <div class="tut-result" id="tut-result">
+      <div class="tut-result-icon" id="tut-result-icon"></div>
+      <div class="tut-result-title" id="tut-result-title"></div>
+      <div class="tut-result-text" id="tut-result-text"></div>
+      <button class="px-btn tut-continue" id="tut-continue" onclick="showScreen('s-lead')">[ SEAL YOUR NAME IN THE CHRONICLES ]</button>
+    </div>
+  </div>
+</div>
+
 <!-- 5. LEAD CAPTURE -->
 <div class="screen" id="s-lead">
-  <div class="px-title">YOUR COMPANION NEEDS A HOME</div>
-  <div class="px-sub" id="lead-sub">Register to protect <span id="lead-petname"></span></div>
+  <div class="px-title">SEAL YOUR NAME IN THE CHRONICLES</div>
+  <div class="px-sub">Your first trial is complete. The realm records all who dare enter.</div>
   <div style="font-size:52px;margin:8px 0" id="lead-pet-emoji"></div>
   <div class="lc-form">
     <div class="lc-group">
-      <div class="lc-label">YOUR NAME</div>
+      <div class="lc-label">GUARDIAN NAME</div>
       <input class="lc-inp" id="lc-name" type="text" placeholder="Full name">
     </div>
     <div class="lc-group">
-      <div class="lc-label">WHATSAPP NUMBER</div>
+      <div class="lc-label">SIGNAL RUNE (WHATSAPP)</div>
       <div class="lc-phone-row">
         <div class="lc-prefix">+65</div>
         <input class="lc-inp" id="lc-phone" type="tel" placeholder="8-digit number" maxlength="8">
       </div>
     </div>
     <div class="lc-group">
-      <div class="lc-label">WHAT MATTERS MOST TO YOU?</div>
-      <select class="lc-inp" id="lc-matters">
-        <option value="My health">My health</option>
-        <option value="My family">My family</option>
-        <option value="My wealth">My wealth</option>
-        <option value="My career">My career</option>
-        <option value="My future">My future</option>
-        <option value="Not sure">Not sure</option>
-      </select>
+      <div class="lc-label">YOUR QUEST</div>
+      <div class="quest-tiles" id="quest-tiles">
+        <div class="quest-tile selected" data-val="My family" onclick="selectQuestTile(this)">
+          <div class="quest-tile-icon">🛡</div>
+          <div class="quest-tile-name">PROTECT</div>
+          <div class="quest-tile-desc">Family &amp; health</div>
+        </div>
+        <div class="quest-tile" data-val="My wealth" onclick="selectQuestTile(this)">
+          <div class="quest-tile-icon">📈</div>
+          <div class="quest-tile-name">GROW</div>
+          <div class="quest-tile-desc">Wealth &amp; career</div>
+        </div>
+        <div class="quest-tile" data-val="My future" onclick="selectQuestTile(this)">
+          <div class="quest-tile-icon">⭐</div>
+          <div class="quest-tile-name">SECURE</div>
+          <div class="quest-tile-desc">Future-proof</div>
+        </div>
+      </div>
     </div>
     <div class="lc-group">
       <div class="lc-label">REFERRAL CODE (optional)</div>
@@ -392,7 +504,7 @@ select.lc-inp{cursor:pointer}
       <label for="lc-pdpa">I consent to being contacted by a financial advisor about my AEGIS PET results. My data is used for advisory purposes only.</label>
     </div>
   </div>
-  <button class="px-btn" style="margin-top:16px" id="lead-btn" onclick="doLeadCapture()">[ ENTER THE REALM ]</button>
+  <button class="px-btn" style="margin-top:16px" id="lead-btn" onclick="doLeadCapture()">[ SEAL THE COVENANT ]</button>
 </div>
 
 <!-- 6. WORLD MAP -->
@@ -1044,6 +1156,14 @@ const TAROT_DATA = {
     advice:"The Star's light reaches farthest when it stops drifting and picks a direction."}
 };
 
+const BOSS_TAUNTS = {
+  1:["I smell unprotected health...","Your vault has no walls, Guardian.","Debt chains are already forming..."],
+  2:["The markets are mine tonight.","Every impatient guardian feeds me.","Panic is my favourite weapon..."],
+  3:["I have already stolen 4% of your hoard.","Time makes me stronger.","Silent. Patient. Inevitable..."],
+  4:["Your dependants are watching...","Who protects them when you fall?","The chains are already set."],
+  5:["I devour legacies.","Everything you built... mine.","The final seal awaits."]
+};
+
 // ─────────────────────────────────────────────────────────────
 // GAME STATE
 // ─────────────────────────────────────────────────────────────
@@ -1053,10 +1173,15 @@ const G = {
   vitality:40, stability:40, resilience:40, bond:40, legacy:40,
   xp:0, guardianLevel:1, trialsComplete:0, evolutionStage:1,
   beastsUnlocked:[], scenariosDone:[],
-  chapters:[], gameComplete:false
+  chapters:[], gameComplete:false, tutorialCorrect:null
 };
 
 let selectedArchetype = null;
+let selectedMatters = 'My family';
+const HERO_ORDER = ['VISIONARY','PROTECTOR','BUILDER','WANDERER','SURVIVOR'];
+let currentHeroIndex = 0;
+let heroTouchStartX = 0;
+let bossTauntInterval = null;
 let battleState = { chapterId:0, scenarioIndex:0, scenarioIds:[], hearts:5, bossHp:100, bossHpMax:100, timer:null, timerVal:30, locked:false, currentChapter:null };
 
 // ─────────────────────────────────────────────────────────────
@@ -1232,33 +1357,94 @@ function skipCinematic(){
   goToArchetype();
 }
 function goToArchetype(){
-  buildArchGrid();
+  currentHeroIndex = 0;
+  renderHeroSelect(currentHeroIndex);
+  buildHeroDots();
   showScreen('s-archetype');
+  // swipe detection
+  const screen = document.getElementById('s-archetype');
+  screen.ontouchstart = e => { heroTouchStartX = e.touches[0].clientX; };
+  screen.ontouchend = e => {
+    const dx = e.changedTouches[0].clientX - heroTouchStartX;
+    if(Math.abs(dx) > 50) heroNavIdx(dx < 0 ? 1 : -1);
+  };
 }
 
 // ─────────────────────────────────────────────────────────────
 // ARCHETYPE
 // ─────
-function buildArchGrid(){
-  const g=document.getElementById('arch-grid');
-  g.innerHTML='';
-  Object.entries(ARCHETYPES).forEach(([key,a])=>{
-    const c=document.createElement('div');
-    c.className='arch-card';
-    c.innerHTML=`<span class="arch-emoji">${a.emoji}</span><div class="arch-name">${a.name}</div><div class="arch-stmt">${a.stmt}</div>`;
-    c.onclick=()=>selectArchetype(key,c);
-    g.appendChild(c);
+function buildArchGrid(){} // no-op: replaced by heroSelect
+function selectArchetype(key){ renderHeroSelect(HERO_ORDER.indexOf(key)); }
+
+function buildHeroDots(){
+  const d = document.getElementById('hero-dots');
+  d.innerHTML = '';
+  HERO_ORDER.forEach((k,i) => {
+    const dot = document.createElement('div');
+    dot.className = 'hero-dot' + (i===0?' active':'');
+    dot.onclick = () => { currentHeroIndex=i; renderHeroSelect(i); updateHeroDots(); };
+    d.appendChild(dot);
   });
 }
-function selectArchetype(key,card){
-  selectedArchetype=key;
-  document.querySelectorAll('.arch-card').forEach(c=>{c.classList.remove('selected','dimmed');c.classList.add('dimmed');});
-  card.classList.remove('dimmed');card.classList.add('selected');
+
+function updateHeroDots(){
+  document.querySelectorAll('.hero-dot').forEach((d,i)=>{
+    d.classList.toggle('active', i===currentHeroIndex);
+    const color = ARCHETYPES[HERO_ORDER[currentHeroIndex]].color;
+    if(i===currentHeroIndex) d.style.background = color;
+    else d.style.background = '';
+  });
+}
+
+function heroNavIdx(dir){
+  currentHeroIndex = (currentHeroIndex + dir + HERO_ORDER.length) % HERO_ORDER.length;
+  const card = document.getElementById('hero-card');
+  card.classList.add('slide-out');
+  setTimeout(()=>{
+    card.classList.remove('slide-out');
+    renderHeroSelect(currentHeroIndex);
+    card.classList.add('slide-in');
+    setTimeout(()=>card.classList.remove('slide-in'),350);
+  },150);
+  updateHeroDots();
+}
+
+function renderHeroSelect(idx){
+  const key = HERO_ORDER[idx];
+  const a = ARCHETYPES[key];
+  selectedArchetype = key;
+  G.archetype = key;
+  document.documentElement.style.setProperty('--hero-color', a.color);
+  document.getElementById('hero-role').textContent = a.role || '';
+  document.getElementById('hero-name').textContent = a.name;
+  document.getElementById('hero-stmt').textContent = '"' + a.stmt + '"';
+  // stats
+  const stats = a.stats || {power:75,vision:75,resilience:75};
+  document.getElementById('hero-stats').innerHTML = ['POWER','VISION','RESILIENCE'].map(s=>{
+    const val = stats[s.toLowerCase()] || 75;
+    return `<div class="hero-stat-row"><div class="hero-stat-lbl">${s}</div><div class="hero-stat-track"><div class="hero-stat-fill" style="width:${val}%;background:${a.color}"></div></div></div>`;
+  }).join('');
+  // ring color
+  const ring = document.getElementById('hero-ring');
+  ring.style.setProperty('--hero-color', a.color);
+  // remove old rings, add new
+  ring.querySelectorAll('.hero-ring-anim').forEach(r=>r.remove());
+  ['hero-ring-1','hero-ring-2'].forEach(cls=>{
+    const r=document.createElement('div');
+    r.className='hero-ring-anim '+cls;
+    r.style.borderColor=a.color;
+    ring.appendChild(r);
+  });
+  // nav btn colors
+  ['hero-prev','hero-next'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn) btn.style.setProperty('--hero-color',a.color);
+  });
+  // choose btn
+  const cb=document.getElementById('hero-choose-btn');
+  if(cb){ cb.style.borderColor=a.color; cb.style.color=a.color; cb.style.boxShadow=`0 0 16px ${a.color}44`; }
+  // load lottie
   heroNav(key);
-  const pb=document.getElementById('pledge-box');
-  document.getElementById('pledge-txt').textContent='"'+ARCHETYPES[key].stmt+'"';
-  pb.style.display='block';
-  document.getElementById('pledge-btn').style.display='inline-block';
 }
 function goToNaming(){
   if(!selectedArchetype){showToast('Choose your archetype first');return;}
@@ -1306,9 +1492,8 @@ function startHatch(){
         hs.classList.remove('active');
         hs.style.opacity='0';
         hs.style.pointerEvents='none';
-        showScreen('s-lead');
-        document.getElementById('lead-petname').textContent=G.petName;
-        document.getElementById('lead-pet-emoji').textContent=ARCHETYPES[G.archetype]?.emoji||'🐾';
+        showScreen('s-tutorial');
+        initTutorialBattle();
         hatchStarted=false;
       },2200);
     },600);
@@ -1325,11 +1510,67 @@ function spawnConfetti(){
   }
 }
 
+// ─── QUEST TILE ───
+function selectQuestTile(el){
+  selectedMatters = el.dataset.val;
+  document.querySelectorAll('.quest-tile').forEach(t=>{
+    t.classList.remove('selected','dimmed');
+    t.classList.add(t===el?'selected':'dimmed');
+  });
+}
+
+// ─── TUTORIAL BATTLE ───
+function initTutorialBattle(){
+  const sc = SCENARIOS[101];
+  if(!sc){ showScreen('s-lead'); return; }
+  document.getElementById('tut-boss-quote').textContent = '"' + sc.bossLine + '"';
+  document.getElementById('tut-situation').textContent = sc.situation;
+  document.getElementById('tut-question').textContent = sc.question;
+  // Reset result
+  const res=document.getElementById('tut-result');
+  res.style.display='none'; res.className='tut-result';
+  document.getElementById('tut-continue').style.display='none';
+  // Build choices
+  const cc=document.getElementById('tut-choices');
+  cc.innerHTML='';
+  const shuffled=[...sc.choices].sort(()=>Math.random()-.5);
+  shuffled.forEach(ch=>{
+    const btn=document.createElement('button');
+    btn.className='battle-choice';
+    btn.dataset.correct=ch.correct;
+    btn.dataset.feedback=ch.feedback;
+    btn.innerHTML=`<span class="choice-label">${ch.id}</span>${ch.text}`;
+    btn.onclick=()=>submitTutChoice(btn, cc);
+    cc.appendChild(btn);
+  });
+}
+
+function submitTutChoice(btn, cc){
+  document.querySelectorAll('#tut-choices .battle-choice').forEach(b=>{ b.onclick=null; b.classList.add('disabled'); });
+  const correct=btn.dataset.correct==='true';
+  const feedback=btn.dataset.feedback;
+  btn.classList.add(correct?'correct':'wrong');
+  if(!correct){ cc.querySelectorAll('.battle-choice').forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); }); }
+  G.tutorialCorrect=correct;
+  flashScreen(correct?'rgba(6,214,160,0.25)':'rgba(255,0,110,0.2)');
+  setTimeout(()=>{
+    const res=document.getElementById('tut-result');
+    res.style.display='flex';
+    res.className='tut-result '+(correct?'correct':'wrong');
+    document.getElementById('tut-result-icon').textContent=correct?'⚔️':'💀';
+    document.getElementById('tut-result-title').textContent=correct?'FIRST BLOW LANDED!':'THE DRAGON STRIKES FIRST.';
+    document.getElementById('tut-result-title').style.color=correct?'var(--success)':'var(--danger)';
+    document.getElementById('tut-result-text').textContent=correct?'Your guardian is strong. The realm takes note.':'The realm is harsh — but you learn fast.';
+    document.getElementById('tut-continue').style.display='block';
+    document.getElementById('tut-result').scrollIntoView({behavior:'smooth',block:'center'});
+  },1800);
+}
+
 // ─── LEAD CAPTURE ───
 async function doLeadCapture(){
   const name=document.getElementById('lc-name').value.trim();
   const phone=document.getElementById('lc-phone').value.trim();
-  const matters=document.getElementById('lc-matters').value;
+  const matters=selectedMatters||'My family';
   const ref=document.getElementById('lc-ref').value.trim();
   const pdpa=document.getElementById('lc-pdpa').checked;
   if(!name||!phone){showToast('Name and WhatsApp required');return;}
@@ -1357,7 +1598,7 @@ async function doLeadCapture(){
     showScreen('s-worldmap');
   }catch(e){
     showToast('Error: '+e.message);
-    btn.textContent='[ ENTER THE REALM ]';btn.disabled=false;
+    btn.textContent='[ SEAL THE COVENANT ]';btn.disabled=false;
   }
 }
 
@@ -1379,7 +1620,10 @@ function renderWorldMap(){
     const statusIcon=status==='cleared'?'✅':status==='active'?'⚔️':status==='failed'?'⚠️':'🔒';
     const node=document.createElement('div');
     node.className='wm-node '+status;
-    node.innerHTML=`<div class="wm-node-num">CH${i}</div><div class="wm-node-info"><div class="wm-node-name">${ch.name}</div><div class="wm-node-region">${ch.region} · ${ch.bossEmoji}</div></div><div class="wm-node-status">${statusIcon}</div>`;
+    const tauntLine = status==='active' ? `<div class="wm-boss-taunt" data-chapter="${i}" style="opacity:1">${(BOSS_TAUNTS[i]||[''])[0]}</div>` : '';
+    const proofNum = status==='active' ? (18+((i*7+G.xp)%30)) : (23+((i*11+G.trialsComplete)%67));
+    const proofLine = status==='active' ? `<div class="wm-social-proof">🔥 ${proofNum} Guardians challenged this week</div>` : status==='cleared' ? `<div class="wm-social-proof">✨ You are among ${proofNum} Guardians to clear this</div>` : '';
+    node.innerHTML=`<div class="wm-node-num">CH${i}</div><div class="wm-node-info"><div class="wm-node-name">${ch.name}</div><div class="wm-node-region">${ch.region} · ${ch.bossEmoji}</div>${tauntLine}${proofLine}</div><div class="wm-node-status">${statusIcon}</div>`;
     if(status==='active'||status==='cleared'||status==='failed'){
       node.onclick=()=>showChapterIntro(i);
     }
@@ -1393,6 +1637,28 @@ function renderWorldMap(){
   if(allDone){
     ebw.innerHTML=`<button class="wm-game-complete-btn" onclick="showEnding()">[ YOUR FINAL ENDING ]</button>`;
   }
+  startBossTaunts();
+}
+
+function startBossTaunts(){
+  clearInterval(bossTauntInterval);
+  const tauntEls = document.querySelectorAll('.wm-boss-taunt[data-chapter]');
+  if(!tauntEls.length) return;
+  const indices = {};
+  tauntEls.forEach(el=>{ indices[el.dataset.chapter]=0; });
+  bossTauntInterval = setInterval(()=>{
+    tauntEls.forEach(el=>{
+      const ch=parseInt(el.dataset.chapter);
+      const taunts=BOSS_TAUNTS[ch]||[];
+      if(!taunts.length) return;
+      el.style.opacity='0';
+      setTimeout(()=>{
+        indices[ch]=(indices[ch]+1)%taunts.length;
+        el.textContent=taunts[indices[ch]];
+        el.style.opacity='1';
+      },600);
+    });
+  },4000);
 }
 
 function enterCurrentChapter(){
@@ -2032,6 +2298,7 @@ async function doRestart(){
 // ─── SCREEN OVERRIDE FOR PROFILE ───
 const _origShowScreen=showScreen;
 window.showScreen=function(id){
+  if(id !== 's-worldmap') clearInterval(bossTauntInterval);
   _origShowScreen(id);
   if(id==='s-profile') renderProfile();
 };
