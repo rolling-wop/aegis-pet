@@ -13,10 +13,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 <style>
-:root{--bg:#0a0a0f;--cyan:#00f5d4;--violet:#7b2fff;--amber:#ffb703;--danger:#ff006e;--success:#06d6a0;--txt:#e2e8f0;--muted:#64748b;--border:rgba(0,245,212,0.25)}
+:root{--bg:#0d0d1f;--cyan:#00f5d4;--violet:#7b2fff;--amber:#ffb703;--danger:#ff006e;--success:#06d6a0;--txt:#e2e8f0;--muted:#64748b;--border:rgba(0,245,212,0.25)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'VT323',monospace}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,212,0.015) 3px,rgba(0,245,212,0.015) 4px)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:radial-gradient(ellipse 120% 80% at 50% -20%,rgba(100,60,220,0.12),transparent 60%)}
 
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10;overflow-y:auto}
 .screen.active{opacity:1;pointer-events:all}
@@ -179,6 +179,7 @@ select.lc-inp{cursor:pointer}
 .wm-nav{display:flex;gap:8px;padding:12px 14px 24px;width:100%;max-width:480px;margin:0 auto}
 .wm-nav-btn{flex:1;font-family:'Press Start 2P';font-size:7px;padding:11px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.5);border-radius:8px;cursor:pointer;transition:all .2s}
 .wm-nav-btn:hover,.wm-nav-btn:active{background:rgba(0,245,212,.08);border-color:var(--cyan);color:var(--cyan)}
+.wm-nav-primary{border-color:var(--cyan);color:var(--cyan);font-size:11px;padding:14px 40px;box-shadow:0 0 20px rgba(0,245,212,0.2)}
 .wm-game-complete-btn{display:block;width:100%;max-width:452px;margin:0 auto 12px;font-family:'Press Start 2P';font-size:8px;padding:14px;background:rgba(0,245,212,.08);border:1px solid var(--cyan);color:var(--cyan);border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:1px}
 .wm-game-complete-btn:hover{background:rgba(0,245,212,.15)}
 
@@ -386,7 +387,7 @@ select.lc-inp{cursor:pointer}
   <div class="grid-bg"></div>
   <div class="cine-wrap">
     <div class="cine-logo">AEGIS PET</div>
-    <div class="cine-sub-logo">CHRONICLES OF THE GUARDIAN REALM</div>
+    <div class="cine-sub-logo">FIND YOUR FINANCIAL SPIRIT ANIMAL</div>
     <div class="cine-text" id="cine-text"></div>
   </div>
   <button class="skip-hint" id="cine-skip-btn" onclick="skipCinematic()">[ SKIP ]</button>
@@ -461,14 +462,14 @@ select.lc-inp{cursor:pointer}
       <div class="tut-result-icon" id="tut-result-icon"></div>
       <div class="tut-result-title" id="tut-result-title"></div>
       <div class="tut-result-text" id="tut-result-text"></div>
-      <button class="px-btn tut-continue" id="tut-continue" onclick="showScreen('s-lead')">[ SEAL YOUR NAME IN THE CHRONICLES ]</button>
+      <button class="px-btn tut-continue" id="tut-continue" onclick="startGuestGame()">[ START YOUR JOURNEY ]</button>
     </div>
   </div>
 </div>
 
 <!-- 5. LEAD CAPTURE -->
 <div class="screen" id="s-lead">
-  <div class="px-title">SEAL YOUR NAME IN THE CHRONICLES</div>
+  <div class="px-title">SEAL YOUR NAME</div>
   <div class="px-sub">Your first trial is complete. The realm records all who dare enter.</div>
   <div style="font-size:52px;margin:8px 0" id="lead-pet-emoji"></div>
   <div class="lc-form">
@@ -509,7 +510,7 @@ select.lc-inp{cursor:pointer}
     </div>
     <div class="lc-check-row">
       <input type="checkbox" id="lc-pdpa">
-      <label for="lc-pdpa">I consent to being contacted by a financial advisor about my AEGIS PET results. My data is used for advisory purposes only.</label>
+      <label for="lc-pdpa">Yes — I want Dylan to break down my results with me personally 🤙</label>
     </div>
   </div>
   <button class="px-btn" style="margin-top:16px" id="lead-btn" onclick="doLeadCapture()">[ SEAL THE COVENANT ]</button>
@@ -534,10 +535,7 @@ select.lc-inp{cursor:pointer}
   <div class="wm-chapters" id="wm-chapters"></div>
   <div id="wm-ending-btn-wrap"></div>
   <div class="wm-nav">
-    <button class="wm-nav-btn" onclick="enterCurrentChapter()">⚔ BATTLE</button>
-    <button class="wm-nav-btn" onclick="showScreen('s-profile')">👤 PET</button>
-    <button class="wm-nav-btn" onclick="showScreen('s-pattern');showPatternReading()">✦ PATTERN</button>
-    <button class="wm-nav-btn" onclick="showScreen('s-collection');renderCollection()">📖 BEASTS</button>
+    <button class="wm-nav-btn wm-nav-primary" onclick="enterCurrentChapter()">▶ CONTINUE</button>
   </div>
 </div>
 
@@ -598,10 +596,10 @@ select.lc-inp{cursor:pointer}
 <!-- 10. DEFEAT -->
 <div class="screen" id="s-defeat">
   <div id="defeat-lottie" style="width:80px;height:80px;margin:0 auto 16px"></div>
-  <div class="result-title" style="color:var(--danger)">GUARDIAN FALLS</div>
+  <div class="result-title" style="color:var(--amber)">TOUGH CALL! HERE'S THE SMARTER MOVE</div>
   <div class="result-subtitle" id="defeat-chapter-name"></div>
   <div class="result-fact" id="defeat-fact"></div>
-  <button class="px-btn danger" style="margin-top:8px" onclick="afterChapter()">[ RISE AGAIN ]</button>
+  <button class="px-btn" style="margin-top:8px;border-color:var(--amber);color:var(--amber)" onclick="afterChapter()">[ GOT IT — KEEP GOING ]</button>
 </div>
 
 <!-- 11. ENDING -->
@@ -639,7 +637,7 @@ select.lc-inp{cursor:pointer}
     <div class="p-card p-card-cta p-card-hidden" id="pc-cta">
       <div class="p-body p-body-italic p-body-muted" id="pc-cta-txt" style="margin-bottom:20px;text-align:center"></div>
       <button class="p-btn-primary" onclick="doWhatsApp()">SPEAK WITH YOUR ADVISOR</button>
-      <button class="p-btn-ghost" onclick="showTarotReveal(G.profileType)">[ YOUR ARCHETYPE READING ]</button>
+      <button class="p-btn-ghost" onclick="maybeShowLead()">[ YOUR ARCHETYPE READING ]</button>
       <button class="p-btn-ghost" onclick="doSharePattern()">[ SHARE MY PATTERN ]</button>
       <button class="p-btn-ghost" onclick="showScreen('s-worldmap');renderWorldMap()">[ RETURN TO REALM ]</button>
       <button class="p-btn-ghost" onclick="doRestart()">[ RESTART JOURNEY ]</button>
@@ -833,11 +831,11 @@ select.lc-inp{cursor:pointer}
 // GAME DATA
 // ─────────────────────────────────────────────────────────────
 const ARCHETYPES = {
-  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'Always thinking five moves ahead.', lottieUrl:'https://assets4.lottiefiles.com/packages/lf20_vnikrcia.json' },
-  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"The people I love don't stress about money.", lottieUrl:'https://assets1.lottiefiles.com/packages/lf20_syqnfe7c.json' },
-  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'Slow and steady. Every choice compounds.', lottieUrl:'https://assets6.lottiefiles.com/packages/lf20_bq4xpnlf.json' },
-  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'I figure it out as I go.', lottieUrl:'https://assets9.lottiefiles.com/packages/lf20_rwq6ciql.json' },
-  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:"Been through the worst. Still here.", lottieUrl:'https://assets5.lottiefiles.com/packages/lf20_obhph6wf.json' }
+  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'Always 10 steps ahead. You see the play before others do.', lottieUrl:'https://assets4.lottiefiles.com/packages/lf20_vnikrcia.json' },
+  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"Family first, always. You'd do anything for the people you love.", lottieUrl:'https://assets1.lottiefiles.com/packages/lf20_syqnfe7c.json' },
+  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'Steady and intentional. You build what lasts.', lottieUrl:'https://assets6.lottiefiles.com/packages/lf20_bq4xpnlf.json' },
+  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'Flexible by design. You figure it out as you go.', lottieUrl:'https://assets9.lottiefiles.com/packages/lf20_rwq6ciql.json' },
+  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:"You've been through the fire. You're still here.", lottieUrl:'https://assets5.lottiefiles.com/packages/lf20_obhph6wf.json' }
 };
 
 const BEASTS = {
@@ -888,166 +886,166 @@ const SCENARIOS = {
     situation:"You're 26. You collapse at the gym. Ambulance, 3 nights in hospital, specialist fees. The bill: $42,000. You have $8,000 in savings.",
     question:"What actually saves you here?", dimension:'vitality',
     choices:[
-      {id:'A',text:'Integrated Shield Plan',correct:true,feedback:'The ISP caps your healer bills dramatically. Basic coverage alone leaves your vault open to Xan\'Dra.'},
-      {id:'B',text:'Charge it to the debt scrolls',correct:false,feedback:'Debt scrolls compound at 26% — the Dragon feeds on interest. Your treasury bleeds longer than the wound.'},
-      {id:'C',text:'Draw from the emergency vault',correct:false,feedback:'The emergency vault covers only a fraction of the healers\' demand. What remains when it is empty?'}]},
-  102:{ chapter:1, name:"XAN'DRA'S AMBUSH TRAP",
-    bossLine:"Every unprotected journey is a trap I laid.",
-    situation:"A shadow snare springs on the road. The Guardian is wounded — unable to fight, unable to earn tribute. The Dragon's chains tighten with every day of lost income.",
-    question:"Which beast breaks the accident chain?", dimension:'resilience',
+      {id:'A',text:'Hospital insurance (Integrated Shield Plan)',correct:true,feedback:"Exactly what it's designed for. With an ISP, your bill drops to almost nothing. This is the #1 financial emergency most young people face."},
+      {id:'B',text:'Put it on the credit card',correct:false,feedback:"$42k on a credit card at 26% interest. Every month you don't clear it, you're paying $910 just in interest. The Dragon just found her meal."},
+      {id:'C',text:'Use savings and borrow the rest',correct:false,feedback:"Your savings are gone. You've put financial stress on the people you love. And the next health crisis? Nothing left."}]},
+  102:{ chapter:1, name:'THE ACCIDENT',
+    bossLine:"You can't work. But rent doesn't care.",
+    situation:"You get hit by a car. Not your fault. Recovery: 3 months — can't work, can't earn. Rent, food, loans don't stop.",
+    question:"What breaks the chain?", dimension:'resilience',
     choices:[
-      {id:'A',text:'Personal Accident Shield',correct:true,feedback:'The PA shield pays healer costs AND lost tribute. Less than one gold coin a day. The chain cannot hold.'},
-      {id:'B',text:'Call on the elder bloodline for aid',correct:false,feedback:'Transfers the burden upward. The dependency pattern begins — and Morvek is watching.'},
-      {id:'C',text:'Fight through the wound',correct:false,feedback:'A wounded guardian fighting is a guardian falling. Resilience crumbles. The Dragon gains ground.'}]},
-  103:{ chapter:1, name:'THE FROZEN TRIBUTE',
-    bossLine:"I freeze the river. The realm still demands its tithe.",
-    situation:"A dark enchantment seals the Guardian's hands. No tribute flows in — but the realm's demands never pause. Shelter, food, fire — the costs march on without mercy.",
-    question:"Which armor breaks the income freeze?", dimension:'stability',
+      {id:'A',text:'Personal accident insurance',correct:true,feedback:"PA insurance pays your medical bills AND replaces lost income. Less than $1 a day. One of the most underrated things you can own."},
+      {id:'B',text:'Ask my parents to cover me',correct:false,feedback:"They love you, but you've transferred the financial pressure to them. And you've started a pattern that's hard to break."},
+      {id:'C',text:'Work part-time through the injury',correct:false,feedback:"Pushing through makes recovery longer. A 3-month setback becomes 12 months. The Dragon keeps feeding."}]},
+  103:{ chapter:1, name:'THE FROZEN PAYCHECK',
+    bossLine:"What happens to your life when the money stops?",
+    situation:"A back condition stops you from working — not permanently, but 6 to 18 months. Your salary stops. Your bills don't.",
+    question:"Which protection keeps your life running?", dimension:'stability',
     choices:[
-      {id:'A',text:'Income Protection Armor',correct:true,feedback:'Replaces the frozen tribute — up to 80% of what you earned. The most underestimated shield in the realm.'},
-      {id:'B',text:'Appeal to the realm\'s aid scrolls',correct:false,feedback:'The aid scrolls take moons to arrive. Your shelter contract is due now.'},
-      {id:'C',text:'Draw early from the retirement vault',correct:false,feedback:'Early withdrawal carries a permanent penalty. You sacrifice tomorrow\'s security for today\'s gap.'}]},
-  104:{ chapter:1, name:"THE DRAGON'S FINAL SEAL",
-    bossLine:"One gap. That is all I need.",
-    situation:"Xan'Dra soars above the battlefield. Your Vitality Shrine trembles — basic coverage only, no accident shield, no critical illness ward. She circles, hunting for the deepest crack.",
-    question:"Which gap does Xan'Dra strike first?", dimension:'vitality',
+      {id:'A',text:'Income protection insurance',correct:true,feedback:"Pays up to 80% of your salary while you can't work. Most underrated insurance there is. Most people don't even know it exists."},
+      {id:'B',text:'Government disability assistance',correct:false,feedback:"Government schemes take months to process and pay a fraction of what you need. Your landlord won't wait."},
+      {id:'C',text:'Pull from CPF savings early',correct:false,feedback:"Early CPF withdrawal comes with penalties. You're burning tomorrow's security to patch today's gap."}]},
+  104:{ chapter:1, name:'THE FIRST CRACK',
+    bossLine:"I only need one gap. Show me yours.",
+    situation:"You have some insurance but not all. Hospital coverage, no accident plan, no income protection, no critical illness. The Dragon circles, looking for the weakest point.",
+    question:"What's the first gap she exploits?", dimension:'vitality',
     choices:[
-      {id:'A',text:'Seal the Healing Ward first — upgrade the Shield Plan',correct:true,feedback:'The first major battle most Guardians face is a health crisis. Seal it before anything else.'},
-      {id:'B',text:'Open the treasure vault — invest in the markets',correct:false,feedback:'Building wealth on an unprotected foundation is building on sand. The Dragon burns it all.'},
-      {id:'C',text:'Fill the emergency vault higher',correct:false,feedback:'The vault depletes — coverage renews. Savings fight one battle. Shields fight every battle.'}]},
+      {id:'A',text:'Upgrade the hospital coverage first',correct:true,feedback:"The most common financial crisis under 40 is a health emergency. Close this gap first. Everything else is secondary."},
+      {id:'B',text:'Build wealth through investments first',correct:false,feedback:"You can't build wealth while unprotected. One health crisis wipes out years of savings. Foundation first, always."},
+      {id:'C',text:'Max out the emergency fund first',correct:false,feedback:"A $10k emergency fund vs a $50k hospital bill. Insurance renews every year. Savings only fight one battle."}]},
 
-  201:{ chapter:2, name:'THE PANIC STORM',
-    bossLine:"Fear is my greatest weapon. I eat panic sellers for breakfast.",
-    situation:"The Shattered Markets tremble. Marvex tears through the trading halls — and the Guardian\'s entire wealth sits in a single cracking crystal. Every frightened guardian who flees feeds her power.",
-    question:"Which strategy outlasts the Market Wraith?", dimension:'legacy',
+  201:{ chapter:2, name:'THE CRASH',
+    bossLine:"Market dropped 40%. Your group chat is on fire. What do you do?",
+    situation:"You've been investing 2 years. Portfolio is down $8,000 — 40% from peak. Everyone is selling. Finance TikTok says it's over.",
+    question:"What does a smart investor do right now?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Hold the position — keep investing through the storm',correct:true,feedback:'Guardians who held through the great crash recovered everything — and more. Marvex feeds only on those who run.'},
-      {id:'B',text:'Liquidate everything — wait for the bottom',correct:false,feedback:'No guardian has ever timed the perfect return. Marvex profits from your hesitation.'},
-      {id:'C',text:'Lock everything in the cold vault at 3.5%',correct:false,feedback:'The Inflation Specter erodes the cold vault at 4% per year. You flee one enemy into another.'}]},
-  202:{ chapter:2, name:'THE UNGUARDED TREASURE',
-    bossLine:"You built it. But who guards it when you fall?",
-    situation:"The Guardian grows a mighty treasure chest — but builds no moat around it. The Wraith whispers: wealth without a protector is an open gate. When the Guardian falls, who inherits the treasure?",
-    question:"What must guard every treasure chest?", dimension:'bond',
+      {id:'A',text:'Stay invested. Keep buying on the dip.',correct:true,feedback:"Every major crash in history recovered and went higher. People who stayed invested made the most money. Panic sellers lost."},
+      {id:'B',text:'Sell everything and wait for the bottom',correct:false,feedback:"No one has timed the exact bottom. You sell low, buy back high when things feel 'safe'. Marvex profits from this every time."},
+      {id:'C',text:'Move everything to fixed deposit at 3.5%',correct:false,feedback:"Inflation runs at 4%. You're locking in a guaranteed loss in real terms. You fled the crash straight into the slow bleed."}]},
+  202:{ chapter:2, name:'THE UNGUARDED WEALTH',
+    bossLine:"You built it. But who gets it when you're gone?",
+    situation:"You're 30 with $60k saved, a car, a growing portfolio. No will. No beneficiary named. You've never thought about what happens to your money when you die.",
+    question:"What protects your wealth after you're gone?", dimension:'bond',
     choices:[
-      {id:'A',text:'Life covenant + inheritance scroll naming',correct:true,feedback:'Without these, the treasure freezes in the realm\'s courts for over a year. The family suffers while it waits.'},
-      {id:'B',text:'A shared vault with your bonded partner',correct:false,feedback:'Shared vaults lock on the Guardian\'s fall — courts must authorize release. Not instant.'},
-      {id:'C',text:'A testament scroll alone is enough',correct:false,feedback:'The testament scroll takes many moons to execute. The family needs the gold now.'}]},
-  203:{ chapter:2, name:'THE SIREN OF SURRENDER',
-    bossLine:"Walk away. I profit from every abandoned shield.",
-    situation:"The Guardian\'s enchanted shield dims — two seasons of weaker returns. The advisor who forged it has vanished. Marvex appears in silver light: \"Give it up. Start fresh.\" Is she offering wisdom — or feeding?",
-    question:"What does a wise Guardian do with a dimming shield?", dimension:'legacy',
+      {id:'A',text:'A will + named beneficiaries on all accounts',correct:true,feedback:"Without these, assets get frozen in court for 12+ months. Your family can't touch them. One document changes everything."},
+      {id:'B',text:'Joint account with my partner',correct:false,feedback:"Joint accounts can be frozen or contested. Not as automatic as you think. Courts can still intervene."},
+      {id:'C',text:'A will is enough on its own',correct:false,feedback:"Critical: bank accounts, insurance, and investments pass through BENEFICIARY NOMINATION — not your will. The will alone doesn't control them."}]},
+  203:{ chapter:2, name:'THE TEMPTATION',
+    bossLine:"Your investment is down. Walk away. Start fresh.",
+    situation:"You bought an investment-linked plan 2 years ago. Returns are down. Your friend says 'cut losses and invest elsewhere.' The temptation is real.",
+    question:"What does a smart person do?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Seek a new forge-master before deciding',correct:true,feedback:'Abandoning early locks in every loss — the forge fees were paid upfront. Restructuring almost always wins.'},
-      {id:'B',text:'Surrender it immediately',correct:false,feedback:'You lose the most in the first seasons. Marvex made her fortune on impatient Guardians.'},
-      {id:'C',text:'Stop feeding it — keep the fading shield',correct:false,feedback:'A starved shield crumbles. The protection weakens until the shield shatters itself.'}]},
-  204:{ chapter:2, name:"MARVEX'S TEMPEST",
-    bossLine:"Three storms. One Guardian. No circuit breaker.",
-    situation:"The Wraith reveals her full power: market collapse, income stripped, healer summons — all at once. The three-headed storm. Without the right armor, no treasury survives this night.",
-    question:"Which shield is the storm\'s circuit breaker?", dimension:'resilience',
+      {id:'A',text:'Review it with an adviser before deciding',correct:true,feedback:"Most upfront fees are already paid in the first 2 years. Surrendering now means you paid the costs but missed the gains. Restructuring almost always beats quitting."},
+      {id:'B',text:'Surrender it immediately',correct:false,feedback:"You locked in every cost upfront. Walking away now means you paid the price but never got the benefit. Classic Marvex trap."},
+      {id:'C',text:'Stop paying but keep the policy',correct:false,feedback:"A policy without premiums lapses — coverage collapses. You lose everything you put in AND the protection too."}]},
+  204:{ chapter:2, name:'THE TRIPLE HIT',
+    bossLine:"Market crash, job loss, medical bills. All at once. What holds?",
+    situation:"It happens. Job loss hits the same week as a cancer diagnosis. Markets are down 30%. Which single protection breaks the spiral?",
+    question:"Which coverage is the circuit breaker?", dimension:'resilience',
     choices:[
-      {id:'A',text:'Critical Illness Ward',correct:true,feedback:'The CI ward pays a lump sum the moment the diagnosis lands — income gone, costs rising, it fills the gap.'},
-      {id:'B',text:'A deeper emergency vault',correct:false,feedback:'The vault empties in months. The CI ward pays a hundred thousand in a single scroll.'},
-      {id:'C',text:'Death covenant only',correct:false,feedback:'The death covenant pays when the Guardian falls forever. You need living armor for surviving the storm.'}]},
+      {id:'A',text:'Critical illness insurance',correct:true,feedback:"CI pays a lump sum the moment you're diagnosed — regardless of employment status. $100,000 cash when everything falls apart. That's the circuit breaker."},
+      {id:'B',text:'A bigger emergency fund',correct:false,feedback:"Emergency funds last 3-6 months. Cancer treatment runs 2-3 years. The fund empties. CI doesn't."},
+      {id:'C',text:'Life insurance only',correct:false,feedback:"Life insurance pays when you die. You're alive and fighting a triple crisis. You need living benefits — CI pays while you're still here."}]},
 
-  301:{ chapter:3, name:'THE PATIENT THIEF',
-    bossLine:"I steal nothing. I simply wait while your hoard shrinks.",
-    situation:"Inflixus does not attack. She breathes on the treasury — slowly, silently. Season after season, the same coins buy less. The Guardian who stores gold without growing it will wake to find half their hoard gone.",
-    question:"Which weapon outlasts the Patient Thief?", dimension:'legacy',
+  301:{ chapter:3, name:'THE SLOW STEAL',
+    bossLine:"I've already taken 4% of your savings this year. Did you feel it?",
+    situation:"$50,000 in a savings account earning 2.5%. Inflation running at 4%. Your money is technically growing — but in real purchasing power, it's shrinking every single year.",
+    question:"What beats the slow steal?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Investment-Linked Growth Plan',correct:true,feedback:'Designed to outpace the Specter\'s breath. Purchasing power preserved — and grown.'},
-      {id:'B',text:'Realm bonds at 3.5% return',correct:false,feedback:'The Specter breathes at 4%. You are losing ground while standing still. Inflixus smiles.'},
-      {id:'C',text:'A stone fortress in the realm',correct:false,feedback:'Illiquid, exposed to one location, leveraged. Your other shields remain wide open.'}]},
-  302:{ chapter:3, name:'THE AGING SCROLL',
-    bossLine:"Your old scroll was written for yesterday\'s healers. Today\'s bills are twice as high.",
-    situation:"The healing scroll the Guardian purchased long ago — it was forged for a different era. Healer costs have doubled since. The Specter smiles: outdated armor is no armor at all.",
-    question:"How does the Guardian stay ahead of the Specter\'s inflation curse?", dimension:'vitality',
+      {id:'A',text:'An investment plan that grows above inflation',correct:true,feedback:"Money that doesn't grow faster than inflation is quietly disappearing. An investment-linked or unit trust plan is designed to outrun the slow steal."},
+      {id:'B',text:'Singapore government bonds at 3.5%',correct:false,feedback:"3.5% minus 4% inflation = you're still losing ground, just slowly. Inflixus smiles at this."},
+      {id:'C',text:'Buy a property',correct:false,feedback:"Property is illiquid, concentrated, leveraged. And it leaves all your other protections wide open while your cash is tied up."}]},
+  302:{ chapter:3, name:'THE OUTDATED PLAN',
+    bossLine:"Your plan was designed for 10 years ago. Today's costs are double.",
+    situation:"You bought hospital coverage at 22. You're 35 now. Medical costs have doubled. The plan that worked for 22-year-old you isn't enough for 35-year-old you.",
+    question:"How do you stay ahead of rising costs?", dimension:'vitality',
     choices:[
-      {id:'A',text:'Early Critical Illness seal + review the shield regularly',correct:true,feedback:'Early CI pays when the curse first strikes — Stage 1 is survivable. Review keeps the shield current.'},
-      {id:'B',text:'Upgrade to the grandmaster healer tower only',correct:false,feedback:'Premium towers without structured coverage still leave gaps Inflixus can slide through.'},
-      {id:'C',text:'Keep the old scroll and save the difference',correct:false,feedback:'The Specter inflates faster than you save. You are chasing a shadow while it runs.'}]},
-  303:{ chapter:3, name:'THE LONG ROAD HOME',
-    bossLine:"The road to retirement is paved with gaps I made.",
-    situation:"When the Guardian finally lays down their sword — the realm\'s pension will cover only one meal a day. The Specter calculated this long before the Guardian did. The gap between the life you built and the life you can afford grows every season.",
-    question:"Which artifact closes the gap before the road ends?", dimension:'legacy',
+      {id:'A',text:'Early critical illness cover + annual plan review',correct:true,feedback:"CI pays when you're first diagnosed — Stage 1 cancer is survivable if funded properly. Annual reviews keep coverage current. This combo beats the clock."},
+      {id:'B',text:'Upgrade to private hospital tier only',correct:false,feedback:"Better hospital room without structured coverage still leaves gap charges Inflixus can slip through."},
+      {id:'C',text:'Keep the old plan and save the difference',correct:false,feedback:"Medical inflation runs 6-8% per year. Your savings can't keep up. Every year you wait, the gap widens."}]},
+  303:{ chapter:3, name:'THE RETIREMENT GAP',
+    bossLine:"CPF won't be enough. It was never going to be.",
+    situation:"CPF Life pays roughly $1,000-$1,500/month at retirement. Average Singapore household spends $4,000-$5,000/month. Who fills the gap?",
+    question:"Which tool closes the retirement gap?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Retirement forge — endowment or savings plan',correct:true,feedback:'Starting early requires far less tribute each season. The forge that begins young finishes mighty.'},
-      {id:'B',text:'Pass the burden to your heirs',correct:false,feedback:'The dependency chain passes down the bloodline. Morvek waits at the next generation too.'},
-      {id:'C',text:'Pledge to fight until the very end',correct:false,feedback:'The body may not permit it. Inflixus has counted on this plan failing for centuries.'}]},
-  304:{ chapter:3, name:"INFLIXUS — THE FINAL FREEZE",
-    bossLine:"Thirty seasons of waiting. Everything you hoarded — I have already claimed.",
-    situation:"The Specter channels thirty seasons of silent erosion into one final verdict. The treasury the Guardian imagined for their later years — does not exist. One choice today rewrites the entire outcome.",
-    question:"What is the Guardian\'s ultimate weapon against the Patient Thief?", dimension:'legacy',
+      {id:'A',text:'A dedicated savings or endowment plan starting now',correct:true,feedback:"Starting at 25 needs 40% less monthly contribution than starting at 35. The earlier you start, the less it costs. Time is your only real advantage here."},
+      {id:'B',text:'Count on my kids to support me',correct:false,feedback:"You're passing the problem to the next generation. And you're counting on circumstances completely out of your control."},
+      {id:'C',text:"Work until I physically can't",correct:false,feedback:"Your body may not cooperate. And working out of necessity instead of choice is not the retirement you want."}]},
+  304:{ chapter:3, name:'THE FINAL FREEZE',
+    bossLine:"Thirty years of slow erosion. Now you see the bill.",
+    situation:"Your 60th birthday. You thought you had enough. But 30 years of inflation ate your savings. The retirement you imagined costs 3× what you planned for.",
+    question:"What is the ultimate weapon against the slow steal?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Whole life forge with guaranteed returns',correct:true,feedback:'Guaranteed treasure cannot be eroded. The Specter cannot touch certainty. This is the ultimate shield.'},
-      {id:'B',text:'High-risk chaos crystals and void markets',correct:false,feedback:'Volatility without a foundation. One crash collapses decades of work.'},
-      {id:'C',text:'Max the realm\'s retirement vault contributions',correct:false,feedback:'The vault is locked until late in life — no living benefits during a crisis. Necessary but not complete.'}]},
+      {id:'A',text:'A whole life plan with guaranteed cash value',correct:true,feedback:"Guaranteed growth that can't be eroded. It compounds, pays living benefits, creates certainty. The one thing Inflixus can't touch."},
+      {id:'B',text:'All-in on high-risk investments',correct:false,feedback:"Volatility without a foundation. One bad decade near retirement erases it all. You can't dollar-cost-average out of a crash at 58."},
+      {id:'C',text:'Max CPF contributions only',correct:false,feedback:"CPF is the floor, not the ceiling. It covers basic survival. It was never designed to fund the retirement you actually want."}]},
 
-  401:{ chapter:4, name:'THE CHAIN NET',
-    bossLine:"I do not hunt you. I hunt everyone who needs you.",
-    situation:"The Guardian falls in battle — gone. The kingdom is unprepared. Debts tower. Dependants scatter. The small shield that seemed enough covers barely one moon\'s worth of the outstanding debt. Morvek laughs.",
-    question:"Which covenant truly protects the bloodline?", dimension:'bond',
+  401:{ chapter:4, name:'THE WORST CALL',
+    bossLine:"You died last night. Your family just found out.",
+    situation:"You're gone. Suddenly. Your family has $200k in debt, a mortgage, two kids in school. Your life insurance payout: $50,000. That covers 3 months.",
+    question:"How much life insurance does a real protector carry?", dimension:'bond',
     choices:[
-      {id:'A',text:'Life covenant at 10-15× annual tribute',correct:true,feedback:'The true minimum: ten times annual tribute plus all debts. The small covenant left everyone exposed.'},
-      {id:'B',text:'A testament scroll dividing the estate',correct:false,feedback:'The scroll distributes what exists. It cannot create what was never built. No gold — nothing to divide.'},
-      {id:'C',text:'Build the emergency vault higher',correct:false,feedback:'The vault at death may be empty. The life covenant creates the treasury the moment it is needed.'}]},
-  402:{ chapter:4, name:'THE BLOODLINE BURDEN',
-    bossLine:"Unprotected elders become chains on their children. I designed it that way.",
-    situation:"The Guardian\'s elder bloodline has fallen ill — no armor, no reserves, healers demanding a king\'s ransom. Morvek watches: the burden will pass to the Guardian, then to their heirs. The chain is unbreakable — unless someone breaks it now.",
-    question:"How does the wise Guardian shatter the bloodline chain?", dimension:'bond',
+      {id:'A',text:'10-15× annual income, plus all debts',correct:true,feedback:"The real number: 10× income + all debts. For most people, that's $500k-$1.5M. Anything less and your family is fighting from behind the moment you're gone."},
+      {id:'B',text:'Enough to cover funeral and immediate bills',correct:false,feedback:"That covers 2 weeks. What about the mortgage? School fees? 20 years of living expenses? Morvek built this gap."},
+      {id:'C',text:'Whatever my company gives me for free',correct:false,feedback:"Company group insurance is usually 2× salary. It ends when you leave the company. Never designed to protect your family."}]},
+  402:{ chapter:4, name:'THE FAMILY CHAIN',
+    bossLine:"Your parents have no coverage. Guess who pays.",
+    situation:"Your parents are 60. No medical insurance, minimal savings. Your dad just got diagnosed with early-stage diabetes. The bills are starting.",
+    question:"How does a smart person break the family chain?", dimension:'bond',
     choices:[
-      {id:'A',text:'Help elders review and upgrade their healing scrolls',correct:true,feedback:'A scroll review costs nothing. It could save the equivalent of a year\'s tribute. Love with financial teeth.'},
-      {id:'B',text:'Pay silently and absorb the blow',correct:false,feedback:'Morvek wins. The next illness arrives before the vault recovers. The pattern does not end.'},
-      {id:'C',text:'Let the elders find their own path',correct:false,feedback:'The family fractures under the weight. Morvek exploits every crack that forms.'}]},
-  403:{ chapter:4, name:'THE FALLEN GUARDIAN',
-    bossLine:"Alive but unable to rise. The kingdom does not wait for you to recover.",
-    situation:"The Guardian survives the darkest curse — but can never raise their sword again. The debts do not rest. The heirs still need shelter and learning. Without the right armor, the kingdom crumbles while the Guardian watches helplessly.",
-    question:"Which shield holds the kingdom when the Guardian cannot?", dimension:'stability',
+      {id:'A',text:'Help them review and get coverage now',correct:true,feedback:"A single coverage review can fix years of exposure. Costs nothing to check. Basic coverage now prevents the chain reaction later."},
+      {id:'B',text:'Just absorb the costs as they come',correct:false,feedback:"This is how families drain wealth across generations. The next crisis hits before you've recovered from the last one."},
+      {id:'C',text:"Leave it — it's their responsibility",correct:false,feedback:"The bills come to you anyway — just without any planning or control. You end up paying more, under more stress, with less time to prepare."}]},
+  403:{ chapter:4, name:'THE DISABLED GUARDIAN',
+    bossLine:"You're alive. But you can never work again. The bills don't know that.",
+    situation:"A stroke at 38. You survive. But you can never work in your field again. Spouse earns $3,000/month. Mortgage is $2,500. Two kids.",
+    question:"What keeps the family from collapsing?", dimension:'stability',
     choices:[
-      {id:'A',text:'Total Disability seal + Income Protection armor',correct:true,feedback:'The lump sum clears the debts. The income armor funds the ongoing kingdom. Both are required.'},
-      {id:'B',text:'The bonded partner carries the kingdom alone',correct:false,feedback:'One tribute for four. Debts, heirs, healers ongoing. The kingdom falls within half a year.'},
-      {id:'C',text:'The realm\'s disability tithe covers it',correct:false,feedback:'The realm\'s tithe: a few hundred coins a moon. The kingdom\'s debt demands thousands. The gap is catastrophic.'}]},
-  404:{ chapter:4, name:"MORVEK'S FINAL NET",
-    bossLine:"I have been threading this net for years. Today it drops.",
-    situation:"The Dependency Lord reveals his master strike: every soul in the Guardian\'s circle stands unprotected at once. Bonded partner. Heirs. Elders. The Guardian themselves. Every thread pulled simultaneously.",
-    question:"Which single forge protects the entire circle?", dimension:'bond',
+      {id:'A',text:'Total permanent disability payout + income protection',correct:true,feedback:"TPD pays a lump sum to clear debts. Income protection covers ongoing monthly expenses. Both are required — neither alone is enough."},
+      {id:'B',text:'My spouse takes over everything',correct:false,feedback:"One income supporting a full family plus a disabled person's care. It collapses within months. This isn't love — it's math."},
+      {id:'C',text:'Government disability support',correct:false,feedback:"Government schemes pay a few hundred a month. Your mortgage is $2,500. The gap is catastrophic."}]},
+  404:{ chapter:4, name:'THE FULL NET',
+    bossLine:"I've been building this for years. Today the net drops.",
+    situation:"The biggest crisis hits: partner, kids, parents — all need you at once. No warning. Every dependency activated simultaneously.",
+    question:"Which plan protects the whole family circle?", dimension:'bond',
     choices:[
-      {id:'A',text:'Whole life forge with cash value and legacy flame',correct:true,feedback:'The whole life forge pays living AND death tributes. Protection forged into wealth — one instrument for all.'},
-      {id:'B',text:'Temporary covenants for every member',correct:false,feedback:'Temporary covenants expire. When Morvek strikes at the end of life, the chain still finds the gap.'},
-      {id:'C',text:'Protect the heirs first — smallest shields',correct:false,feedback:'The heirs earn no tribute to protect. Forge the income earner first. Always. Without exception.'}]},
+      {id:'A',text:'Whole life insurance with cash value and legacy benefits',correct:true,feedback:"Whole life pays while you're alive (via cash value) AND when you die (via death benefit). One plan that grows, protects, and passes on wealth."},
+      {id:'B',text:'Term insurance for every family member',correct:false,feedback:"Term expires. At renewal, you requalify at older ages with higher premiums — or get declined. Morvek waits at every renewal date."},
+      {id:'C',text:'Protect the kids first',correct:false,feedback:"Kids have no income to protect. The income earner is the fulcrum. Protect the person generating the money first — everything flows from there."}]},
 
-  501:{ chapter:5, name:'THE UNCLAIMED TREASURY',
-    bossLine:"You built the treasure. You never sealed the vault. It is mine now.",
-    situation:"A Guardian passes into legend — without sealing the inheritance scrolls. The realm\'s courts divide the treasury as the ancient laws demand: slowly, imperfectly, with conflict. Voidex feasts on every delay, every family dispute, every coin consumed by the court.",
-    question:"Which scrolls seal the vault before Voidex claims it?", dimension:'legacy',
+  501:{ chapter:5, name:'THE MISSING WILL',
+    bossLine:"You built it. Never wrote it down. Now it's mine.",
+    situation:"Someone dies without a will in Singapore. The law decides who gets what — not them. An estranged sibling gets a share. An unmarried partner of 10 years gets nothing. Accounts frozen for a year.",
+    question:"What three documents seal your legacy?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Testament + Inheritance Naming + Power of Guardian scroll',correct:true,feedback:'Three ancient scrolls. A pittance to forge. Together they transfer all treasure instantly — Voidex gets nothing.'},
-      {id:'B',text:'Joint ownership of all treasures',correct:false,feedback:'Jointly held treasures still freeze when challenged in court. The transfer is not instant. Voidex waits.'},
-      {id:'C',text:'A grand trust covenant',correct:false,feedback:'Trust covenants serve great dynasties, not most Guardians. The three scrolls are what you need first.'}]},
-  502:{ chapter:5, name:'THE SHATTERED ALLIANCE',
-    bossLine:"Your battle-partner has fallen. Now everything you built together is mine.",
-    situation:"The Guardian\'s war-brother has fallen in battle. Half the kingdom passes to those who never fought for it — and they want to sell. Everything forged together hangs by the thread Voidex is already pulling apart.",
-    question:"Which covenant would have held the alliance together?", dimension:'legacy',
+      {id:'A',text:'Will + beneficiary nominations + Lasting Power of Attorney',correct:true,feedback:"These three cost almost nothing and control everything. The will directs assets. Nominations bypass courts entirely. The LPA gives someone you trust power if you're incapacitated."},
+      {id:'B',text:'Joint ownership of everything with my partner',correct:false,feedback:"Joint ownership can still be challenged in court. And if you're not married, 'joint' doesn't mean what you think it means."},
+      {id:'C',text:'A trust fund for the big stuff',correct:false,feedback:"Trusts are for high-net-worth planning. Most people need the basics first. Do the foundation before the penthouse."}]},
+  502:{ chapter:5, name:'THE BUSINESS SPLIT',
+    bossLine:"Your business partner just died. His widow wants to sell. You have 72 hours.",
+    situation:"You and your best friend built a business. He dies suddenly. Shares pass to his wife, who wants to sell immediately. She has a buyer. Your business is about to change hands.",
+    question:"What would have prevented this?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Key warrior covenant + succession agreement',correct:true,feedback:'The covenant funds the buyout at true value. The kingdom stays whole. Both families are honored.'},
-      {id:'B',text:'Recruit a new battle-partner quickly',correct:false,feedback:'A rushed alliance under duress always destroys value. Voidex profits from the desperation.'},
-      {id:'C',text:'Buy the fallen half with the kingdom\'s war chest',correct:false,feedback:'Emptying the war chest leaves the kingdom defenseless. Operations collapse within months.'}]},
-  503:{ chapter:5, name:'THE EXPIRED SCROLL',
-    bossLine:"Your inheritance naming expired long ago. I have known this since your bonding ceremony.",
-    situation:"The Guardian\'s inheritance scrolls — signed in another era — have silently lapsed. Voidex has known since the moment they expired. The Guardian\'s vast treasury will not flow where they intended. It will flow where the realm\'s courts decide.",
-    question:"How does the Guardian restore the inheritance stream?", dimension:'legacy',
+      {id:'A',text:'Key person insurance + buy-sell agreement',correct:true,feedback:"Key person insurance funds you to buy back shares at fair value. The buy-sell agreement locks in the process. Without both, you're negotiating under duress."},
+      {id:'B',text:'Bring in a new partner quickly',correct:false,feedback:"Desperation means bad deals. Voidex profits from decisions made under pressure."},
+      {id:'C',text:'Buy the shares from business cash reserves',correct:false,feedback:"Most businesses aren't sitting on enough cash for a buyout. Emptying reserves leaves operations vulnerable."}]},
+  503:{ chapter:5, name:'THE EXPIRED NOMINATION',
+    bossLine:"You named your beneficiary in 2018. You got married in 2022. The old nomination is void.",
+    situation:"In Singapore, getting married automatically revokes insurance beneficiary nominations made before marriage. Most people don't know this. Your insurance now pays to your estate — not your spouse.",
+    question:"How do you fix this?", dimension:'legacy',
     choices:[
-      {id:'A',text:'Re-seal all inheritance naming scrolls immediately',correct:true,feedback:'Updated naming scrolls ensure immediate, court-free transfer the moment they\'re needed. Voidex gets nothing.'},
-      {id:'B',text:'A new testament scroll covers everything',correct:false,feedback:'Critical: the realm\'s retirement vault does NOT follow the testament. It follows only the naming scroll.'},
-      {id:'C',text:'Convert all treasures to gold coins before the end',correct:false,feedback:'Forced conversion destroys 20-40% of value at the worst possible moment. Voidex profits from the fire sale.'}]},
+      {id:'A',text:'Re-nominate beneficiaries on all accounts immediately',correct:true,feedback:"Takes 15 minutes per account. Ensures your money goes directly to who you want — bypassing courts, delays, disputes. Do this after every major life event."},
+      {id:'B',text:'Update my will to cover it',correct:false,feedback:"Critical: insurance payouts follow BENEFICIARY NOMINATION — not your will. A will does not override a nomination. These are completely separate."},
+      {id:'C',text:'Transfer everything to joint accounts',correct:false,feedback:"Joint assets can still be contested. And forced restructuring often has tax and legal implications you don't see coming."}]},
   504:{ chapter:5, name:'VOIDEX — THE FINAL RECKONING',
-    bossLine:"Every legacy you dreamed of. Every seal you left open. All of it is mine.",
-    situation:"The Final Chaos Lord rises. Five dimensions — all tested at once. Vitality. Stability. Resilience. Bond. Legacy. He hunts the single crack that was never sealed. One gap and he consumes everything the Guardian ever built.",
-    question:"What does the truly complete Guardian look like?", dimension:'legacy',
+    bossLine:"Every legacy you imagined. Every seal you left open. All of it disappears.",
+    situation:"The final test. Five dimensions revealed at once: Health. Income. Life. Dependants. Legacy. Voidex looks for the one gap never closed. One gap — everything built over a lifetime gets swallowed.",
+    question:"What does complete financial protection actually look like?", dimension:'legacy',
     choices:[
-      {id:'A',text:'All five sealed: Health. Income. Life. CI. Legacy.',correct:true,feedback:'THE FINAL SEAL CLOSES. Voidex screams into the void. The realm is restored. You are LEGEND.'},
-      {id:'B',text:'Maximum treasure and market returns',correct:false,feedback:'Wealth without protection is Voidex\'s favourite feast. One catastrophic event. Everything gone.'},
-      {id:'C',text:'The realm\'s systems and pension fully maximised',correct:false,feedback:'The realm\'s systems guard the floor. Not the kingdom you built above it. Voidex lives in the gap.'}]}
-};
+      {id:'A',text:'All five sealed: Hospital, Income, Life cover, Critical illness, Legacy plan',correct:true,feedback:"THE FINAL SEAL CLOSES. This is not a product pitch — this is what financial security actually looks like. You now know what it requires."},
+      {id:'B',text:'Maximum savings and investment returns',correct:false,feedback:"Wealth without protection is Voidex's favourite meal. One catastrophic event. Everything gone. Saved for decades, wiped in months."},
+      {id:'C',text:'CPF fully maximised',correct:false,feedback:"CPF covers the floor. Not the life you built above it. Voidex lives in the gap between what the system provides and what you actually need."}]}
+}};
 
 const ENDINGS = {
   LEGEND:{title:'THE LEGEND',subtitle:'The five seals hold.',
@@ -1186,7 +1184,7 @@ const G = {
   vitality:40, stability:40, resilience:40, bond:40, legacy:40,
   xp:0, guardianLevel:1, trialsComplete:0, evolutionStage:1,
   beastsUnlocked:[], scenariosDone:[],
-  chapters:[], gameComplete:false, tutorialCorrect:null
+  chapters:[], gameComplete:false, tutorialCorrect:null, leadSubmitted:false
 };
 
 let selectedArchetype = null;
@@ -1579,6 +1577,22 @@ function submitTutChoice(btn, cc){
   },1800);
 }
 
+// ─── GUEST MODE (pre-lead) ───
+function initLocalChapters(){
+  G.chapters=[
+    {chapter_id:1,status:'active'},
+    {chapter_id:2,status:'locked'},
+    {chapter_id:3,status:'locked'},
+    {chapter_id:4,status:'locked'},
+    {chapter_id:5,status:'locked'}
+  ];
+}
+function startGuestGame(){
+  initLocalChapters();
+  renderWorldMap();
+  showScreen('s-worldmap');
+}
+
 // ─── LEAD CAPTURE ───
 async function doLeadCapture(){
   const name=document.getElementById('lc-name').value.trim();
@@ -1598,17 +1612,20 @@ async function doLeadCapture(){
     if(!d.ok) throw new Error(d.error);
     G.playerId=d.playerId; G.refCode=d.refCode;
     G.playerName=name; G.playerPhone='+65'+phone;
+    G.leadSubmitted=true;
     localStorage.setItem('aegis_player_id',d.playerId);
     localStorage.setItem('aegis_pet_name',G.petName);
     localStorage.setItem('aegis_archetype',G.archetype);
-    // init chapters
+    // init chapters (only if guest, else sync existing progress)
     await fetch('/api/game-start/'+d.playerId,{method:'POST'});
     // load chapters
     const cr=await fetch('/api/chapters/'+d.playerId);
     const cd=await cr.json();
-    G.chapters=cd.chapters||[];
-    renderWorldMap();
-    showScreen('s-worldmap');
+    if(!G.chapters.length) G.chapters=cd.chapters||[];
+    // if came from pattern page → show tarot; else → worldmap
+    const hasProgress=G.chapters.some(c=>c.status==='cleared'||c.status==='failed');
+    if(hasProgress){ showTarotReveal(G.archetype); }
+    else{ renderWorldMap(); showScreen('s-worldmap'); }
   }catch(e){
     showToast('Error: '+e.message);
     btn.textContent='[ SEAL THE COVENANT ]';btn.disabled=false;
@@ -1938,15 +1955,25 @@ function advanceScenario(){
 
 async function endChapter(won){
   const chId=battleState.chapterId;
-  try{
-    const r=await fetch('/api/chapter-complete',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({playerId:G.playerId,chapterId:chId,won})});
-    const d=await r.json();
-    // reload chapters
-    const cr=await fetch('/api/chapters/'+G.playerId);
-    const cd=await cr.json();
-    G.chapters=cd.chapters||[];
-  }catch(e){}
+  if(G.playerId){
+    try{
+      const r=await fetch('/api/chapter-complete',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({playerId:G.playerId,chapterId:chId,won})});
+      const d=await r.json();
+      const cr=await fetch('/api/chapters/'+G.playerId);
+      const cd=await cr.json();
+      G.chapters=cd.chapters||[];
+    }catch(e){}
+  }else{
+    // guest mode: update local chapter state
+    const idx=G.chapters.findIndex(c=>c.chapter_id===chId);
+    if(idx!==-1) G.chapters[idx].status=won?'cleared':'failed';
+    if(won&&chId<5){
+      const nextIdx=G.chapters.findIndex(c=>c.chapter_id===chId+1);
+      if(nextIdx!==-1) G.chapters[nextIdx].status='active';
+      else G.chapters.push({chapter_id:chId+1,status:'active'});
+    }
+  }
   if(won){
     showVictory(chId);
   }else{
@@ -2123,6 +2150,11 @@ function buildTarotStars(){
     s.style.cssText=`width:${sz}px;height:${sz}px;background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s`;
     c.appendChild(s);
   }
+}
+
+function maybeShowLead(){
+  if(!G.leadSubmitted){ showScreen('s-lead'); }
+  else{ showTarotReveal(G.profileType); }
 }
 
 function showTarotReveal(profileType){
