@@ -204,6 +204,15 @@ select.lc-inp{cursor:pointer}
 .ci-boss-name{font-family:'Press Start 2P';font-size:clamp(10px,3.5vw,14px);color:#fff;opacity:0;transition:opacity .8s;letter-spacing:2px}
 .ci-lore{font-family:'VT323';font-size:clamp(17px,5vw,22px);color:rgba(255,255,255,.65);line-height:1.7;max-width:400px;min-height:60px;opacity:0;transition:opacity .8s}
 .ci-enter-btn{opacity:0;transition:opacity .6s}
+.ci-particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ci-boss-aura{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s;flex-shrink:0}
+.ci-aura-ring{position:absolute;border-radius:50%;border:2px solid var(--ci-color,#ff006e);animation:auraRingPulse 2.5s ease-in-out infinite}
+.ci-aura-ring-1{width:100px;height:100px;opacity:0.5}
+.ci-aura-ring-2{width:130px;height:130px;opacity:0.25;animation-delay:0.7s}
+.ci-aura-ring-3{width:160px;height:160px;opacity:0.12;animation-delay:1.4s}
+.ci-boss-emoji{font-size:88px;line-height:1;filter:drop-shadow(0 0 20px var(--ci-color,#ff006e));animation:bossFloat 3s ease-in-out infinite;position:relative;z-index:2}
+@keyframes auraRingPulse{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.12);opacity:0.1}}
+@keyframes particleDrift{0%{transform:translateY(0)scale(1);opacity:0.3}100%{transform:translateY(-40px)scale(1.4);opacity:0}}
 
 /* ── BATTLE ── */
 #s-battle{display:flex;flex-direction:column;padding:0;justify-content:flex-start;overflow:hidden}
@@ -226,8 +235,7 @@ select.lc-inp{cursor:pointer}
 .battle-dialogue{background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin:0 10px;padding:11px 14px;position:relative;z-index:2;flex-shrink:0}
 .battle-dialogue-speaker{font-family:'Press Start 2P';font-size:6px;color:var(--cyan);margin-bottom:5px;letter-spacing:1px}
 .battle-dialogue-text{font-family:'VT323';font-size:16px;color:rgba(255,255,255,.8);line-height:1.45;min-height:36px}
-.battle-timer-bar{height:4px;background:rgba(255,255,255,.06);margin:4px 0;overflow:hidden;flex-shrink:0}
-.battle-timer-fill{height:100%;background:var(--cyan);transition:width 0.1s linear,background 0.3s;border-radius:0;box-shadow:0 0 8px currentColor}
+
 .battle-situation{font-family:'VT323';font-size:14px;color:rgba(255,255,255,.6);padding:4px 12px;text-align:center;line-height:1.45;position:relative;z-index:2;flex-shrink:0;max-height:60px;overflow:hidden}
 .battle-question{font-family:'Press Start 2P';font-size:7px;color:rgba(255,255,255,.5);padding:4px 12px;text-align:center;letter-spacing:.5px;flex-shrink:0}
 .battle-choices{display:flex;flex-direction:column;gap:6px;padding:6px 10px 12px;position:relative;z-index:2;flex-shrink:0}
@@ -536,9 +544,15 @@ select.lc-inp{cursor:pointer}
 <!-- 7. CHAPTER INTRO -->
 <div class="screen" id="s-chapter-intro">
   <div class="ci-bg" id="ci-bg"></div>
+  <div class="ci-particles" id="ci-particles"></div>
   <div class="ci-content">
     <div class="ci-region" id="ci-region"></div>
-    <div id="ci-boss-lottie" style="width:140px;height:140px"></div>
+    <div class="ci-boss-aura" id="ci-boss-aura">
+      <div class="ci-aura-ring ci-aura-ring-1"></div>
+      <div class="ci-aura-ring ci-aura-ring-2"></div>
+      <div class="ci-aura-ring ci-aura-ring-3"></div>
+      <div class="ci-boss-emoji" id="ci-boss-emoji"></div>
+    </div>
     <div class="ci-boss-name" id="ci-boss-name"></div>
     <div class="ci-lore" id="ci-lore"></div>
     <button class="px-btn danger ci-enter-btn" id="ci-enter-btn" onclick="startBattle()">[ ENTER BATTLE ]</button>
@@ -565,7 +579,6 @@ select.lc-inp{cursor:pointer}
     <div class="battle-dialogue-speaker" id="battle-dlg-speaker"></div>
     <div class="battle-dialogue-text" id="battle-dlg-text"></div>
   </div>
-  <div class="battle-timer-bar"><div class="battle-timer-fill" id="battle-timer-fill"></div></div>
   <div class="battle-situation" id="battle-situation"></div>
   <div class="battle-question" id="battle-question"></div>
   <div class="battle-choices" id="battle-choices"></div>
@@ -820,11 +833,11 @@ select.lc-inp{cursor:pointer}
 // GAME DATA
 // ─────────────────────────────────────────────────────────────
 const ARCHETYPES = {
-  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'I see what others miss. I build what others fear.', lottieUrl:'https://assets4.lottiefiles.com/packages/lf20_vnikrcia.json' },
-  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"My strength is my family's safety.", lottieUrl:'https://assets1.lottiefiles.com/packages/lf20_syqnfe7c.json' },
-  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'I create. I accumulate. I leave a mark.', lottieUrl:'https://assets6.lottiefiles.com/packages/lf20_bq4xpnlf.json' },
-  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'I adapt. I survive. I thrive on uncertainty.', lottieUrl:'https://assets9.lottiefiles.com/packages/lf20_rwq6ciql.json' },
-  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:'I have been tested. I will not break again.', lottieUrl:'https://assets5.lottiefiles.com/packages/lf20_obhph6wf.json' }
+  VISIONARY:{ name:'THE VISIONARY', emoji:'🐉', color:'#00f5d4', stmt:'Always thinking five moves ahead.', lottieUrl:'https://assets4.lottiefiles.com/packages/lf20_vnikrcia.json' },
+  PROTECTOR:{ name:'THE PROTECTOR', emoji:'🐺', color:'#ffb703', stmt:"The people I love don't stress about money.", lottieUrl:'https://assets1.lottiefiles.com/packages/lf20_syqnfe7c.json' },
+  BUILDER:  { name:'THE BUILDER',   emoji:'🐂', color:'#ff8c00', stmt:'Slow and steady. Every choice compounds.', lottieUrl:'https://assets6.lottiefiles.com/packages/lf20_bq4xpnlf.json' },
+  WANDERER: { name:'THE WANDERER',  emoji:'🦊', color:'#ff006e', stmt:'I figure it out as I go.', lottieUrl:'https://assets9.lottiefiles.com/packages/lf20_rwq6ciql.json' },
+  SURVIVOR: { name:'THE SURVIVOR',  emoji:'🦌', color:'#06d6a0', stmt:"Been through the worst. Still here.", lottieUrl:'https://assets5.lottiefiles.com/packages/lf20_obhph6wf.json' }
 };
 
 const BEASTS = {
@@ -849,31 +862,31 @@ const BEASTS = {
 const CHAPTERS = {
   1:{ name:'THE AWAKENING', region:'Ember Fields', bossName:"Xan'Dra the Debt Dragon", bossColor:'#cc0000',
     bgGradient:'radial-gradient(ellipse at 50% 100%,#3a0000,#180000,#0a0a0f)',
-    lore:"Long dormant beneath the financial realm, Xan'Dra awakens. Her debt-fire scorches all who are unprepared. She feeds on unprotected health and frozen income.",
-    bossHpMax:100, bossEmoji:'🐉', lottieUrl:'https://assets3.lottiefiles.com/packages/lf20_UJNc2t.json', scenarios:[101,102,103,104] },
+    lore:"One hospital bill. One accident. One month without income. That's all it takes. Xan'Dra doesn't hunt the weak — she hunts the unprotected.",
+    bossHpMax:100, bossEmoji:'🐉', bossColor:'#ff4d4d', lottieUrl:'https://assets3.lottiefiles.com/packages/lf20_UJNc2t.json', scenarios:[101,102,103,104] },
   2:{ name:'THE STORM FRONT', region:'Shattered Markets', bossName:'Marvex the Market Wraith', bossColor:'#7b2fff',
     bgGradient:'radial-gradient(ellipse at 50% 100%,#160030,#0d0018,#0a0a0f)',
-    lore:"The markets shatter. Marvex materialises from every panic sell and abandoned policy. She profits from your impatience and fear.",
-    bossHpMax:100, bossEmoji:'👻', lottieUrl:'https://assets2.lottiefiles.com/packages/lf20_qp1q7mct.json', scenarios:[201,202,203,204] },
+    lore:"Markets crash. Everyone's selling. Your group chat is on fire. Marvex doesn't crash the market — she waits for you to panic and does the rest.",
+    bossHpMax:100, bossEmoji:'👻', bossColor:'#7b2fff', lottieUrl:'https://assets2.lottiefiles.com/packages/lf20_qp1q7mct.json', scenarios:[201,202,203,204] },
   3:{ name:'THE LONG WINTER', region:'Frost Plains', bossName:'Inflixus the Inflation Specter', bossColor:'#ffb703',
     bgGradient:'radial-gradient(ellipse at 50% 0%,#1a1400,#0d0a00,#0a0a0f)',
-    lore:"Silent. Patient. Inflixus erodes everything over time. Those who ignore the Specter wake to find nothing left. Time is her weapon.",
-    bossHpMax:100, bossEmoji:'💀', lottieUrl:'https://assets7.lottiefiles.com/packages/lf20_s9miyk3p.json', scenarios:[301,302,303,304] },
+    lore:"You can't see it. You can't fight it. But Inflixus has been stealing from you since your first paycheck. Every year, your money quietly buys less.",
+    bossHpMax:100, bossEmoji:'💀', bossColor:'#00bcd4', lottieUrl:'https://assets7.lottiefiles.com/packages/lf20_s9miyk3p.json', scenarios:[301,302,303,304] },
   4:{ name:'THE SHADOW DIVIDE', region:'Void Wastes', bossName:'Morvek the Dependency Lord', bossColor:'#4a5568',
     bgGradient:'radial-gradient(ellipse at 50% 50%,#0d0d1e,#080814,#0a0a0f)',
-    lore:"Morvek does not attack you. He attacks the people who need you. He binds your dependants as weapons against your will.",
-    bossHpMax:100, bossEmoji:'⛓️', lottieUrl:'https://assets8.lottiefiles.com/packages/lf20_svy4ivyb.json', scenarios:[401,402,403,404] },
+    lore:"Morvek doesn't need to touch you. He goes for the people who need you. Your family. Your parents. The ones counting on you to have it figured out.",
+    bossHpMax:100, bossEmoji:'⛓️', bossColor:'#ff8c00', lottieUrl:'https://assets8.lottiefiles.com/packages/lf20_svy4ivyb.json', scenarios:[401,402,403,404] },
   5:{ name:'THE FINAL SEAL', region:'Legacy Citadel', bossName:'Voidex the Legacy Destroyer', bossColor:'#4c1d95',
     bgGradient:'radial-gradient(ellipse at 50% 30%,#0d0020,#060010,#000)',
-    lore:"The final chaos lord. Voidex devours legacies. Everything you've built, everything you'd leave behind — he wants all of it. This is what you have been preparing for.",
-    bossHpMax:150, bossEmoji:'🌑', lottieUrl:'https://assets10.lottiefiles.com/packages/lf20_ystsffqy.json', scenarios:[501,502,503,504] }
+    lore:"You spent decades building something. Then you're gone — and no one knows where anything is. Voidex doesn't steal from you. He lets the paperwork do it for him.",
+    bossHpMax:150, bossEmoji:'🌑', bossColor:'#9c27b0', lottieUrl:'https://assets10.lottiefiles.com/packages/lf20_ystsffqy.json', scenarios:[501,502,503,504] }
 };
 
 const SCENARIOS = {
-  101:{ chapter:1, name:'THE HEALING WARD TRIAL',
-    bossLine:"Without a healing ward, your coin drains for eternity.",
-    situation:"Xan'Dra's first curse strikes the Guardian's Vitality Shrine. Healers swarm — but every visit costs more coin than your war chest holds. Unprotected, one illness drains everything.",
-    question:"Which shield seals the Vitality Shrine?", dimension:'vitality',
+  101:{ chapter:1, name:'THE HOSPITAL BILL',
+    bossLine:"One hospital stay. That's all it takes to drain you dry.",
+    situation:"You're 26. You collapse at the gym. Ambulance, 3 nights in hospital, specialist fees. The bill: $42,000. You have $8,000 in savings.",
+    question:"What actually saves you here?", dimension:'vitality',
     choices:[
       {id:'A',text:'Integrated Shield Plan',correct:true,feedback:'The ISP caps your healer bills dramatically. Basic coverage alone leaves your vault open to Xan\'Dra.'},
       {id:'B',text:'Charge it to the debt scrolls',correct:false,feedback:'Debt scrolls compound at 26% — the Dragon feeds on interest. Your treasury bleeds longer than the wound.'},
@@ -1182,7 +1195,7 @@ const HERO_ORDER = ['VISIONARY','PROTECTOR','BUILDER','WANDERER','SURVIVOR'];
 let currentHeroIndex = 0;
 let heroTouchStartX = 0;
 let bossTauntInterval = null;
-let battleState = { chapterId:0, scenarioIndex:0, scenarioIds:[], hearts:5, bossHp:100, bossHpMax:100, timer:null, timerVal:30, locked:false, currentChapter:null };
+let battleState = { chapterId:0, scenarioIndex:0, scenarioIds:[], hearts:5, bossHp:100, bossHpMax:100, locked:false, currentChapter:null };
 
 // ─────────────────────────────────────────────────────────────
 // UTILS
@@ -1679,23 +1692,35 @@ function showChapterIntro(chId){
   const ch=CHAPTERS[chId];
 
   const region=document.getElementById('ci-region');
-  const art=document.getElementById('ci-boss-lottie');
+  const aura=document.getElementById('ci-boss-aura');
   const name=document.getElementById('ci-boss-name');
   const lore=document.getElementById('ci-lore');
   const btn=document.getElementById('ci-enter-btn');
 
   // Reset all elements immediately
   region.style.opacity='0';
-  art.style.opacity='0';
-  art.style.transform='scale(0.3)';
-  art.style.transition='';
+  aura.style.opacity='0';
   name.style.opacity='0';
   lore.style.opacity='0';
   btn.style.opacity='0';
   lore.textContent='';
 
   document.getElementById('ci-bg').style.background=ch.bgGradient;
-  loadLottie('ci-boss-lottie',ch.lottieUrl,ch.bossEmoji);
+
+  // set aura color + emoji
+  const color=ch.bossColor||'#ff006e';
+  aura.style.setProperty('--ci-color', color);
+  document.getElementById('ci-boss-emoji').textContent=ch.bossEmoji;
+
+  // spawn floating particles
+  const pCont=document.getElementById('ci-particles');
+  pCont.innerHTML='';
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.style.cssText=`position:absolute;width:${3+Math.random()*5}px;height:${3+Math.random()*5}px;border-radius:50%;background:${color};opacity:${0.2+Math.random()*0.5};left:${Math.random()*100}%;top:${Math.random()*100}%;animation:particleDrift ${4+Math.random()*6}s ${Math.random()*3}s ease-in-out infinite alternate`;
+    pCont.appendChild(p);
+  }
+
   name.textContent=ch.bossName.toUpperCase();
 
   showScreen('s-chapter-intro');
@@ -1704,11 +1729,7 @@ function showChapterIntro(chId){
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
       setTimeout(()=>{region.style.opacity='1';},200);
-      setTimeout(()=>{
-        art.style.opacity='1';
-        art.style.transform='scale(1)';
-        art.style.transition='all 1s cubic-bezier(0.34,1.56,0.64,1)';
-      },600);
+      setTimeout(()=>{aura.style.opacity='1';},600);
       setTimeout(()=>{name.style.opacity='1';},1200);
       setTimeout(()=>{
         lore.style.opacity='1';
@@ -1747,7 +1768,7 @@ function startChapterBattle(chId){
     hearts:cp.hearts_remaining||5,
     bossHp:cp.boss_hp||ch.bossHpMax,
     bossHpMax:ch.bossHpMax,
-    timer:null,timerVal:30,locked:false,
+    locked:false,
     currentChapter:ch
   };
   // setup battle screen
@@ -1815,37 +1836,8 @@ function loadScenario(sId){
     btn.onclick=()=>submitChoice(btn);
     cc.appendChild(btn);
   });
-  // timer
-  startTimer();
 }
 
-function startTimer(){
-  clearInterval(battleState.timer);
-  battleState.timerVal=30;
-  const fill=document.getElementById('battle-timer-fill');
-  fill.style.width='100%';
-  fill.style.transition='none';
-  setTimeout(()=>{fill.style.transition='width 0.1s linear';},50);
-  battleState.timer=setInterval(()=>{
-    battleState.timerVal--;
-    fill.style.width=(battleState.timerVal/30*100)+'%';
-    if(battleState.timerVal<=8) fill.style.background='#ff006e';
-    else fill.style.background='var(--cyan)';
-    if(battleState.timerVal<=0){
-      clearInterval(battleState.timer);
-      if(!battleState.locked) timeOut();
-    }
-  },1000);
-}
-
-function timeOut(){
-  // auto-wrong on timeout
-  battleState.locked=true;
-  clearInterval(battleState.timer);
-  document.getElementById('battle-feedback').textContent='⏱ Time ran out! The chaos lord attacks!';
-  document.querySelectorAll('.battle-choice').forEach(b=>b.classList.add('disabled'));
-  applyWrongChoice('vitality','Time ran out — the boss attacks!');
-}
 
 function flashScreen(color){
   const flash=document.createElement('div');
@@ -1857,7 +1849,6 @@ function flashScreen(color){
 async function submitChoice(btn){
   if(battleState.locked) return;
   battleState.locked=true;
-  clearInterval(battleState.timer);
   const correct=btn.dataset.correct==='true';
   const feedback=btn.dataset.feedback;
   document.querySelectorAll('.battle-choice').forEach(b=>b.classList.add('disabled'));
@@ -1890,7 +1881,7 @@ async function applyCorrectChoice(){
   const sc=SCENARIOS[scId];
   try{
     const r=await fetch('/api/chapter-trial',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({playerId:G.playerId,chapterId:battleState.chapterId,scenarioId:scId,correct:true,dimensionAffected:sc.dimension,decisionTimeMs:((30-battleState.timerVal)*1000)})});
+      body:JSON.stringify({playerId:G.playerId,chapterId:battleState.chapterId,scenarioId:scId,correct:true,dimensionAffected:sc.dimension,decisionTimeMs:0})});
     const d=await r.json();
     if(d.ok){
       battleState.bossHp=d.bossHp;
@@ -1925,7 +1916,7 @@ async function applyWrongChoice(dim, feedback){
   const scId=battleState.scenarioIds[battleState.scenarioIndex];
   try{
     await fetch('/api/chapter-trial',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({playerId:G.playerId,chapterId:battleState.chapterId,scenarioId:scId,correct:false,dimensionAffected:dim,decisionTimeMs:((30-battleState.timerVal)*1000)})});
+      body:JSON.stringify({playerId:G.playerId,chapterId:battleState.chapterId,scenarioId:scId,correct:false,dimensionAffected:dim,decisionTimeMs:0})});
   }catch(e){}
   if(battleState.hearts<=0){
     setTimeout(()=>endChapter(false),2500);
@@ -1946,7 +1937,6 @@ function advanceScenario(){
 }
 
 async function endChapter(won){
-  clearInterval(battleState.timer);
   const chId=battleState.chapterId;
   try{
     const r=await fetch('/api/chapter-complete',{method:'POST',headers:{'Content-Type':'application/json'},
