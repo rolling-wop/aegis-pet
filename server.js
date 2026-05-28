@@ -73,6 +73,9 @@ async function initDB() {
       scenarios_done TEXT DEFAULT '[]',
       hearts_remaining INTEGER DEFAULT 5,
       completed_at TEXT,
+      dodge_count INTEGER DEFAULT 0,
+      wrong_answers_json TEXT DEFAULT '[]',
+      age_reached INTEGER DEFAULT 22,
       PRIMARY KEY(player_id, chapter_id),
       FOREIGN KEY(player_id) REFERENCES players(id)
     );
@@ -348,10 +351,10 @@ app.post('/api/chapter-trial', async (req, res) => {
 
 app.post('/api/chapter-complete', async (req, res) => {
   try {
-    const { playerId, chapterId, won } = req.body;
+    const { playerId, chapterId, won, dodgeCount, wrongAnswers, ageReached } = req.body;
     const now = new Date().toISOString();
-    dbRun('UPDATE chapter_progress SET status=?,completed_at=? WHERE player_id=? AND chapter_id=?',
-      [won?'cleared':'failed', now, playerId, chapterId]);
+    dbRun('UPDATE chapter_progress SET status=?,completed_at=?,dodge_count=?,wrong_answers_json=?,age_reached=? WHERE player_id=? AND chapter_id=?',
+      [won?'cleared':'failed', now, dodgeCount||0, wrongAnswers||'[]', ageReached||22, playerId, chapterId]);
     if (won && chapterId < 5) {
       const next = dbGet('SELECT * FROM chapter_progress WHERE player_id=? AND chapter_id=?', [playerId, chapterId+1]);
       if (next && next.status === 'locked') {

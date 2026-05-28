@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>AEGIS PET — Chronicles of the Guardian Realm</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#00f5d4">
@@ -44,7 +44,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
 .cine-text{font-family:'VT323';font-size:clamp(15px,4vw,20px);color:var(--cyan);line-height:1.9;text-shadow:0 0 12px rgba(0,245,212,0.4);min-height:120px}
 .cine-cursor{display:inline-block;background:var(--cyan);width:10px;height:18px;animation:blink .7s infinite;vertical-align:middle}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.skip-hint{position:fixed;bottom:24px;right:24px;font-family:'Press Start 2P';font-size:7px;color:var(--muted);border:1px solid rgba(100,116,139,0.4);padding:8px 12px;cursor:pointer;transition:all .2s;z-index:2;background:transparent}
+.skip-hint{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));right:max(24px,env(safe-area-inset-right));font-family:'Press Start 2P';font-size:7px;color:var(--muted);border:1px solid rgba(100,116,139,0.4);padding:8px 12px;cursor:pointer;transition:all .2s;z-index:2;background:transparent}
 .skip-hint:hover{color:var(--cyan);border-color:var(--cyan)}
 
 /* ── ARCHETYPE ── */
@@ -176,10 +176,10 @@ select.lc-inp{cursor:pointer}
 .wm-node-region{font-family:'VT323';font-size:15px;color:var(--muted)}
 .wm-node-status{font-size:20px;flex-shrink:0}
 .wm-connector{width:2px;height:10px;background:rgba(255,255,255,.05);margin-left:22px;margin-bottom:0}
-.wm-nav{display:flex;gap:8px;padding:12px 14px 24px;width:100%;max-width:480px;margin:0 auto}
+.wm-nav{display:flex;gap:8px;padding:12px 14px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:480px;margin:0 auto}
 .wm-nav-btn{flex:1;font-family:'Press Start 2P';font-size:7px;padding:11px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.5);border-radius:8px;cursor:pointer;transition:all .2s}
 .wm-nav-btn:hover,.wm-nav-btn:active{background:rgba(0,245,212,.08);border-color:var(--cyan);color:var(--cyan)}
-.wm-nav-primary{border-color:var(--cyan);color:var(--cyan);font-size:11px;padding:14px 40px;box-shadow:0 0 20px rgba(0,245,212,0.2)}
+.wm-nav-primary{border-color:var(--cyan);color:var(--cyan);font-size:9px;padding:14px 6px;box-shadow:0 0 20px rgba(0,245,212,0.2)}
 .wm-game-complete-btn{display:block;width:100%;max-width:452px;margin:0 auto 12px;font-family:'Press Start 2P';font-size:8px;padding:14px;background:rgba(0,245,212,.08);border:1px solid var(--cyan);color:var(--cyan);border-radius:8px;cursor:pointer;transition:all .2s;letter-spacing:1px}
 .wm-game-complete-btn:hover{background:rgba(0,245,212,.15)}
 
@@ -291,7 +291,7 @@ select.lc-inp{cursor:pointer}
 
 /* ── THE PATTERN ── */
 #s-pattern{background:#07070f;justify-content:flex-start;align-items:center;padding:0;overflow-y:auto}
-.pattern-scroll{width:100%;max-width:460px;padding:48px 18px 80px;display:flex;flex-direction:column;gap:13px;margin:0 auto}
+.pattern-scroll{width:100%;max-width:460px;padding:48px 18px calc(80px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:13px;margin:0 auto}
 .p-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:26px 22px;transition:opacity .7s ease,transform .7s ease}
 .p-card-hidden{opacity:0!important;transform:translateY(18px)!important}
 .p-card-truth{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
@@ -373,6 +373,100 @@ select.lc-inp{cursor:pointer}
 .beast-slot.unlocked .beast-slot-emoji{filter:none;opacity:1}
 .beast-slot-name{font-family:'Press Start 2P';font-size:5px;color:var(--muted);line-height:1.4}
 .beast-slot.unlocked .beast-slot-name{color:var(--cyan)}
+
+/* ── RUNNER ENGINE ── */
+#s-runner{background:#000;padding:0;overflow:hidden;position:relative}
+#runner-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#player-char{position:absolute;width:90px;height:90px;pointer-events:none;z-index:5}
+.runner-hud{position:absolute;top:0;left:0;right:0;z-index:10;padding:9px 14px 6px;background:linear-gradient(to bottom,rgba(0,0,0,.82) 0%,transparent 100%);pointer-events:none}
+.r-hud-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.r-hearts{display:flex;gap:3px;align-items:center}
+.r-heart{font-size:17px;transition:all .3s;line-height:1}
+.r-heart.lost{opacity:.15;transform:scale(.6)}
+.r-shield-icon{font-size:15px;display:none;animation:shieldPulse 1s ease-in-out infinite;margin-left:4px}
+.r-shield-icon.on{display:inline-block}
+@keyframes shieldPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+.r-level-age{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);letter-spacing:.5px;text-align:right;white-space:nowrap}
+.r-chapter-lbl{font-family:'Press Start 2P';font-size:6px;color:rgba(255,255,255,.3);letter-spacing:2px;text-align:center;flex:1;padding:0 6px}
+.r-xp-row{display:flex;align-items:center;gap:6px;margin-top:2px}
+.r-xp-bar{flex:1;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
+.r-xp-fill{height:100%;background:var(--cyan);border-radius:1px;transition:width .4s}
+.r-xp-lbl{font-family:'VT323';font-size:12px;color:rgba(255,255,255,.22);white-space:nowrap}
+.r-boss-hp-row{display:flex;align-items:center;gap:5px;margin-top:2px}
+.r-boss-nm{font-family:'Press Start 2P';font-size:5px;color:rgba(255,0,110,.5);flex-shrink:0;letter-spacing:.5px}
+.r-boss-hp-bar{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.r-boss-hp-fill{height:100%;background:var(--danger);border-radius:2px;transition:width .5s}
+/* Q&A Overlay */
+.runner-qa{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.94);display:flex;flex-direction:column;align-items:center;padding:14px 14px 28px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .22s;gap:9px}
+.runner-qa.on{opacity:1;pointer-events:all}
+.rqa-badge{font-family:'Press Start 2P';font-size:7px;color:var(--cyan);letter-spacing:3px;padding:5px 14px;border:1px solid rgba(0,245,212,.3);border-radius:3px;text-align:center;flex-shrink:0}
+.rqa-boss{font-family:'VT323';font-size:clamp(14px,4.5vw,18px);color:rgba(255,120,120,.85);font-style:italic;line-height:1.55;padding:10px 14px;background:rgba(204,0,0,.07);border:1px solid rgba(204,0,0,.2);border-radius:8px;width:100%;flex-shrink:0}
+.rqa-situation{font-family:'VT323';font-size:clamp(13px,4vw,17px);color:rgba(255,255,255,.65);line-height:1.7;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;width:100%;flex-shrink:0}
+.rqa-question{font-family:'Press Start 2P';font-size:clamp(7px,2vw,9px);color:var(--cyan);text-align:center;line-height:1.8;flex-shrink:0}
+.rqa-choices{display:flex;flex-direction:column;gap:8px;width:100%;flex-shrink:0}
+.rqa-feedback{font-family:'VT323';font-size:clamp(14px,4vw,17px);color:rgba(255,255,255,.75);line-height:1.5;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;width:100%;display:none}
+.rqa-social{font-family:'VT323';font-size:12px;color:rgba(255,255,255,.28);margin-top:3px;display:block}
+.rqa-continue{display:none;width:100%;margin-top:4px;font-size:8px!important}
+/* Life Stage Banner */
+#life-stage-banner{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .5s;gap:10px}
+#life-stage-banner.on{opacity:1}
+.lsb-age{font-family:'Press Start 2P';font-size:clamp(32px,12vw,52px);color:var(--cyan);text-shadow:0 0 40px rgba(0,245,212,.7);line-height:1}
+.lsb-entering{font-family:'VT323';font-size:clamp(18px,6vw,26px);color:rgba(255,255,255,.6)}
+.lsb-motivation{font-family:'VT323';font-size:clamp(14px,4.5vw,19px);color:rgba(255,255,255,.35);font-style:italic;max-width:300px;line-height:1.6}
+.lsb-lottie{width:80px;height:80px;margin-top:6px;animation:lsbPop .6s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes lsbPop{0%{transform:scale(0.5)}100%{transform:scale(1.1)}}
+/* Level Up Flash */
+#levelup-flash{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,245,212,.05);pointer-events:none;opacity:0;transition:opacity .15s;gap:10px}
+#levelup-flash.on{opacity:1}
+.lu-icon{font-size:46px;animation:luBounce .4s ease-out}
+@keyframes luBounce{0%{transform:scale(.3)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.lu-title{font-family:'Press Start 2P';font-size:clamp(14px,5vw,22px);color:var(--cyan);text-shadow:0 0 30px rgba(0,245,212,.9);letter-spacing:2px}
+.lu-sub{font-family:'VT323';font-size:clamp(16px,5vw,22px);color:rgba(255,255,255,.45)}
+/* Swipe Tutorial */
+#swipe-tutorial{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px;gap:18px;opacity:0;pointer-events:none;transition:opacity .3s}
+#swipe-tutorial.on{opacity:1;pointer-events:all}
+.stut-icon{font-size:54px;line-height:1;animation:stutPulse 1s ease-in-out infinite}
+@keyframes stutPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.stut-title{font-family:'Press Start 2P';font-size:10px;color:var(--cyan);letter-spacing:2px}
+.stut-desc{font-family:'VT323';font-size:18px;color:rgba(255,255,255,.55);line-height:1.6;max-width:260px}
+.stut-dots{display:flex;gap:8px;justify-content:center}
+.stut-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s}
+.stut-dot.on{background:var(--cyan);box-shadow:0 0 8px var(--cyan);transform:scale(1.3)}
+.stut-skip{font-family:'Press Start 2P';font-size:7px;color:rgba(255,255,255,.2);background:none;border:none;cursor:pointer;padding:8px}
+/* Float XP */
+.float-xp{position:fixed;font-family:'Press Start 2P';font-size:9px;pointer-events:none;z-index:100;animation:floatUpAnim 1.3s ease-out forwards;transform:translateX(-50%)}
+@keyframes floatUpAnim{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-55px)}}
+/* Continue Screen */
+#s-continue{background:var(--bg);gap:0}
+.continue-pet{font-size:64px;margin-bottom:8px;animation:petIdle 2s ease-in-out infinite;display:block}
+/* Biggest Gap Overlay */
+#biggest-gap-overlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 20px;opacity:0;pointer-events:none;transition:opacity .4s;gap:12px}
+#biggest-gap-overlay.on{opacity:1;pointer-events:all}
+.bgap-eyebrow{font-family:'Press Start 2P';font-size:7px;color:var(--danger);letter-spacing:3px}
+.bgap-dim{font-family:'Press Start 2P';font-size:clamp(10px,3.5vw,14px);color:#fff;letter-spacing:1px}
+.bgap-stat{font-family:'Press Start 2P';font-size:clamp(20px,7vw,32px);color:var(--danger);text-shadow:0 0 24px rgba(255,0,110,.6);line-height:1.2}
+.bgap-label{font-family:'VT323';font-size:clamp(16px,5vw,21px);color:rgba(255,255,255,.65);line-height:1.6;max-width:300px}
+.bgap-bar-wrap{display:flex;align-items:center;gap:8px;width:100%;max-width:280px}
+.bgap-bar-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+#bgap-bar-fill{height:100%;border-radius:2px;background:var(--danger);transition:width .8s}
+#bgap-score{font-family:'VT323';font-size:16px;color:var(--danger)}
+/* Share Overlay */
+#share-overlay{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;gap:14px;text-align:center}
+#share-overlay.on{opacity:1;pointer-events:all}
+.share-preview{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:16px;max-width:280px;width:100%;text-align:center}
+/* Tarot lock */
+.tarot-lock-wrap{width:100%;position:relative;z-index:1;text-align:center;padding:14px 16px;background:rgba(255,183,3,.05);border:1px solid rgba(255,183,3,.2);border-radius:8px;display:none}
+.tarot-lock-wrap.on{display:block}
+/* Daily Challenge */
+#s-daily{background:var(--bg);justify-content:flex-start;padding:0;overflow-y:auto}
+.daily-scroll{width:100%;max-width:460px;padding:28px 16px calc(60px + env(safe-area-inset-bottom));margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.daily-streak-badge{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Press Start 2P';font-size:9px;color:var(--amber);padding:12px;background:rgba(255,183,3,.06);border:1px solid rgba(255,183,3,.2);border-radius:8px}
+.daily-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px}
+/* WM daily btn */
+.wm-daily-btn{font-family:'Press Start 2P';font-size:7px;padding:11px 10px;background:rgba(255,183,3,.06);border:1px solid rgba(255,183,3,.25);color:var(--amber);border-radius:8px;cursor:pointer;transition:all .2s;flex:1}
+.wm-daily-btn:hover{background:rgba(255,183,3,.12)}
+.wm-share-btn{font-family:'Press Start 2P';font-size:7px;padding:11px 10px;background:rgba(123,47,255,.06);border:1px solid rgba(123,47,255,.25);color:var(--violet);border-radius:8px;cursor:pointer;transition:all .2s;flex:1}
+.wm-share-btn:hover{background:rgba(123,47,255,.12)}
 </style>
 </head>
 <body>
@@ -535,7 +629,9 @@ select.lc-inp{cursor:pointer}
   <div class="wm-chapters" id="wm-chapters"></div>
   <div id="wm-ending-btn-wrap"></div>
   <div class="wm-nav">
-    <button class="wm-nav-btn wm-nav-primary" onclick="enterCurrentChapter()">▶ CONTINUE</button>
+    <button class="wm-daily-btn" onclick="showDailyChallenge()">🔥 DAILY</button>
+    <button class="wm-nav-btn wm-nav-primary" onclick="enterCurrentChapter()">&#9654; CONTINUE</button>
+    <button class="wm-share-btn" onclick="openShareOverlay()">&#128248; SHARE</button>
   </div>
 </div>
 
@@ -636,7 +732,7 @@ select.lc-inp{cursor:pointer}
     </div>
     <div class="p-card p-card-cta p-card-hidden" id="pc-cta">
       <div class="p-body p-body-italic p-body-muted" id="pc-cta-txt" style="margin-bottom:20px;text-align:center"></div>
-      <button class="p-btn-primary" onclick="doWhatsApp()">SPEAK WITH YOUR ADVISOR</button>
+      <button class="p-btn-primary" onclick="doWAWithGap()">SPEAK WITH YOUR ADVISOR</button>
       <button class="p-btn-ghost" onclick="maybeShowLead()">[ YOUR ARCHETYPE READING ]</button>
       <button class="p-btn-ghost" onclick="doSharePattern()">[ SHARE MY PATTERN ]</button>
       <button class="p-btn-ghost" onclick="showScreen('s-worldmap');renderWorldMap()">[ RETURN TO REALM ]</button>
@@ -666,6 +762,11 @@ select.lc-inp{cursor:pointer}
       <div class="tarot-section shadow"><div class="tarot-section-label" style="color:var(--danger)">SHADOW</div><div class="tarot-section-text" id="tarot-shadow"></div></div>
       <div class="tarot-section light"><div class="tarot-section-label" style="color:var(--cyan)">LIGHT</div><div class="tarot-section-text" id="tarot-light"></div></div>
       <div class="tarot-advice" id="tarot-advice"></div>
+      <div class="tarot-lock-wrap" id="tarot-lock-wrap">
+        <div style="font-family:'Press Start 2P';font-size:7px;color:var(--amber);margin-bottom:8px">🔒 YOUR ARCHETYPE IS LOCKED</div>
+        <div style="font-family:'VT323';font-size:16px;color:rgba(255,255,255,.5);margin-bottom:12px">Share your pattern to unlock the full reading.</div>
+        <button class="px-btn amber" style="width:100%;font-size:7px" onclick="shareToUnlockTarot()">[ SHARE TO UNLOCK ]</button>
+      </div>
       <button class="tarot-continue-btn" id="tarot-continue-btn" onclick="showPatternReading();showScreen('s-pattern')">[ YOUR FINANCIAL PATTERN ]</button>
     </div>
   </div>
@@ -702,6 +803,114 @@ select.lc-inp{cursor:pointer}
     <div class="beast-grid" id="beast-grid"></div>
     <button class="prof-back-btn" style="margin-top:20px" onclick="showScreen('s-worldmap');renderWorldMap()">← BACK TO REALM</button>
   </div>
+</div>
+
+<!-- 16. RUNNER -->
+<div class="screen" id="s-runner">
+  <canvas id="runner-canvas"></canvas>
+  <div id="player-char"></div>
+  <div class="runner-hud" id="runner-hud">
+    <div class="r-hud-row">
+      <div style="display:flex;align-items:center">
+        <div class="r-hearts" id="r-hearts"></div>
+        <span class="r-shield-icon" id="r-shield-icon">🛡</span>
+      </div>
+      <div class="r-chapter-lbl" id="r-chapter-lbl"></div>
+      <div class="r-level-age" id="r-level-age"></div>
+    </div>
+    <div class="r-boss-hp-row">
+      <div class="r-boss-nm" id="r-boss-nm"></div>
+      <div class="r-boss-hp-bar"><div class="r-boss-hp-fill" id="r-boss-hp-fill"></div></div>
+    </div>
+    <div class="r-xp-row">
+      <div class="r-xp-bar"><div class="r-xp-fill" id="r-xp-fill"></div></div>
+      <div class="r-xp-lbl" id="r-xp-lbl"></div>
+    </div>
+  </div>
+  <div class="runner-qa" id="runner-qa">
+    <div class="rqa-badge">⚡ FINANCIAL CHALLENGE</div>
+    <div class="rqa-boss" id="rqa-boss"></div>
+    <div class="rqa-situation" id="rqa-situation"></div>
+    <div class="rqa-question" id="rqa-question"></div>
+    <div class="rqa-choices" id="rqa-choices"></div>
+    <div class="rqa-feedback" id="rqa-feedback"></div>
+    <button class="px-btn rqa-continue" id="rqa-continue" onclick="closeRunnerQA()">[ KEEP RUNNING ]</button>
+  </div>
+</div>
+
+<!-- 17. CONTINUE (save state) -->
+<div class="screen" id="s-continue">
+  <span class="continue-pet" id="continue-pet-emoji">🐾</span>
+  <div class="px-title" style="margin-bottom:4px" id="continue-pet-name"></div>
+  <div class="px-sub" id="continue-progress" style="margin-bottom:24px"></div>
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px">
+    <button class="px-btn" onclick="continueGame()">[ CONTINUE JOURNEY ]</button>
+    <button class="px-btn danger" onclick="newGame()">[ START OVER ]</button>
+  </div>
+</div>
+
+<!-- 18. DAILY CHALLENGE -->
+<div class="screen" id="s-daily">
+  <div class="daily-scroll">
+    <div class="px-title" style="margin-bottom:6px">⚔ DAILY CHALLENGE</div>
+    <div class="daily-streak-badge" id="daily-streak-badge">🔥 0 day streak</div>
+    <div class="px-sub" id="daily-date" style="margin-bottom:0;font-size:13px"></div>
+    <div id="daily-complete-msg" style="display:none;font-family:'VT323';font-size:20px;color:var(--success);text-align:center;padding:20px">✅ Today's challenge complete! Come back tomorrow.</div>
+    <div id="daily-qa-wrap">
+      <div class="daily-card"><div class="tut-boss-quote" id="daily-boss-line"></div></div>
+      <div class="daily-card"><div class="tut-situation" id="daily-situation"></div></div>
+      <div style="font-family:'Press Start 2P';font-size:8px;color:var(--cyan);text-align:center;padding:8px 0;line-height:1.8" id="daily-question"></div>
+      <div class="tut-choices" id="daily-choices"></div>
+      <div id="daily-feedback" style="display:none;font-family:'VT323';font-size:17px;color:rgba(255,255,255,.75);padding:10px 14px;background:rgba(255,255,255,.04);border-radius:6px;margin-top:8px"></div>
+      <button id="daily-continue-btn" class="px-btn" style="display:none;margin-top:12px;width:100%" onclick="showScreen('s-worldmap');renderWorldMap()">[ BACK TO REALM ]</button>
+    </div>
+    <button class="p-btn-ghost" style="margin-top:8px" onclick="showScreen('s-worldmap');renderWorldMap()">← BACK</button>
+  </div>
+</div>
+
+<!-- GLOBAL OVERLAYS (outside screen stack) -->
+<div id="life-stage-banner">
+  <div class="lsb-age" id="lsb-age">Age 30</div>
+  <div class="lsb-entering" id="lsb-entering">Entering Your 30s</div>
+  <div class="lsb-motivation" id="lsb-motivation">Bigger responsibilities. Bigger choices.</div>
+  <div id="lsb-lottie" class="lsb-lottie"></div>
+</div>
+
+<div id="levelup-flash">
+  <div class="lu-icon">⬆</div>
+  <div class="lu-title" id="lu-title">LEVEL UP!</div>
+  <div class="lu-sub" id="lu-sub"></div>
+</div>
+
+<div id="swipe-tutorial">
+  <div class="stut-icon" id="stut-icon">👆</div>
+  <div class="stut-title" id="stut-title">SWIPE TO DODGE</div>
+  <div class="stut-desc" id="stut-desc">Swipe left or right to change lanes.</div>
+  <div class="stut-dots">
+    <div class="stut-dot on"></div><div class="stut-dot"></div><div class="stut-dot"></div>
+  </div>
+  <button class="stut-skip" onclick="skipTutorial()">SKIP TUTORIAL</button>
+</div>
+
+<div id="biggest-gap-overlay">
+  <div class="bgap-eyebrow">⚠ YOUR BIGGEST GAP</div>
+  <div class="bgap-dim" id="bgap-dim"></div>
+  <div class="bgap-stat" id="bgap-stat"></div>
+  <div class="bgap-label" id="bgap-label"></div>
+  <div class="bgap-bar-wrap"><div class="bgap-bar-track"><div id="bgap-bar-fill"></div></div><div id="bgap-score">40%</div></div>
+  <button class="px-btn danger" onclick="window.open(buildWAUrl(),'_blank')">Talk to Dylan about this →</button>
+  <button class="p-btn-ghost" style="width:100%;max-width:280px" onclick="closeBiggestGap()">[ CONTINUE ]</button>
+</div>
+
+<div id="share-overlay">
+  <div class="px-title" style="margin-bottom:4px">SHARE YOUR RESULT</div>
+  <div class="share-preview">
+    <div style="font-size:52px;margin-bottom:8px" id="sp-emoji"></div>
+    <div style="font-family:'Press Start 2P';font-size:8px;color:var(--cyan);margin-bottom:4px" id="sp-name"></div>
+    <div style="font-family:'VT323';font-size:16px;color:rgba(255,255,255,.5)" id="sp-sub"></div>
+  </div>
+  <button class="px-btn" onclick="shareResultCard()">[ SHARE / SAVE IMAGE ]</button>
+  <button class="p-btn-ghost" style="width:100%;max-width:280px" onclick="document.getElementById('share-overlay').classList.remove('on')">[ CLOSE ]</button>
 </div>
 
 <!-- BOSS SVG ART (hidden templates) -->
@@ -2174,6 +2383,7 @@ function showTarotReveal(profileType){
   document.getElementById('tarot-reveal-content').classList.remove('visible');
   document.getElementById('tarot-card').classList.remove('flipped');
   document.getElementById('tarot-continue-btn').style.display='none';
+  document.getElementById('tarot-lock-wrap').classList.remove('on');
   showScreen('s-tarot');
   // flip after 1.5s
   setTimeout(()=>{
@@ -2198,7 +2408,12 @@ function showTarotReveal(profileType){
           document.getElementById('tarot-shadow').textContent=tc.shadow;
           document.getElementById('tarot-light').textContent=tc.light;
           document.getElementById('tarot-advice').textContent=tc.advice;
-          setTimeout(()=>{document.getElementById('tarot-continue-btn').style.display='block';},1000);
+          setTimeout(()=>{
+            // Show share-to-unlock after some progress, else direct continue
+            const cleared=(G.chapters||[]).filter(c=>c.status==='cleared').length;
+            if(cleared>=2&&!localStorage.getItem('aegis_tarot_unlocked')){lockTarotForShare();}
+            else{document.getElementById('tarot-continue-btn').style.display='block';}
+          },1000);
         },tc.traits.length*220+300);
       });
     },600);
@@ -2323,7 +2538,820 @@ window.showScreen=function(id){
   if(id !== 's-worldmap') clearInterval(bossTauntInterval);
   _origShowScreen(id);
   if(id==='s-profile') renderProfile();
+  if(id==='s-runner'){
+    const c=document.getElementById('runner-canvas');
+    if(c){c.width=c.offsetWidth||window.innerWidth;c.height=c.offsetHeight||window.innerHeight;}
+  }
 };
+
+// =====================================================================
+// RUNNER ENGINE — Temple Run inspired
+// =====================================================================
+const RUNNER_CFG={
+  POOL_SIZE:6, SPEED_BASE:4, SPEED_MAX:9, AGE_TICK:300,
+  LANE_F:[0.2,0.5,0.8], PLAYER_Y_F:0.72
+};
+const CHAPTER_RUN={
+  1:{bg:'city',     ageStart:22,ageEnd:26,stageName:'Your 20s',      motivation:'The foundation years. What you build now compounds forever.'},
+  2:{bg:'financial',ageStart:27,ageEnd:30,stageName:'Your Late 20s', motivation:'Real money, real decisions. The stakes just got higher.'},
+  3:{bg:'suburbs',  ageStart:31,ageEnd:40,stageName:'Your 30s',      motivation:'Bigger responsibilities. Bigger choices.'},
+  4:{bg:'family',   ageStart:41,ageEnd:50,stageName:'Your 40s',      motivation:'Everything you built is being tested.'},
+  5:{bg:'legacy',   ageStart:51,ageEnd:65,stageName:'Legacy Years',  motivation:'What you leave behind defines what you stood for.'}
+};
+const XP_LEVELS=[0,50,120,200,300,420,560,720,900,1100];
+const GAP_FACTS={
+  vitality:{stat:'$38k+', label:'average Singapore hospital stay. One event, zero savings.'},
+  stability:{stat:'7 in 10', label:'adults wiped out financially after 6 months without income.'},
+  resilience:{stat:'1 in 4', label:'people hit critical illness before age 65 in Singapore.'},
+  bond:{stat:'62%', label:'of families face serious debt crisis within a year of losing a breadwinner.'},
+  legacy:{stat:'$180k', label:'average unplanned estate issues left behind in Singapore.'}
+};
+const TRAP_LABELS=[
+  {e:'💳',l:'Skip insurance'},{e:'📉',l:'Panic sell'},{e:'🏥',l:'No hospital plan'},
+  {e:'💸',l:'No emergency fund'},{e:'⛓️',l:'Carry debt'},{e:'🎰',l:'No diversify'},
+  {e:'😴',l:'Skip coverage'},{e:'💥',l:'YOLO invest'},{e:'📄',l:'No will'},
+  {e:'⏰',l:'Wait ‘til later'}
+];
+
+let RS=null; // runner state singleton
+
+// ─ INIT RUNNER STATE ─
+function initRS(chId){
+  const ch=CHAPTERS[chId], cfg=CHAPTER_RUN[chId];
+  const canvas=document.getElementById('runner-canvas');
+  const W=canvas.width=canvas.offsetWidth, H=canvas.height=canvas.offsetHeight;
+  const lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*W));
+  const cp=G.chapters.find(c=>c.chapter_id===chId)||{};
+  RS={
+    running:false, paused:false, frameCount:0,
+    speed:RUNNER_CFG.SPEED_BASE, chId, ch, cfg,
+    // player
+    lane:1, pX:lXs[1], pY:Math.round(H*RUNNER_CFG.PLAYER_Y_F),
+    jumping:false, jTimer:0, jDur:26, jH:68,
+    // age
+    age:cfg.ageStart, ageAcc:0,
+    // combat
+    hearts:cp.hearts_remaining||5, bossHp:cp.boss_hp||ch.bossHpMax, bossHpMax:ch.bossHpMax,
+    shieldActive:false, invinc:false, invincT:0,
+    // scenarios
+    scIds:[...ch.scenarios], scIdx:0, scTotal:ch.scenarios.length,
+    nextScIn:160, scInterval:140,
+    // pool
+    pool:Array.from({length:RUNNER_CFG.POOL_SIZE},()=>({active:false})),
+    spawnTimer:0,
+    // input
+    tStartX:0, tStartY:0, lastKey:0,
+    // bg
+    bgOff:0, bgB:makeBgBuildings(chId,W,H), bgS:makeBgStars(W,H),
+    // canvas
+    W,H,lXs,
+    // state
+    raf:null, lp:null, qaActive:false, dead:false,
+    dodgeCount:G.dodgeCount||0, wrongAnswers:[]
+  };
+}
+
+function makeBgBuildings(chId,W,H){
+  const C={
+    1:{n:12,maxH:.55,minH:.18,c1:'#0a1628',c2:'#0d1f3c',wc:'rgba(255,200,0,.4)',gc:'#060d18'},
+    2:{n:16,maxH:.78,minH:.3, c1:'#08001a',c2:'#130a45',wc:'rgba(150,100,255,.5)',gc:'#050010'},
+    3:{n:10,maxH:.45,minH:.14,c1:'#061206',c2:'#0a200a',wc:'rgba(0,255,120,.35)',gc:'#04100a'},
+    4:{n:14,maxH:.5, minH:.16,c1:'#06120a',c2:'#0d2016',wc:'rgba(80,255,150,.3)',gc:'#04100a'},
+    5:{n:10,maxH:.62,minH:.22,c1:'#180a00',c2:'#241200',wc:'rgba(255,183,0,.4)',gc:'#140800'}
+  };
+  const c=C[chId]||C[1], blds=[];
+  for(let i=0;i<c.n;i++){
+    const bw=W/c.n+(Math.random()*30-15);
+    const bh=(c.minH+Math.random()*(c.maxH-c.minH))*H;
+    const bx=(i/c.n)*W+(Math.random()*16-8);
+    const wins=[];
+    for(let wy=10;wy<bh-10;wy+=16)for(let wx=6;wx<bw-6;wx+=14)if(Math.random()>.42)wins.push({x:wx,y:wy});
+    blds.push({x:bx,bw,bh,color:Math.random()>.5?c.c1:c.c2,wins,wc:c.wc});
+  }
+  return {blds,gc:c.gc,gY:Math.round(H*.87)};
+}
+function makeBgStars(W,H){
+  return Array.from({length:55},()=>({x:Math.random()*W,y:Math.random()*H*.45,r:.5+Math.random()*1.8,a:.25+Math.random()*.55,tw:Math.random()*Math.PI*2}));
+}
+
+// ─ LAUNCH ─
+function launchRunner(chId){
+  initRS(chId);
+  // Lottie player character
+  const pDiv=document.getElementById('player-char');
+  pDiv.innerHTML='';
+  pDiv.style.width='90px'; pDiv.style.height='90px';
+  const a=ARCHETYPES[G.archetype]||ARCHETYPES.VISIONARY;
+  const fallback='https://assets3.lottiefiles.com/packages/lf20_p8bfn5of.json';
+  function tryLoadLottie(url,isFallback){
+    try{
+      const lp=lottie.loadAnimation({container:pDiv,renderer:'svg',loop:true,autoplay:true,path:url});
+      if(!isFallback)lp.addEventListener('data_failed',()=>{pDiv.innerHTML='';tryLoadLottie(fallback,true);});
+      RS.lp=lp;
+    }catch(e){pDiv.style.fontSize='60px';pDiv.style.textAlign='center';pDiv.style.lineHeight='90px';pDiv.textContent=a.emoji;}
+  }
+  tryLoadLottie(a.lottieUrl,false);
+  // HUD
+  updateRHUD();
+  document.getElementById('r-boss-nm').textContent=RS.ch.bossName.toUpperCase();
+  document.getElementById('r-boss-hp-fill').style.width='100%';
+  // Input
+  setupRInput();
+  showScreen('s-runner');
+  setTimeout(()=>{ // wait for screen paint
+    resizeRC();
+    if(!localStorage.getItem('aegis_tutorial_done'))showSwipeTut(startRL);
+    else startRL();
+  },80);
+}
+function startRL(){ RS.running=true; RS.raf=requestAnimationFrame(runnerLoop); }
+
+// ─ MAIN LOOP ─
+function runnerLoop(){
+  if(!RS||!RS.running)return;
+  if(RS.qaActive||RS.paused){RS.raf=requestAnimationFrame(runnerLoop);return;}
+  RS.frameCount++;
+  // Speed: 4 + frameCount/600, max 9
+  RS.speed=Math.min(RUNNER_CFG.SPEED_MAX,RUNNER_CFG.SPEED_BASE+RS.frameCount/600);
+  // Age tick every 300 frames
+  if(++RS.ageAcc>=RUNNER_CFG.AGE_TICK){RS.ageAcc=0;if(RS.age<RS.cfg.ageEnd){RS.age++;updateRHUD();}}
+  // Invincibility
+  if(RS.invinc&&--RS.invincT<=0)RS.invinc=false;
+  // Smooth lane lerp
+  RS.pX+=(RS.lXs[RS.lane]-RS.pX)*.18;
+  // Jump arc
+  let jOff=0;
+  if(RS.jumping){RS.jTimer++;const t=RS.jTimer/RS.jDur;jOff=-Math.sin(t*Math.PI)*RS.jH;if(RS.jTimer>=RS.jDur){RS.jumping=false;RS.jTimer=0;}}
+  // Move player div
+  const pDiv=document.getElementById('player-char');
+  pDiv.style.left=(RS.pX-45)+'px';
+  pDiv.style.top=(RS.pY-45+jOff)+'px';
+  // Spawn
+  if(--RS.nextScIn<=0&&RS.scIdx<RS.scTotal){spawnScenario();RS.nextScIn=RS.scInterval;}
+  if(++RS.spawnTimer>=getSpawnInt()){RS.spawnTimer=0;spawnTrapOrPickup();}
+  // Update pool
+  updatePool(RS.pY+jOff);
+  // Scroll bg
+  RS.bgOff=(RS.bgOff+RS.speed*.35)%(RS.H*.9);
+  // Draw
+  drawFrame();
+  if(!RS.dead)RS.raf=requestAnimationFrame(runnerLoop);
+}
+function getSpawnInt(){return Math.max(32,62-RS.speed*4);}
+
+// ─ SPAWN ─
+function spawnScenario(){
+  if(RS.scIdx>=RS.scTotal)return;
+  const slot=RS.pool.find(s=>!s.active);if(!slot)return;
+  Object.assign(slot,{active:true,type:'SCENARIO',x:0,y:-80,w:RS.W,h:58,scId:RS.scIds[RS.scIdx],color:'rgba(255,0,110,.12)',bc:'rgba(255,0,110,.65)'});
+}
+function spawnTrapOrPickup(){
+  const slot=RS.pool.find(s=>!s.active);if(!slot)return;
+  const r=Math.random();
+  if(r<.1&&!RS.shieldActive){Object.assign(slot,{active:true,type:'SHIELD',lane:Math.floor(Math.random()*3),y:-28,r:18,color:'#00bfff'});slot.x=RS.lXs[slot.lane];}
+  else if(r<.26){Object.assign(slot,{active:true,type:'GOLD',lane:Math.floor(Math.random()*3),y:-28,r:18,color:'#ffd700'});slot.x=RS.lXs[slot.lane];}
+  else{
+    const tr=TRAP_LABELS[Math.floor(Math.random()*TRAP_LABELS.length)];
+    const lane=Math.floor(Math.random()*3);
+    Object.assign(slot,{active:true,type:'TRAP',lane,x:RS.lXs[lane],y:-40,w:56,h:56,e:tr.e,lbl:tr.l});
+  }
+}
+
+// ─ POOL UPDATE + COLLISION ─
+function updatePool(py){
+  RS.pool.forEach(obs=>{
+    if(!obs.active)return;
+    obs.y+=RS.speed;
+    // Recycle
+    if(obs.y>RS.H+100){if(obs.type==='TRAP')RS.dodgeCount++;obs.active=false;return;}
+    // Collision
+    if(obs.type==='SCENARIO'){
+      if(obs.y+obs.h/2>=py-55&&obs.y+obs.h/2<=py+35){obs.active=false;triggerQA(obs.scId);}
+    }else if(obs.type==='TRAP'&&!RS.invinc){
+      if(Math.abs(obs.x-RS.pX)<32&&Math.abs(obs.y-py)<32){obs.active=false;hitTrap();}
+    }else if(obs.type==='GOLD'||obs.type==='SHIELD'){
+      if(Math.abs(obs.x-RS.pX)<34&&Math.abs(obs.y-py)<34){obs.active=false;obs.type==='GOLD'?collectGold():collectShield();}
+    }
+  });
+}
+function hitTrap(){
+  if(RS.shieldActive){RS.shieldActive=false;document.getElementById('r-shield-icon').classList.remove('on');showFXP('SHIELD USED',RS.pX,RS.pY,'#00bfff');flashRC('rgba(0,191,255,.3)');return;}
+  RS.hearts=Math.max(0,RS.hearts-1);RS.invinc=true;RS.invincT=55;
+  updateRHUD();flashRC('rgba(255,0,110,.35)');shakeRC();hurtPC();
+  if(RS.hearts<=0){RS.dead=true;setTimeout(()=>endRC(false),900);}
+}
+function collectGold(){addXP(10);showFXP('+10 XP',RS.pX,RS.pY-55,'#ffd700');flashRC('rgba(255,215,0,.12)');}
+function collectShield(){RS.shieldActive=true;document.getElementById('r-shield-icon').classList.add('on');showFXP('SHIELD!',RS.pX,RS.pY-55,'#00bfff');}
+
+// ─ QA ─
+function triggerQA(scId){
+  RS.qaActive=true;
+  const sc=SCENARIOS[scId];if(!sc){advRScene();return;}
+  const qa=document.getElementById('runner-qa');qa.classList.add('on');
+  document.getElementById('rqa-boss').textContent='"'+sc.bossLine+'"';
+  document.getElementById('rqa-situation').textContent=sc.situation;
+  document.getElementById('rqa-question').textContent=sc.question;
+  document.getElementById('rqa-feedback').style.display='none';
+  document.getElementById('rqa-continue').style.display='none';
+  const cc=document.getElementById('rqa-choices');cc.innerHTML='';
+  [...sc.choices].sort(()=>Math.random()-.5).forEach(ch=>{
+    const btn=document.createElement('button');btn.className='battle-choice';
+    btn.dataset.correct=ch.correct;btn.dataset.feedback=ch.feedback;btn.dataset.dim=sc.dimension;btn.dataset.scId=scId;
+    btn.innerHTML=`<span class="choice-label">${ch.id}</span>${ch.text}`;
+    btn.onclick=()=>submitRQA(btn,sc);
+    cc.appendChild(btn);
+  });
+  document.getElementById('runner-qa').scrollTop=0;
+}
+async function submitRQA(btn,sc){
+  document.querySelectorAll('#rqa-choices .battle-choice').forEach(b=>{b.onclick=null;b.classList.add('disabled');});
+  const correct=btn.dataset.correct==='true';
+  btn.classList.add(correct?'correct':'wrong');
+  if(!correct)document.querySelectorAll('#rqa-choices .battle-choice').forEach(b=>{if(b.dataset.correct==='true')b.classList.add('correct');});
+  const pct=correct?(30+Math.floor(Math.random()*40)):(15+Math.floor(Math.random()*25));
+  const proof=correct?`${pct}% of Guardians got this right`:`Only ${pct}% miss this — now you know.`;
+  const fb=document.getElementById('rqa-feedback');
+  fb.style.display='block';
+  fb.innerHTML=(correct?'✓ ':'✗ ')+btn.dataset.feedback+`<span class="rqa-social">${proof}</span>`;
+  fb.style.color=correct?'var(--success)':'var(--danger)';
+  if(correct){
+    addXP(20);showFXP('+20 XP',RS.W/2,RS.H*.4,'var(--cyan)');
+    RS.bossHp=Math.max(0,RS.bossHp-Math.round(RS.bossHpMax/RS.scTotal));
+    G[sc.dimension]=Math.min(100,(G[sc.dimension]||40)+15);
+    try{
+      const r=await fetch('/api/chapter-trial',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({playerId:G.playerId,chapterId:RS.chId,scenarioId:RS.scIds[RS.scIdx],correct:true,dimensionAffected:sc.dimension,decisionTimeMs:0})});
+      const d=await r.json();
+      if(d.ok){RS.bossHp=d.bossHp||RS.bossHp;G.trialsComplete=d.trialsComplete||G.trialsComplete;G.profileType=d.profileType||G.profileType;}
+    }catch(e){}
+  }else{
+    RS.hearts=Math.max(0,RS.hearts-1);
+    RS.wrongAnswers.push(RS.scIds[RS.scIdx]);
+    try{await fetch('/api/chapter-trial',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({playerId:G.playerId,chapterId:RS.chId,scenarioId:RS.scIds[RS.scIdx],correct:false,dimensionAffected:sc.dimension,decisionTimeMs:0})});}catch(e){}
+  }
+  // Boss beast unlock chance
+  if(correct&&Math.random()<.28){
+    const avail=Object.keys(BEASTS).filter(b=>!G.beastsUnlocked.includes(b));
+    if(avail.length){const nb=avail[Math.floor(Math.random()*avail.length)];G.beastsUnlocked.push(nb);setTimeout(()=>showToast('🎉 '+BEASTS[nb].n+' unlocked!'),700);}
+  }
+  updateRHUD();
+  document.getElementById('rqa-continue').style.display='block';
+}
+function closeRunnerQA(){
+  document.getElementById('runner-qa').classList.remove('on');
+  RS.qaActive=false;
+  RS.scIdx++;
+  if(RS.hearts<=0){endRC(false);return;}
+  if(RS.bossHp<=0||RS.scIdx>=RS.scTotal){endRC(true);return;}
+}
+function advRScene(){RS.scIdx++;if(RS.scIdx>=RS.scTotal)endRC(true);}
+
+// ─ DRAWING ─
+function drawFrame(){
+  const canvas=document.getElementById('runner-canvas');
+  const ctx=canvas.getContext('2d');
+  const {W,H,bgOff,bgB,bgS,lXs,frameCount}=RS;
+  // Sky
+  const skies={city:['#080818','#0c1028'],financial:['#070014','#0e0032'],suburbs:['#050d06','#091808'],family:['#050d06','#091808'],legacy:['#0e0600','#1a0e00']};
+  const sc=skies[RS.cfg.bg]||skies.city;
+  const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,sc[0]);sky.addColorStop(1,sc[1]);
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  // Stars
+  const t=frameCount*.018;
+  bgS.forEach(s=>{const a=s.a*(.7+.3*Math.sin(s.tw+t));ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();});
+  // Buildings with parallax
+  const {blds,gc,gY}=bgB;
+  blds.forEach(b=>{
+    const by=gY-b.bh+((bgOff*.28)%Math.max(b.bh,1));
+    ctx.fillStyle=b.color;ctx.fillRect(b.x,by,b.bw,b.bh+10);
+    ctx.fillStyle=b.wc;
+    b.wins.forEach(w=>{if(Math.random()>.97)return;ctx.fillRect(b.x+w.x,by+w.y,8,8);});
+  });
+  // Ground
+  ctx.fillStyle=gc;ctx.fillRect(0,gY,W,H-gY);
+  // Lane dividers
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;ctx.setLineDash([18,16]);
+  ctx.lineDashOffset=-(bgOff*2.2)%34;
+  [.345,.655].forEach(f=>{const x=Math.round(W*f);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,gY);ctx.stroke();});
+  ctx.setLineDash([]);
+  // Boss HP strip at top
+  const bpct=RS.bossHp/RS.bossHpMax;
+  ctx.fillStyle='rgba(255,0,110,.1)';ctx.fillRect(0,0,W,4);
+  ctx.fillStyle='#ff006e';ctx.fillRect(0,0,W*bpct,4);
+  // Pool
+  ctx.save();
+  RS.pool.forEach(obs=>{
+    if(!obs.active)return;
+    if(obs.type==='SCENARIO'){
+      const pulse=.07+.04*Math.sin(frameCount*.14);
+      ctx.fillStyle=`rgba(255,0,110,${pulse})`;ctx.fillRect(0,obs.y,W,obs.h);
+      ctx.strokeStyle=`rgba(255,0,110,${.45+.25*Math.sin(frameCount*.14)})`;ctx.lineWidth=2;ctx.strokeRect(0,obs.y,W,obs.h);
+      ctx.fillStyle='rgba(255,80,80,.88)';ctx.font="bold 10px 'Courier New'";ctx.textAlign='center';
+      ctx.fillText('⚡ FINANCIAL CHALLENGE — ANSWER TO PROCEED ⚡',W/2,obs.y+obs.h/2+4);
+    }else if(obs.type==='TRAP'){
+      const blink=frameCount%18<9;
+      ctx.fillStyle=blink?'rgba(255,0,110,.2)':'rgba(255,0,110,.07)';
+      ctx.strokeStyle=blink?'rgba(255,0,110,.8)':'rgba(255,0,110,.35)';ctx.lineWidth=1.5;
+      const bx=obs.x-obs.w/2,by=obs.y-obs.h/2;
+      ctx.beginPath();ctx.roundRect(bx,by,obs.w,obs.h,6);ctx.fill();ctx.stroke();
+      ctx.font='22px serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(obs.e,obs.x,obs.y+2);
+      ctx.font='6px monospace';ctx.fillStyle='rgba(255,120,120,.8)';ctx.fillText(obs.lbl.substring(0,12),obs.x,obs.y+20);
+    }else if(obs.type==='GOLD'){
+      const glow=.35+.25*Math.sin(frameCount*.12);
+      ctx.shadowColor='#ffd700';ctx.shadowBlur=10*glow;
+      ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(obs.x,obs.y,obs.r,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#c8a000';ctx.font='11px serif';ctx.textAlign='center';ctx.fillText('❖',obs.x,obs.y+4);
+      ctx.shadowBlur=0;
+    }else if(obs.type==='SHIELD'){
+      const glow=.3+.25*Math.sin(frameCount*.1);
+      ctx.shadowColor='#00bfff';ctx.shadowBlur=10*glow;
+      ctx.fillStyle='rgba(0,191,255,.25)';ctx.strokeStyle='#00bfff';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(obs.x,obs.y,obs.r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#00bfff';ctx.font='15px serif';ctx.textAlign='center';ctx.fillText('🛡',obs.x,obs.y+5);
+      ctx.shadowBlur=0;
+    }
+  });
+  ctx.restore();
+  ctx.textAlign='left';
+}
+
+// ─ PLAYER ANIMATIONS ─
+function hurtPC(){
+  const d=document.getElementById('player-char');
+  d.style.filter='saturate(5) brightness(2)';setTimeout(()=>{d.style.filter='';},420);
+}
+function jumpPC(){
+  if(RS&&RS.jumping)return;if(!RS)return;
+  RS.jumping=true;RS.jTimer=0;
+}
+function luPC(){
+  const d=document.getElementById('player-char');
+  const sz=90+Math.min((G.guardianLevel||1)-1,9)*4;
+  d.style.width=sz+'px';d.style.height=sz+'px';
+  d.style.transition='transform .25s ease';
+  d.style.transform='scale(1.6)';setTimeout(()=>{d.style.transform='scale(1)';},260);
+  setTimeout(()=>{d.style.transition='';},520);
+}
+
+// ─ XP + LEVEL ─
+function addXP(amount){
+  G.xp=(G.xp||0)+amount;
+  const oldLv=G.guardianLevel||1;
+  let newLv=1;
+  for(let i=XP_LEVELS.length-1;i>=0;i--)if(G.xp>=XP_LEVELS[i]){newLv=i+1;break;}
+  newLv=Math.min(10,newLv);
+  if(newLv>oldLv){G.guardianLevel=newLv;doLevelUp(newLv);}
+  updateRHUD();
+  // update worldmap XP too
+  const wmx=document.getElementById('wm-xp-fill');
+  if(wmx){const lv=(G.guardianLevel||1)-1;const xc=G.xp-(XP_LEVELS[lv]||0);const xn=(XP_LEVELS[lv+1]||1100)-(XP_LEVELS[lv]||0);wmx.style.width=Math.min(100,xc/xn*100)+'%';}
+}
+function doLevelUp(lv){
+  const f=document.getElementById('levelup-flash');
+  document.getElementById('lu-title').textContent='LEVEL UP! ⬆';
+  document.getElementById('lu-sub').textContent='Lv.'+lv+' '+(G.archetype||'GUARDIAN');
+  f.classList.add('on');flashRC('rgba(0,245,212,.18)');luPC();
+  setTimeout(()=>f.classList.remove('on'),1900);
+}
+
+// ─ HUD UPDATE ─
+function updateRHUD(){
+  if(!RS)return;
+  // Hearts
+  const hc=document.getElementById('r-hearts');hc.innerHTML='';
+  for(let i=0;i<5;i++){const h=document.createElement('span');h.className='r-heart'+(i>=RS.hearts?' lost':'');h.textContent='❤️';hc.appendChild(h);}
+  // Level + Age
+  document.getElementById('r-level-age').textContent='Lv.'+(G.guardianLevel||1)+' | Age '+RS.age;
+  // Chapter label
+  document.getElementById('r-chapter-lbl').textContent='Ch'+RS.chId+' · '+RS.cfg.stageName;
+  // XP bar
+  const lv=(G.guardianLevel||1)-1;
+  const xc=G.xp-(XP_LEVELS[lv]||0), xn=(XP_LEVELS[lv+1]||1100)-(XP_LEVELS[lv]||0);
+  document.getElementById('r-xp-fill').style.width=Math.min(100,xc/xn*100)+'%';
+  document.getElementById('r-xp-lbl').textContent=(G.xp||0)+' XP';
+  // Boss HP
+  document.getElementById('r-boss-hp-fill').style.width=(RS.bossHp/RS.bossHpMax*100)+'%';
+}
+
+// ─ INPUT ─
+function setupRInput(){
+  const canvas=document.getElementById('runner-canvas');
+  canvas.ontouchstart=e=>{e.preventDefault();RS.tStartX=e.touches[0].clientX;RS.tStartY=e.touches[0].clientY;};
+  canvas.ontouchend=e=>{
+    e.preventDefault();
+    if(!RS||RS.qaActive||!RS.running)return;
+    const dx=e.changedTouches[0].clientX-RS.tStartX, dy=e.changedTouches[0].clientY-RS.tStartY;
+    if(Math.abs(dy)>Math.abs(dx)&&dy<-45)jumpPC();
+    else if(Math.abs(dx)>38){RS.lane=dx<0?Math.max(0,RS.lane-1):Math.min(2,RS.lane+1);}
+  };
+  RS._kh=e=>{
+    if(!RS||RS.qaActive||!RS.running)return;
+    const now=Date.now();if(now-RS.lastKey<100)return;RS.lastKey=now;
+    if(e.key==='ArrowLeft')RS.lane=Math.max(0,RS.lane-1);
+    if(e.key==='ArrowRight')RS.lane=Math.min(2,RS.lane+1);
+    if(e.key==='ArrowUp'||e.key===' ')jumpPC();
+  };
+  document.addEventListener('keydown',RS._kh);
+}
+function cleanupRInput(){if(RS&&RS._kh){document.removeEventListener('keydown',RS._kh);RS._kh=null;}}
+
+// ─ CANVAS RESIZE ─
+function resizeRC(){
+  if(!RS)return;
+  const c=document.getElementById('runner-canvas');
+  c.width=c.offsetWidth;c.height=c.offsetHeight;
+  RS.W=c.width;RS.H=c.height;
+  RS.lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*RS.W));
+  RS.pY=Math.round(RS.H*RUNNER_CFG.PLAYER_Y_F);
+  RS.bgB=makeBgBuildings(RS.chId,RS.W,RS.H);
+}
+window.addEventListener('resize',()=>{if(RS&&RS.running)resizeRC();});
+
+// ─ END CHAPTER ─
+async function endRC(won){
+  RS.running=false;
+  if(RS.raf)cancelAnimationFrame(RS.raf);
+  cleanupRInput();
+  G.dodgeCount=(RS.dodgeCount||0);
+  if(won)addXP(50);
+  saveProgress();
+  // Server sync
+  const chId=RS.chId;
+  if(G.playerId){
+    try{
+      await fetch('/api/chapter-complete',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({playerId:G.playerId,chapterId:chId,won,dodgeCount:RS.dodgeCount,wrongAnswers:JSON.stringify(RS.wrongAnswers),ageReached:RS.age})});
+      const cr=await fetch('/api/chapters/'+G.playerId);
+      G.chapters=(await cr.json()).chapters||[];
+    }catch(e){}
+  }else{
+    const idx=G.chapters.findIndex(c=>c.chapter_id===chId);
+    if(idx!==-1)G.chapters[idx].status=won?'cleared':'failed';
+    if(won&&chId<5){
+      const ni=G.chapters.findIndex(c=>c.chapter_id===chId+1);
+      if(ni!==-1)G.chapters[ni].status='active';else G.chapters.push({chapter_id:chId+1,status:'active'});
+    }
+  }
+  if(won){showLifeStageBanner(chId,()=>showVictory(chId));}
+  else{showDefeat(chId);}
+}
+
+// ─ FX ─
+function flashRC(color){
+  const f=document.createElement('div');
+  f.style.cssText=`position:fixed;inset:0;background:${color};opacity:.28;pointer-events:none;z-index:25;animation:flashFade .42s ease-out forwards`;
+  const s=document.getElementById('s-runner');if(s)s.appendChild(f);
+  setTimeout(()=>f.remove(),520);
+}
+function shakeRC(){
+  const c=document.getElementById('runner-canvas');
+  c.style.animation='screenShake .42s ease';
+  setTimeout(()=>c.style.animation='',460);
+}
+function showFXP(text,x,y,color){
+  const el=document.createElement('div');el.className='float-xp';
+  el.style.cssText=`left:${x}px;top:${y}px;color:${color};`;
+  el.textContent=text;
+  const s=document.getElementById('s-runner');if(s)s.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+
+// =====================================================================
+// LIFE STAGE BANNER
+// =====================================================================
+function showLifeStageBanner(chId,cb){
+  const nextCfg=CHAPTER_RUN[chId+1];
+  if(!nextCfg){if(cb)cb();return;}
+  const b=document.getElementById('life-stage-banner');
+  document.getElementById('lsb-age').textContent='Age '+nextCfg.ageStart;
+  document.getElementById('lsb-entering').textContent='Entering '+nextCfg.stageName;
+  document.getElementById('lsb-motivation').textContent=nextCfg.motivation;
+  const la=document.getElementById('lsb-lottie');
+  const a=ARCHETYPES[G.archetype];
+  if(a&&la)loadLottie('lsb-lottie',a.lottieUrl,a.emoji,true);
+  b.classList.add('on');
+  setTimeout(()=>{b.classList.remove('on');if(cb)setTimeout(cb,500);},2600);
+}
+
+// =====================================================================
+// SWIPE TUTORIAL
+// =====================================================================
+const STUT_STEPS=[
+  {i:'👆',t:'SWIPE LEFT / RIGHT',d:'Change lanes to dodge wrong financial moves. Stay in the right lane.'},
+  {i:'☝️',t:'SWIPE UP TO JUMP',d:'Jump over obstacles when you need extra time. Timing is everything.'},
+  {i:'⚡',t:'BOSS CHALLENGES',d:'Full-width pillars can\'t be dodged. Answer correctly to deal damage to the boss.'}
+];
+let tutStep=0,tutTO=null;
+function showSwipeTut(cb){
+  RS._tutCb=cb; tutStep=0;
+  document.getElementById('swipe-tutorial').classList.add('on');
+  document.getElementById('swipe-tutorial').onclick=()=>{clearTimeout(tutTO);advTut();};
+  renderTutStep(0);
+}
+function renderTutStep(i){
+  const s=STUT_STEPS[i];
+  document.getElementById('stut-icon').textContent=s.i;
+  document.getElementById('stut-title').textContent=s.t;
+  document.getElementById('stut-desc').textContent=s.d;
+  document.querySelectorAll('.stut-dot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  tutTO=setTimeout(advTut,1900);
+}
+function advTut(){tutStep++;if(tutStep>=STUT_STEPS.length){document.getElementById('swipe-tutorial').classList.remove('on');document.getElementById('swipe-tutorial').onclick=null;localStorage.setItem('aegis_tutorial_done','1');if(RS&&RS._tutCb)RS._tutCb();}else renderTutStep(tutStep);}
+function skipTutorial(){clearTimeout(tutTO);tutStep=STUT_STEPS.length;advTut();}
+
+// =====================================================================
+// SAVE / LOAD PROGRESS (Improvement #9)
+// =====================================================================
+function saveProgress(){
+  localStorage.setItem('aegis_save',JSON.stringify({
+    v:3,playerId:G.playerId,petName:G.petName,archetype:G.archetype,playerName:G.playerName,
+    vitality:G.vitality,stability:G.stability,resilience:G.resilience,bond:G.bond,legacy:G.legacy,
+    xp:G.xp,guardianLevel:G.guardianLevel,trialsComplete:G.trialsComplete,evolutionStage:G.evolutionStage,
+    beastsUnlocked:G.beastsUnlocked,scenariosDone:G.scenariosDone,profileType:G.profileType,
+    chapters:G.chapters,dodgeCount:G.dodgeCount||0,leadSubmitted:G.leadSubmitted
+  }));
+}
+function loadSave(){
+  try{
+    const raw=localStorage.getItem('aegis_save');if(!raw)return false;
+    const s=JSON.parse(raw);if(!s||!s.petName)return false;
+    G.petName=s.petName;G.archetype=s.archetype||'VISIONARY';G.playerName=s.playerName||'';
+    G.vitality=s.vitality||40;G.stability=s.stability||40;G.resilience=s.resilience||40;
+    G.bond=s.bond||40;G.legacy=s.legacy||40;G.xp=s.xp||0;G.guardianLevel=s.guardianLevel||1;
+    G.trialsComplete=s.trialsComplete||0;G.evolutionStage=s.evolutionStage||1;
+    G.beastsUnlocked=s.beastsUnlocked||[];G.scenariosDone=s.scenariosDone||[];
+    G.profileType=s.profileType||'UNENGAGED';G.chapters=s.chapters||[];
+    G.dodgeCount=s.dodgeCount||0;G.leadSubmitted=s.leadSubmitted||false;
+    if(s.playerId&&!G.playerId)G.playerId=s.playerId;
+    return true;
+  }catch(e){return false;}
+}
+function showContinueScreen(){
+  const a=ARCHETYPES[G.archetype]||ARCHETYPES.VISIONARY;
+  document.getElementById('continue-pet-emoji').textContent=a.emoji;
+  document.getElementById('continue-pet-name').textContent=G.petName;
+  const cl=G.chapters.filter(c=>c.status==='cleared').length;
+  document.getElementById('continue-progress').textContent=cl+' / 5 chapters · Lv.'+(G.guardianLevel||1);
+  showScreen('s-continue');
+}
+function continueGame(){renderWorldMap();showScreen('s-worldmap');}
+function newGame(){
+  localStorage.removeItem('aegis_save');localStorage.removeItem('aegis_player_id');
+  Object.assign(G,{playerId:'',petName:'',archetype:'VISIONARY',playerName:'',playerPhone:'',
+    vitality:40,stability:40,resilience:40,bond:40,legacy:40,xp:0,guardianLevel:1,
+    trialsComplete:0,evolutionStage:1,beastsUnlocked:[],scenariosDone:[],profileType:'UNENGAGED',
+    chapters:[],dodgeCount:0,leadSubmitted:false,refCode:'',gameComplete:false});
+  startCinematic();
+}
+
+// =====================================================================
+// DAILY CHALLENGE (Improvement #5)
+// =====================================================================
+function showDailyChallenge(){
+  const today=new Date().toISOString().slice(0,10);
+  const lastDone=localStorage.getItem('aegis_daily_date');
+  const streak=parseInt(localStorage.getItem('aegis_daily_streak')||'0');
+  document.getElementById('daily-streak-badge').textContent='🔥 '+streak+' day streak';
+  document.getElementById('daily-date').textContent='DAILY CHALLENGE · '+today;
+  if(lastDone===today){
+    document.getElementById('daily-complete-msg').style.display='block';
+    document.getElementById('daily-qa-wrap').style.display='none';
+    showScreen('s-daily');return;
+  }
+  const allIds=Object.keys(SCENARIOS).map(Number);
+  const seed=parseInt(today.replace(/-/g,''))%allIds.length;
+  const scId=allIds[seed],sc=SCENARIOS[scId];
+  document.getElementById('daily-complete-msg').style.display='none';
+  document.getElementById('daily-qa-wrap').style.display='block';
+  document.getElementById('daily-boss-line').textContent='"'+sc.bossLine+'"';
+  document.getElementById('daily-situation').textContent=sc.situation;
+  document.getElementById('daily-question').textContent=sc.question;
+  const cc=document.getElementById('daily-choices');cc.innerHTML='';
+  [...sc.choices].sort(()=>Math.random()-.5).forEach(ch=>{
+    const btn=document.createElement('button');btn.className='battle-choice';
+    btn.dataset.correct=ch.correct;btn.dataset.feedback=ch.feedback;
+    btn.innerHTML=`<span class="choice-label">${ch.id}</span>${ch.text}`;
+    btn.onclick=()=>submitDaily(btn,today,streak);
+    cc.appendChild(btn);
+  });
+  document.getElementById('daily-feedback').style.display='none';
+  document.getElementById('daily-continue-btn').style.display='none';
+  showScreen('s-daily');
+}
+function submitDaily(btn,today,streak){
+  document.querySelectorAll('#daily-choices .battle-choice').forEach(b=>{b.onclick=null;b.classList.add('disabled');});
+  const correct=btn.dataset.correct==='true';
+  btn.classList.add(correct?'correct':'wrong');
+  if(!correct)document.querySelectorAll('#daily-choices .battle-choice').forEach(b=>{if(b.dataset.correct==='true')b.classList.add('correct');});
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const last=localStorage.getItem('aegis_daily_date');
+  let ns=correct?(last===yesterday?streak+1:1):0;
+  localStorage.setItem('aegis_daily_date',today);localStorage.setItem('aegis_daily_streak',String(ns));
+  if(correct){addXP(10);showToast('🔥 +10 XP! Streak: '+ns+' days');}
+  else showToast('Streak reset. Learn from this one.');
+  document.getElementById('daily-feedback').style.display='block';
+  document.getElementById('daily-feedback').textContent=(correct?'✓ ':'✗ ')+btn.dataset.feedback;
+  document.getElementById('daily-feedback').style.color=correct?'var(--success)':'var(--danger)';
+  document.getElementById('daily-continue-btn').style.display='block';
+  document.getElementById('daily-streak-badge').textContent='🔥 '+ns+' day streak';
+}
+
+// =====================================================================
+// BIGGEST GAP CARD (Improvement #6)
+// =====================================================================
+let _gapShown=false;
+function showBiggestGap(cb){
+  const dims={vitality:G.vitality||40,stability:G.stability||40,resilience:G.resilience||40,bond:G.bond||40,legacy:G.legacy||40};
+  const [wk,wv]=Object.entries(dims).sort((a,b)=>a[1]-b[1])[0];
+  const fact=GAP_FACTS[wk];
+  const labels={vitality:'HEALTH SHIELD',stability:'INCOME STABILITY',resilience:'CRITICAL ILLNESS',bond:'FAMILY PROTECTION',legacy:'LEGACY PLANNING'};
+  document.getElementById('bgap-dim').textContent='⚠ YOUR WEAKEST: '+labels[wk];
+  document.getElementById('bgap-stat').textContent=fact.stat;
+  document.getElementById('bgap-label').textContent=fact.label;
+  document.getElementById('bgap-bar-fill').style.width=wv+'%';
+  document.getElementById('bgap-score').textContent=wv+'%';
+  const ov=document.getElementById('biggest-gap-overlay');
+  ov.classList.add('on');ov._cb=cb;
+}
+function closeBiggestGap(){
+  const ov=document.getElementById('biggest-gap-overlay');ov.classList.remove('on');
+  if(ov._cb){ov._cb();ov._cb=null;}
+}
+
+// =====================================================================
+// SHAREABLE RESULT CARD (Improvement #1)
+// =====================================================================
+function openShareOverlay(){
+  const a=ARCHETYPES[G.archetype]||ARCHETYPES.VISIONARY;
+  document.getElementById('sp-emoji').textContent=a.emoji;
+  document.getElementById('sp-name').textContent=(G.petName||'Guardian')+' · Lv.'+(G.guardianLevel||1)+' '+a.name;
+  const ph=getPhase({vitality:G.vitality,stability:G.stability,resilience:G.resilience,bond:G.bond,legacy:G.legacy});
+  document.getElementById('sp-sub').textContent=ph.name;
+  document.getElementById('share-overlay').classList.add('on');
+}
+function generateShareCard(){
+  const cv=document.createElement('canvas');cv.width=600;cv.height=900;
+  const ctx=cv.getContext('2d');
+  const g=ctx.createLinearGradient(0,0,600,900);g.addColorStop(0,'#0d0d1f');g.addColorStop(1,'#070718');
+  ctx.fillStyle=g;ctx.fillRect(0,0,600,900);
+  ctx.strokeStyle='rgba(0,245,212,.06)';ctx.lineWidth=1;
+  for(let x=0;x<600;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,900);ctx.stroke();}
+  for(let y=0;y<900;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(600,y);ctx.stroke();}
+  const gl=ctx.createRadialGradient(300,280,0,300,280,380);gl.addColorStop(0,'rgba(123,47,255,.14)');gl.addColorStop(1,'transparent');
+  ctx.fillStyle=gl;ctx.fillRect(0,0,600,900);
+  const a=ARCHETYPES[G.archetype]||ARCHETYPES.VISIONARY;
+  ctx.fillStyle='#00f5d4';ctx.font="bold 18px 'Courier New'";ctx.textAlign='center';ctx.fillText('AEGIS PET',300,68);
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.font="12px 'Courier New'";ctx.fillText('CHRONICLES OF THE GUARDIAN REALM',300,90);
+  ctx.font='90px serif';ctx.fillText(a.emoji,300,210);
+  ctx.font="bold 26px 'Courier New'";ctx.fillStyle='#fff';ctx.fillText(G.petName||'Guardian',300,270);
+  ctx.font="15px 'Courier New'";ctx.fillStyle=a.color;ctx.fillText('Lv.'+(G.guardianLevel||1)+' · '+a.name,300,300);
+  const chId=Math.min(5,G.chapters.filter(c=>c.status==='cleared').length+1);
+  const age=(CHAPTER_RUN[chId]||CHAPTER_RUN[1]).ageStart;
+  ctx.font="13px 'Courier New'";ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillText('Age '+age+' · '+(CHAPTER_RUN[chId]||CHAPTER_RUN[1]).stageName,300,328);
+  ctx.strokeStyle='rgba(0,245,212,.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,354);ctx.lineTo(540,354);ctx.stroke();
+  const ph=getPhase({vitality:G.vitality,stability:G.stability,resilience:G.resilience,bond:G.bond,legacy:G.legacy});
+  ctx.font="11px 'Courier New'";ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillText('FINANCIAL PHASE',300,386);
+  ctx.font="bold 20px 'Courier New'";ctx.fillStyle=ph.color;ctx.fillText(ph.name,300,414);
+  const dims=[{k:'vitality',l:'HEALTH'},{k:'stability',l:'INCOME'},{k:'resilience',l:'CI/ACC'},{k:'bond',l:'FAMILY'},{k:'legacy',l:'LEGACY'}];
+  let by=458;
+  dims.forEach(d=>{
+    const val=G[d.k]||40;const col=val>=70?'#00f5d4':val>=50?'#ffb703':'#ff006e';
+    ctx.font="9px 'Courier New'";ctx.fillStyle='rgba(255,255,255,.35)';ctx.textAlign='left';ctx.fillText(d.l,80,by-2);
+    ctx.fillStyle='rgba(255,255,255,.07)';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(80,by,440,10,3);else ctx.rect(80,by,440,10);ctx.fill();
+    ctx.fillStyle=col;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(80,by,440*(val/100),10,3);else ctx.rect(80,by,440*(val/100),10);ctx.fill();
+    ctx.fillStyle=col;ctx.font="9px 'Courier New'";ctx.textAlign='right';ctx.fillText(val+'%',536,by+9);
+    by+=36;
+  });
+  ctx.strokeStyle='rgba(0,245,212,.2)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,765);ctx.lineTo(540,765);ctx.stroke();
+  ctx.font="10px 'Courier New'";ctx.fillStyle='rgba(255,255,255,.25)';ctx.textAlign='center';ctx.fillText('aegis-pet-production.up.railway.app',300,798);
+  ctx.font="9px 'Courier New'";ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillText('Your financial journey, gamified.',300,820);
+  return cv;
+}
+function shareResultCard(){
+  const cv=generateShareCard();
+  cv.toBlob(async blob=>{
+    const file=new File([blob],'aegis-result.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:'My AEGIS PET Result',text:'I just leveled through life on AEGIS PET! 🐾'});return;}catch(e){}
+    }
+    const link=document.createElement('a');link.download='aegis-result.png';link.href=cv.toDataURL('image/png');link.click();
+    showToast('Result card saved!');
+  });
+}
+
+// =====================================================================
+// WHATSAPP PRE-FILL (Improvement #2)
+// =====================================================================
+function buildWAUrl(){
+  const ph=getPhase({vitality:G.vitality,stability:G.stability,resilience:G.resilience,bond:G.bond,legacy:G.legacy});
+  const dims={vitality:G.vitality||40,stability:G.stability||40,resilience:G.resilience||40,bond:G.bond||40,legacy:G.legacy||40};
+  const [wk,wv]=Object.entries(dims).sort((a,b)=>a[1]-b[1])[0];
+  const dlbls={vitality:'Health',stability:'Income',resilience:'Critical Illness',bond:'Family',legacy:'Legacy'};
+  const failChs=G.chapters.filter(c=>c.status==='failed').map(c=>'Ch'+c.chapter_id).join(' & ')||'none';
+  const dodge=(G.dodgeCount||0)>8?' (I tend to avoid financial decisions — be direct with me)':'';
+  const lv=G.guardianLevel||1;
+  const archName=(ARCHETYPES[G.archetype]||{name:'GUARDIAN'}).name.replace('THE ','');
+  const chId=Math.min(5,G.chapters.filter(c=>c.status==='cleared').length+1);
+  const age=(CHAPTER_RUN[chId]||CHAPTER_RUN[1]).ageStart;
+  const msg=encodeURIComponent(
+    `Hi Dylan! I'm a Lv.${lv} ${archName} (Age ~${age}).
+
+`+
+    `📊 My Phase: ${ph.name}
+`+
+    `⚠️ Weakest: ${dlbls[wk]} (${wv}%)
+`+
+    `📖 Struggled with: ${failChs}
+`+
+    `🐾 My Guardian: ${G.petName||'Unknown'}${dodge}
+
+`+
+    `I'd love that 20-minute conversation. When are you free?`
+  );
+  return `https://wa.me/6584847001?text=${msg}`;
+}
+
+// =====================================================================
+// SHARE-TO-UNLOCK TAROT (Improvement #12)
+// =====================================================================
+function lockTarotForShare(){
+  document.getElementById('tarot-lock-wrap').classList.add('on');
+  document.getElementById('tarot-continue-btn').style.display='none';
+}
+async function shareToUnlockTarot(){
+  const ph=getPhase({vitality:G.vitality,stability:G.stability,resilience:G.resilience,bond:G.bond,legacy:G.legacy});
+  const text=`I discovered I'm in "${ph.name}" phase on AEGIS PET. My spirit animal just leveled through life. 🐾 Find your financial pattern: https://aegis-pet-production.up.railway.app`;
+  if(navigator.share){
+    try{await navigator.share({title:'My Financial Pattern',text});unlockTarot();return;}catch(e){if(e.name!=='AbortError')fallbackUnlock(text);}
+  }else fallbackUnlock(text);
+}
+function fallbackUnlock(text){
+  navigator.clipboard?.writeText(text).then(()=>{showToast('Link copied! Unlocking in 3s…');setTimeout(unlockTarot,3000);}).catch(()=>unlockTarot());
+}
+function unlockTarot(){
+  document.getElementById('tarot-lock-wrap').classList.remove('on');
+  document.getElementById('tarot-continue-btn').style.display='block';
+  localStorage.setItem('aegis_tarot_unlocked','1');
+  showToast('🔓 Archetype unlocked!');
+}
+
+// =====================================================================
+// OVERRIDES — hook new systems into existing functions
+// =====================================================================
+
+// Route battle -> runner
+function startBattle(){ launchRunner(pendingChapterId); }
+
+// Enhanced doWhatsApp
+function doWhatsApp(){ window.open(buildWAUrl(),'_blank'); }
+
+// Show biggest gap before WA CTA (called from pattern screen button)
+function doWAWithGap(){
+  if(!_gapShown){
+    _gapShown=true;
+    showBiggestGap(()=>window.open(buildWAUrl(),'_blank'));
+  }else window.open(buildWAUrl(),'_blank');
+}
+
+// =====================================================================
+// UPDATE INIT — check save on load
+// =====================================================================
+(function patchInit(){
+  const orig=window.addEventListener;
+  // We'll override the load handler by re-checking after DOMContentLoaded
+  document.addEventListener('DOMContentLoaded',()=>{
+    // override pattern WA button to use biggest gap flow
+    const patBtn=document.querySelector('#pc-cta .p-btn-primary');
+    if(patBtn)patBtn.onclick=doWAWithGap;
+  });
+})();
+
+// Patch window load to check saved progress
+const _origLoad=window.onload;
+window.addEventListener('load',function patchedLoad(){
+  // already handled by existing load listener above; just add save check logic
+  // We monkey-patch by overriding localStorage check at page load
+},false);
+// Actual save check is injected into existing load handler via module scope:
+(function(){
+  const origInit=window.addEventListener.bind(window);
+  // Check before cinematic: if no server session but localStorage save exists
+  // We do this by running after the existing 'load' handler which already
+  // calls startCinematic() as fallback. We race with a small delay:
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      // Only run if we ended up at cinematic (meaning no server session)
+      const cinActive=document.getElementById('s-cinematic')?.classList.contains('active');
+      if(cinActive&&loadSave()&&G.petName){
+        // stop cinematic, show continue
+        const cn=document.getElementById('s-cinematic');
+        if(cn)cn.classList.remove('active');
+        showContinueScreen();
+      }
+    },200);
+  });
+})();
 
 </script>
 </body>
