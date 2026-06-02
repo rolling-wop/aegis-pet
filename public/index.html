@@ -2591,7 +2591,7 @@ let RS=null; // runner state singleton
 function initRS(chId){
   const ch=CHAPTERS[chId], cfg=CHAPTER_RUN[chId];
   const canvas=document.getElementById('runner-canvas');
-  const W=canvas.width=canvas.offsetWidth, H=canvas.height=canvas.offsetHeight;
+  const W=canvas.width=canvas.offsetWidth||window.innerWidth, H=canvas.height=canvas.offsetHeight||window.innerHeight;
   const lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*W));
   const cp=G.chapters.find(c=>c.chapter_id===chId)||{};
   RS={
@@ -2674,7 +2674,7 @@ function launchRunner(chId){
     resizeRC();
     if(!localStorage.getItem('aegis_tutorial_done'))showSwipeTut(startRL);
     else startRL();
-  },80);
+  },150);
 }
 function startRL(){ RS.running=true; RS.raf=requestAnimationFrame(runnerLoop); }
 
@@ -2972,7 +2972,7 @@ function cleanupRInput(){if(RS&&RS._kh){document.removeEventListener('keydown',R
 function resizeRC(){
   if(!RS)return;
   const c=document.getElementById('runner-canvas');
-  c.width=c.offsetWidth;c.height=c.offsetHeight;
+  c.width=c.offsetWidth||window.innerWidth;c.height=c.offsetHeight||window.innerHeight;
   RS.W=c.width;RS.H=c.height;
   RS.lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*RS.W));
   RS.pY=Math.round(RS.H*RUNNER_CFG.PLAYER_Y_F);
