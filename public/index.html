@@ -2552,7 +2552,7 @@ window.showScreen=function(id){
   if(id==='s-profile') renderProfile();
   if(id==='s-runner'){
     const c=document.getElementById('runner-canvas');
-    if(c){c.width=c.offsetWidth||window.innerWidth;c.height=c.offsetHeight||window.innerHeight;}
+    if(c){c.width=window.innerWidth;c.height=window.innerHeight;}
   }
 };
 
@@ -2591,7 +2591,7 @@ let RS=null; // runner state singleton
 function initRS(chId){
   const ch=CHAPTERS[chId], cfg=CHAPTER_RUN[chId];
   const canvas=document.getElementById('runner-canvas');
-  const W=canvas.width=canvas.offsetWidth||window.innerWidth, H=canvas.height=canvas.offsetHeight||window.innerHeight;
+  const W=canvas.width=window.innerWidth, H=canvas.height=window.innerHeight;
   const lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*W));
   const cp=G.chapters.find(c=>c.chapter_id===chId)||{};
   RS={
@@ -2972,7 +2972,7 @@ function cleanupRInput(){if(RS&&RS._kh){document.removeEventListener('keydown',R
 function resizeRC(){
   if(!RS)return;
   const c=document.getElementById('runner-canvas');
-  c.width=c.offsetWidth||window.innerWidth;c.height=c.offsetHeight||window.innerHeight;
+  c.width=window.innerWidth;c.height=window.innerHeight;
   RS.W=c.width;RS.H=c.height;
   RS.lXs=RUNNER_CFG.LANE_F.map(f=>Math.round(f*RS.W));
   RS.pY=Math.round(RS.H*RUNNER_CFG.PLAYER_Y_F);
